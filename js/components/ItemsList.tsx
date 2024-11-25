@@ -17,7 +17,7 @@ const ItemsList: React.FC<ItemsListProps> = ({
   selectedItemId,
 }) => {
   return (
-    <div className="items-list h-full overflow-auto">
+    <div className="items-list flex flex-col overflow-auto">
       {items.map((item) => (
         <button
           key={item.id}

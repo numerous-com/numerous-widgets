@@ -230,22 +230,14 @@
   .dropdown-item:hover {
     background-color: #f3f4f6;
   }
-  
-  /* Constrain the project list and project details */
-  .project-browser-flex {
-    display: flex;
-    gap: 1.5rem;
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
-  }
+
   
   .project-list-container {
     width: 300px;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: auto;
   }
   
   .project-details-container {
@@ -253,7 +245,7 @@
     min-width: 0;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: auto;
   }
   
   .scrollable-content {

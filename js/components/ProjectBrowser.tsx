@@ -87,8 +87,8 @@ export const ProjectBrowser: React.FC<ProjectBrowserProps> = ({
           </button>
         </div>
         
-        <div className="modal-content">
-          <div className="project-browser-flex">
+        
+          <div className="flex">
             <div className="project-list-container">
               <ProjectList
                 projects={projects}
@@ -112,7 +112,7 @@ export const ProjectBrowser: React.FC<ProjectBrowserProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    
   );
 };
 
