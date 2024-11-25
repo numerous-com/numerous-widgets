@@ -1,0 +1,11 @@
+.venv
+dist
+.DS_Store
+
+# Python
+__pycache__
+.ipynb_checkpoints
+
+src/widget/static
+src/collections
+node_modules
