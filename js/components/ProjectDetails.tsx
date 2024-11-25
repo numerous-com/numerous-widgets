@@ -1,16 +1,28 @@
 import React, { useState, useEffect } from 'react';
+import { ScenarioList } from './ScenarioList';
 
 interface ProjectDetailsProps {
   project: {
+    id: string;
     name: string;
     description: string;
   };
+  scenarios: {
+    id: string;
+    name: string;
+    projectId: string;
+  }[];
+  selectedScenarioId: string | null;
+  onSelectScenario: (scenarioId: string | null) => void;
   onClose: () => void;
   onSave: (name: string, description: string) => void;
 }
 
 export const ProjectDetails: React.FC<ProjectDetailsProps> = ({
   project,
+  scenarios,
+  selectedScenarioId,
+  onSelectScenario,
   onClose,
   onSave,
 }) => {
@@ -71,6 +83,13 @@ export const ProjectDetails: React.FC<ProjectDetailsProps> = ({
           </button>
         </div>
       </form>
+      
+      <ScenarioList
+        scenarios={scenarios}
+        projectId={project.id}
+        onSelectScenario={onSelectScenario}
+        selectedScenarioId={selectedScenarioId}
+      />
     </div>
   );
 };

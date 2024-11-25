@@ -67,21 +67,15 @@ export const ProjectBrowser: React.FC<ProjectBrowserProps> = ({ projects, scenar
             onSelectProject={handleSelectProject}
             selectedProjectId={selectedProjectId ?? undefined}
           />
-          {selectedProjectId && (
-            <ScenarioList
-              scenarios={projectScenarios}
-              projectId={selectedProjectId}
-              onSelectScenario={onSelectScenario}
-              selectedScenarioId={selectedScenarioId ?? undefined}
-            />
-          )}
         </div>
                 
         {selectedProject && (
           <div className="flex-1">
             <ProjectDetails
               project={selectedProject}
-              isOpen={true}
+              scenarios={projectScenarios}
+              selectedScenarioId={selectedScenarioId}
+              onSelectScenario={onSelectScenario}
               onClose={() => handleSelectProject(null)}
               onSave={handleSave}
             />
