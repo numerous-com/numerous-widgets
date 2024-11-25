@@ -1,7 +1,6 @@
 import React from 'react';
 import { ProjectList } from './ProjectList';
 import { ProjectDetails } from './ProjectDetails';
-import { ScenarioList } from './ScenarioList';
 
 interface Project {
   id: string;
@@ -16,6 +15,8 @@ interface Scenario {
 }
 
 interface ProjectBrowserProps {
+  isOpen: boolean;
+  onClose: () => void;
   projects: Project[];
   scenarios: Scenario[];
   onUpdateProject: (projectId: string, name: string, description: string) => void;
@@ -23,10 +24,21 @@ interface ProjectBrowserProps {
   onSelectScenario: (scenarioId: string | null) => void;
   selectedProjectId: string | null;
   selectedScenarioId: string | null;
-  onClose: () => void;
 }
 
-export const ProjectBrowser: React.FC<ProjectBrowserProps> = ({ projects, scenarios, onUpdateProject, onSelectProject, onSelectScenario, selectedProjectId, selectedScenarioId, onClose }) => {
+export const ProjectBrowser: React.FC<ProjectBrowserProps> = ({
+  isOpen,
+  onClose,
+  projects,
+  scenarios,
+  onUpdateProject,
+  onSelectProject,
+  onSelectScenario,
+  selectedProjectId,
+  selectedScenarioId,
+}) => {
+  if (!isOpen) return null;
+
   // Store the initial project and scenario IDs
   const initialProjectId = React.useRef(selectedProjectId);
   const initialScenarioId = React.useRef(selectedScenarioId);
@@ -57,30 +69,48 @@ export const ProjectBrowser: React.FC<ProjectBrowserProps> = ({ projects, scenar
     }
   };
 
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold mb-4">Project Browser</h1>
-      <div className="flex gap-4 h-full">
-        <div className="w-1/3 min-w-[250px]">
-          <ProjectList
-            projects={projects}
-            onSelectProject={handleSelectProject}
-            selectedProjectId={selectedProjectId ?? undefined}
-          />
+    <div className="modal-overlay" onClick={handleOverlayClick}>
+      <div className="modal-container">
+        <div className="modal-header">
+          <h1 className="text-2xl font-bold">Project Browser</h1>
+          <button className="modal-close-button" onClick={onClose}>
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
-                
-        {selectedProject && (
-          <div className="flex-1">
-            <ProjectDetails
-              project={selectedProject}
-              scenarios={projectScenarios}
-              selectedScenarioId={selectedScenarioId}
-              onSelectScenario={onSelectScenario}
-              onClose={() => handleSelectProject(null)}
-              onSave={handleSave}
-            />
+        
+        <div className="modal-content">
+          <div className="project-browser-flex">
+            <div className="project-list-container">
+              <ProjectList
+                projects={projects}
+                onSelectProject={handleSelectProject}
+                selectedProjectId={selectedProjectId ?? undefined}
+              />
+            </div>
+            
+            {selectedProject && (
+              <div className="project-details-container">
+                <ProjectDetails
+                  project={selectedProject}
+                  scenarios={projectScenarios}
+                  selectedScenarioId={selectedScenarioId}
+                  onSelectScenario={onSelectScenario}
+                  onClose={() => handleSelectProject(null)}
+                  onSave={handleSave}
+                />
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

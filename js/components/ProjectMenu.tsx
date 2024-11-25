@@ -1,6 +1,5 @@
 import React from 'react';
-import { ProjectModal } from './ProjectModal';
-
+import { ProjectBrowser } from './ProjectBrowser';
 interface Project {
   id: string;
   name: string;
@@ -114,7 +113,7 @@ export const ProjectMenu: React.FC<ProjectMenuProps> = ({
       )}
 
       {isModalOpen && (
-        <ProjectModal
+        <ProjectBrowser
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           projects={projects}

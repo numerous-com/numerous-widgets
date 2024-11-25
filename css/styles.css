@@ -139,19 +139,23 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 50;
+    z-index: 1000;
   }
   
   .modal-container {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1rem;
+    max-height: 90vh;
+    height: auto;
+    width: 90%;
+    max-width: 1200px;
     background-color: white;
     border-radius: 8px;
     border: 1px solid #ddd;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-    width: 90%;
-    max-width: 1000px;
-    height: 80vh;
     position: relative;
-    padding: 1.5rem;
   }
   
   .modal-close-button {
@@ -170,8 +174,16 @@
   }
   
   .modal-content {
-    height: calc(100% - 2rem);
-    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
   }
   
   /* List item selection styles */
@@ -217,4 +229,44 @@
   
   .dropdown-item:hover {
     background-color: #f3f4f6;
+  }
+  
+  /* Constrain the project list and project details */
+  .project-browser-flex {
+    display: flex;
+    gap: 1.5rem;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+  
+  .project-list-container {
+    width: 300px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  .project-details-container {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  .scrollable-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+  
+  /* Ensure ItemsList takes full width and height */
+  .items-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    border: 1px solid #eaeaea;
+    border-radius: 6px;
   }

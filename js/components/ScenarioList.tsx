@@ -1,4 +1,5 @@
 import React from 'react';
+import ItemsList from './ItemsList'; // Import the new ItemsList component
 
 interface Scenario {
   id: string;
@@ -27,21 +28,11 @@ export const ScenarioList: React.FC<ScenarioListProps> = ({
     <div className="mt-4">
       <h3 className="text-md font-semibold mb-2">Scenarios</h3>
       <div className="border rounded" role="listbox">
-        {projectScenarios.map((scenario) => (
-          <button
-            key={scenario.id}
-            className={`w-full text-left p-2 hover:bg-gray-50 ${
-              selectedScenarioId === scenario.id 
-                ? 'bg-blue-100 border-l-4 border-blue-500' 
-                : ''
-            }`}
-            onClick={() => onSelectScenario?.(scenario.id)}
-            aria-selected={selectedScenarioId === scenario.id}
-            role="option"
-          >
-            {scenario.name}
-          </button>
-        ))}
+        <ItemsList 
+          items={projectScenarios} 
+          onSelectItem={onSelectScenario} 
+          selectedItemId={selectedScenarioId} 
+        />
       </div>
     </div>
   );
