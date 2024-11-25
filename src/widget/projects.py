@@ -157,11 +157,11 @@ if __name__ == "__main__":
     # Save everything
     save_project(project1)
     save_scenario(project1, scenario1)
-    save_document(project1, scenario1, doc1)
+    save_document(project1, scenario1, "doc1", doc1)
     
     save_scenario(project1, scenario2)
-    save_document(project1, scenario2, doc1)
-    save_document(project1, scenario2, doc2)
+    save_document(project1, scenario2, "doc1", doc1)
+    save_document(project1, scenario2, "doc2", doc2)
 
     # Create and save a second project
     project2 = Project(
