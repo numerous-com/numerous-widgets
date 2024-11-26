@@ -4,7 +4,7 @@ from typing import Dict, Union
 from .config import get_widget_paths
 
 # Get environment-appropriate paths
-ESM, CSS = get_widget_paths("widgets/NumberInputWidget")
+ESM, CSS = get_widget_paths("NumberInputWidget")
 
 class NumberWidget(anywidget.AnyWidget):
     # Define traitlets for the widget properties

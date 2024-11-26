@@ -12,8 +12,8 @@ def __():
 
 @app.cell
 def __():
-    from widgets import ProjectsMenuWidget, ScenarioInputWidget
-    return ProjectsMenuWidget, ScenarioInputWidget
+    from widgets import ProjectsMenuWidget
+    return (ProjectsMenuWidget,)
 
 
 @app.cell
