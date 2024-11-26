@@ -18,7 +18,6 @@ const App = () => {
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [selectedScenarioId, setSelectedScenarioId] = useState<string | null>(null);
   const [changed, setChanged] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const selectedProject = projects.find(p => p.id === selectedProjectId);
   const selectedScenario = scenarios.find(s => s.id === selectedScenarioId);
@@ -51,6 +50,8 @@ const App = () => {
         onSave={handleSave}
         changed={changed}
         hasSelection={!!selectedProjectId}
+        isModalOpen={isModalOpen}
+        onCloseModal={() => setIsModalOpen(false)}
       />
     </div>
   );
