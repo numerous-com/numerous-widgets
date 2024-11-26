@@ -1,49 +1,38 @@
 # widget
 
-## Installation
+## Installation of Python Package
 
 ```sh
-pip install widget
-```
-
-or with [uv](https://github.com/astral-sh/uv):
-
-```sh
-uv add widget
+pip install widgets
 ```
 
 ## Development
 
-We recommend using [uv](https://github.com/astral-sh/uv) for development.
-It will automatically manage virtual environments and dependencies for you.
+To install the development dependencies, run:
 
 ```sh
-uv run jupyter lab example.ipynb
-```
-
-Alternatively, create and manage your own virtual environment:
-
-```sh
-python -m venv .venv
-source .venv/bin/activate
 pip install -e ".[dev]"
-jupyter lab example.ipynb
 ```
 
-The widget front-end code bundles it's JavaScript dependencies. After setting up Python,
-make sure to install these dependencies locally:
+To develop the JavaScript code, run:
 
 ```sh
 npm install
 ```
 
-While developing, you can run the following in a separate terminal to automatically
-rebuild JavaScript as you make changes:
+Prerequisites:
+
+- Node.js
+- npm
+
+To run the development server, run:
 
 ```sh
-npm run dev
+npx vite
 ```
 
-Open `example.ipynb` in JupyterLab, VS Code, or your favorite editor
-to start developing. Changes made in `js/` will be reflected
-in the notebook.
+To build the JavaScript code, run:
+
+```sh
+npx vite build
+```
