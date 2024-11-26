@@ -15,7 +15,15 @@ def __():
     from widgets import ProjectsMenuWidget
     from widgets.number_widget import NumberWidget
     from widgets.drop_down_widget import DropDownWidget
-    return DropDownWidget, NumberWidget, ProjectsMenuWidget
+    from widgets.tabs_widget import TabsWidget
+    from widgets.card_widget import CardWidget
+    return (
+        CardWidget,
+        DropDownWidget,
+        NumberWidget,
+        ProjectsMenuWidget,
+        TabsWidget,
+    )
 
 
 @app.cell
@@ -108,6 +116,27 @@ def __(DropDownWidget, mo):
     dropdown_widget = DropDownWidget("Hello", options=["1", "2", "3"])
     mo.ui.anywidget(dropdown_widget)
     return (dropdown_widget,)
+
+
+@app.cell
+def __(TabsWidget, mo):
+    tabs_widget = TabsWidget("Tabs", ["Tab1", "Tab2"])
+    mo.ui.anywidget(tabs_widget)
+    return (tabs_widget,)
+
+
+@app.cell
+def __(tabs_widget):
+    tabs_widget.tab_elements
+    return
+
+
+@app.cell
+def __(CardWidget, mo, tabs_widget):
+    card_widget = CardWidget("teerte", "sfsfd", element_id=tabs_widget.tab_ids["Tab2"])
+    card_widget_ = mo.ui.anywidget(card_widget)
+    card_widget_
+    return card_widget, card_widget_
 
 
 if __name__ == "__main__":

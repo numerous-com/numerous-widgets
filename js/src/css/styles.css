@@ -10,6 +10,7 @@
   --ui-widget-focus-border: #0066cc;
   --ui-widget-focus-shadow: 0 0 0 2px rgba(0, 102, 204, 0.25);
   --ui-widget-dropdown-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --ui-widget-secondary-text: #666666;
 }
 
 /* Base styles */
@@ -508,4 +509,90 @@
   
   select::-ms-expand {
     display: none;
+  }
+  
+  /* Tab styles */
+  .tabs-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .tabs-list {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .tabs-row {
+    display: flex;
+    border-bottom: 1px solid var(--ui-widget-border-color);
+    background-color: var(--ui-widget-primary-background);
+    border-radius: 4px 4px 0 0;
+    position: relative;
+  }
+  
+  .tab-content {
+    padding: 16px;
+    background-color: var(--ui-widget-primary-background);
+  }
+  
+  .tab-content.hidden {
+    display: none;
+  }
+  
+  .tab {
+    position: relative;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    user-select: none;
+    border: 1px solid transparent;
+    border-bottom: none;
+    margin-bottom: -1px;
+    background-color: transparent;
+    color: var(--ui-widget-secondary-text);
+    transition: background-color 0.2s, color 0.2s;
+    z-index: 1;
+  }
+  
+  .tab:hover:not(.active) {
+    background-color: var(--ui-widget-hover-background);
+  }
+  
+  .tab.active {
+    background-color: var(--ui-widget-primary-background);
+    border-color: var(--ui-widget-border-color);
+    border-bottom-color: var(--ui-widget-primary-background);
+    color: var(--ui-widget-primary-text);
+    font-weight: 500;
+    z-index: 2;
+  }
+  
+  .tab:first-child {
+    border-top-left-radius: 4px;
+  }
+  
+  .tab:last-child {
+    border-top-right-radius: 4px;
+  }
+  
+  /* Card styles */
+  .card-container {
+    background-color: var(--ui-widget-primary-background);
+    border: 1px solid var(--ui-widget-border-color);
+    border-radius: 4px;
+    padding: 16px;
+    box-shadow: var(--ui-widget-dropdown-shadow);
+  }
+  
+  .card-title {
+    color: var(--ui-widget-primary-text);
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+  
+  .card-content {
+    color: var(--ui-widget-primary-text);
+    font-size: 14px;
   }

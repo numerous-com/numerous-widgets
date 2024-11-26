@@ -1,12 +1,12 @@
-import anywidget
-import traitlets
 from typing import Dict, Union, List
+import traitlets
+from .base import PortalWidget
 from .config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("DropDownWidget")
 
-class DropDownWidget(anywidget.AnyWidget):
+class DropDownWidget(PortalWidget):
     # Define traitlets for the widget properties
     ui_label = traitlets.Unicode().tag(sync=True)
     ui_tooltip = traitlets.Unicode().tag(sync=True)
@@ -23,6 +23,7 @@ class DropDownWidget(anywidget.AnyWidget):
         options: List[str],
         tooltip: str = None,
         default: str = None,
+        element_id: str = None,
     ):
         # Initialize with keyword arguments
         super().__init__(
@@ -30,6 +31,7 @@ class DropDownWidget(anywidget.AnyWidget):
             ui_tooltip=tooltip if tooltip is not None else "",
             value=default if default is not None else options[0],
             options=options,
+            element_id=element_id,
         )
 
     @staticmethod
