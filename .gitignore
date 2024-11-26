@@ -1,3 +1,5 @@
+*.egg-info/
+
 .venv
 dist
 .DS_Store
@@ -13,6 +15,3 @@ node_modules
 # Environment files
 .env
 .env.local
-
-# Exclude eggs in any directory
-*.egg-info

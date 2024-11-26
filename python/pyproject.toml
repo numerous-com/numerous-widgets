@@ -5,17 +5,13 @@ dependencies = ["anywidget"]
 readme = "README.md"
 
 [project.optional-dependencies]
-dev = ["anywidget[dev]", "python-dotenv"]
-marimo = ["marimo"]
-numerous = ["numerous"]
+dev = ["anywidget[dev]", "python-dotenv", "marimo", "numerous"]
 
 [tool.setuptools]
 packages.find = {where = ["src"]}
 
 [dependency-groups]
-dev = ["anywidget[dev]", "python-dotenv"]
-marimo = ["marimo"]
-numerous = ["numerous"]
+dev = ["anywidget[dev]", "python-dotenv", "marimo", "numerous"]
 
 [tool.poetry.dependencies]
 python-dotenv = "^1.0.0"

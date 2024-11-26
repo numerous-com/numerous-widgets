@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.9.22"
+__generated_with = "0.9.24"
 app = marimo.App(width="medium")
 
 
@@ -12,8 +12,8 @@ def __():
 
 @app.cell
 def __():
-    from widgets import ProjectsMenuWidget, ScenarioInputWidget
-    return ProjectsMenuWidget, ScenarioInputWidget
+    from widgets import ProjectsMenuWidget
+    return (ProjectsMenuWidget,)
 
 
 @app.cell
