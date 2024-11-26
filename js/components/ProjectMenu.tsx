@@ -99,7 +99,7 @@ export const ProjectMenu: React.FC<ProjectMenuProps> = ({
             }}
             className="dropdown-item"
           >
-            Save as...
+            Select
           </button>
           {hasSelection && changed && (
             <button

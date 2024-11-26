@@ -33,10 +33,21 @@ def __(widget):
 def __(mo, widget_):
     def onclick(event):
         widget_.set_document("doc3", {"content": 1})
+        results_file = "test.txt"
+        with open(results_file, 'w+') as f:
+            f.write("Simulation results...")
+        #widget_.set_file("results", results_file)
+
 
     button = mo.ui.button(label="Simulate", on_click=onclick)
     button
     return button, onclick
+
+
+@app.cell
+def __():
+    # Input suggestions
+    return
 
 
 if __name__ == "__main__":

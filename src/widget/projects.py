@@ -1,4 +1,4 @@
-from numerous.collection import collection
+from numerous.collections import collection
 from uuid import uuid4
 from dataclasses import dataclass, field
 
@@ -7,7 +7,19 @@ class Scenario:
     name: str
     description: str
     documents: dict[str, dict]
+    files: dict[str, str]
     id: str = field(default_factory=lambda: str(uuid4()))
+
+@dataclass
+class ScenarioMetadata:
+    id: str
+    name: str
+    description: str
+    app_slug: str
+    app_version: str
+    interface: str
+    interface_version: str
+
 
 @dataclass
 class Project:
@@ -45,7 +57,8 @@ def get_project(project_name):
             id=scenario_metadata["id"],
             name=scenario_metadata["name"],
             description=scenario_metadata["description"],
-            documents={}
+            documents={},
+            files={}
         )
     
     return Project(
@@ -65,11 +78,16 @@ def get_scenario(project_name, scenario_name):
     for doc in scenario.collection("documents").documents():
         docs_dict[doc.key] = doc.get()
     
+    files_dict = {}
+    for file in scenario.collection("files").files():
+        files_dict[file.key] = file.get()
+    
     return Scenario(
         id=scenario_metadata["id"],
         name=scenario_metadata["name"],
         description=scenario_metadata["description"],
-        documents=docs_dict
+        documents=docs_dict,
+        files=files_dict
     )
 
 def get_document(project_name: str, scenario_name: str, document_key: str) -> dict:
@@ -87,6 +105,19 @@ def get_document(project_name: str, scenario_name: str, document_key: str) -> di
     scenario = project.collection("scenarios").collection(scenario_name)
     document = scenario.collection("documents").document(document_key).get()
     return document
+
+def get_file(project_name: str, scenario_name: str, file_key: str) -> str:
+    """Returns a specific file from a scenario
+    """
+    project = collection("projects").collection(project_name)
+    scenario = project.collection("scenarios").collection(scenario_name)
+    file = scenario.collection("files").file(file_key).get()
+    return file
+
+def save_file(project: Project, scenario: Scenario, file_key: str, file_path: str):
+    scenario = collection("projects").collection(project.id).collection("scenarios").collection(scenario.id)
+    with open(file_path, "rb") as file:
+        scenario.collection("files").file(file_key).save(file.read())
 
 def save_project(project: Project):
     project_collection = collection("projects").collection(project.id)
@@ -114,6 +145,10 @@ def save_document(project: Project, scenario: Scenario, name: str, document: dic
     document_collection = collection("projects").collection(project.id).collection("scenarios").collection(scenario.id).collection("documents")
     document_collection.document(name).set(document)
 
+def save_scenario_metadata(project: Project, scenario: Scenario, metadata: ScenarioMetadata):
+    scenario_collection = collection("projects").collection(project.id).collection("scenarios").collection(scenario.id)
+    scenario_collection.document(".scenario_metadata").set(metadata)
+    
 if __name__ == "__main__":
     # Create test documents
     doc1 = {
@@ -145,13 +180,15 @@ if __name__ == "__main__":
         id="scenario-1",
         name="scenario1", 
         description="This is a scenario", 
-        documents={"doc1": doc1}
+        documents={"doc1": doc1},
+        files={}
     )
     scenario2 = Scenario(
         id="scenario-2",
         name="scenario2", 
         description="This is another scenario", 
-        documents={"doc1": doc1, "doc2": doc2}
+        documents={"doc1": doc1, "doc2": doc2},
+        files={}
     )
     
     # Save everything

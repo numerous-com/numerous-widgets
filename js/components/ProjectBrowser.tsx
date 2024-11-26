@@ -63,6 +63,18 @@ export const ProjectBrowser: React.FC<ProjectBrowserProps> = ({
     }
   };
 
+  const handleProjectDetailsClose = (reset: boolean) => {
+    if (reset) {
+      // Reset to initial selection when canceling
+      onSelectProject(initialProjectId.current ?? null);
+      onSelectScenario(initialScenarioId.current);
+      onClose();
+    } else {
+      // Keep current selection and close
+      onClose();
+    }
+  };
+
   const handleSave = (name: string, description: string) => {
     if (selectedProjectId) {
       onUpdateProject(selectedProjectId, name, description);
@@ -104,7 +116,7 @@ export const ProjectBrowser: React.FC<ProjectBrowserProps> = ({
                   scenarios={projectScenarios}
                   selectedScenarioId={selectedScenarioId}
                   onSelectScenario={onSelectScenario}
-                  onClose={() => handleSelectProject(null)}
+                  onClose={handleProjectDetailsClose}
                   onSave={handleSave}
                 />
               </div>

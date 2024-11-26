@@ -16,7 +16,7 @@ interface ProjectDetailsProps {
   }[];
   selectedScenarioId: string | null;
   onSelectScenario: (scenarioId: string | null) => void;
-  onClose: () => void;
+  onClose: (reset: boolean) => void;
   onSave: (name: string, description: string) => void;
   onSaveScenario?: (scenarioId: string, name: string, description: string) => void;
 }
@@ -51,7 +51,7 @@ export const ProjectDetails: React.FC<ProjectDetailsProps> = ({
       setScenarioName(selectedScenario.name);
       setScenarioDescription(selectedScenario.description || '');
     }
-    onClose();
+    onClose(true);
   };
 
   const handleSave = () => {
@@ -60,6 +60,7 @@ export const ProjectDetails: React.FC<ProjectDetailsProps> = ({
     } else {
       onSave(projectName, projectDescription);
     }
+    onClose(false);
   };
 
   return (
@@ -100,16 +101,21 @@ export const ProjectDetails: React.FC<ProjectDetailsProps> = ({
           <button
             type="button"
             onClick={handleCancel}
-            className="px-4 py-2 border rounded"
+            className="px-4 py-2 border rounded hover:bg-gray-50"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={handleSave}
-            className="px-4 py-2 bg-blue-500 text-white rounded"
+            disabled={!projectName || !selectedScenario}
+            className={`px-4 py-2 rounded text-white ${
+              !projectName || !selectedScenario
+                ? 'bg-blue-300'
+                : 'bg-blue-500 hover:bg-blue-600'
+            }`}
           >
-            Save
+            OK
           </button>
         </div>
       </div>

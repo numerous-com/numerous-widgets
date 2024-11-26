@@ -3,7 +3,8 @@ import pathlib
 
 import anywidget
 import traitlets
-from .projects import list_projects, get_project, get_scenario, save_project, save_scenario, get_document, save_document, Project, Scenario
+from .projects import list_projects, get_project, get_scenario, save_project, save_scenario, get_document, save_document, get_file, save_file, Project, Scenario, save_scenario_metadata, ScenarioMetadata
+
 
 try:
     __version__ = importlib.metadata.version("widget")
@@ -46,6 +47,8 @@ class ProjectsMenuWidget(anywidget.AnyWidget):
         ]
         self.scenarios = []
         self._documents = {}
+        self._files = {}
+        self._metadata_changed = False
 
     @traitlets.observe('selected_project_id')
     def _selected_project_id_changed(self, change):
@@ -110,9 +113,20 @@ class ProjectsMenuWidget(anywidget.AnyWidget):
                 print("saving document:", doc)
                 save_document(project, scenario, name, doc)
 
+            for name, file_path in self._files.items():
+                print("saving file:", file_path)
+                save_file(project, scenario, name, file_path)
+            
+            if self._metadata_changed:
+                save_scenario_metadata(project, scenario, self._scenario_metadata)
+
 
     def set_document(self, name, doc):
         self._documents[name] = doc
+        self.changed = True
+
+    def set_file(self, name, file_path):
+        self._files[name] = file_path
         self.changed = True
 
     def get_document(self, name):
@@ -121,4 +135,13 @@ class ProjectsMenuWidget(anywidget.AnyWidget):
         else:
             return get_document(self.selected_project_id, self.selected_scenario_id, name)
         
-    
+    def get_file(self, name):
+        if name in self._files:
+            return self._files[name]
+        else:
+            return get_file(self.selected_project_id, self.selected_scenario_id, name)
+        
+    def set_scenario_metadata(self, metadata: ScenarioMetadata):
+        self._scenario_metadata = metadata
+        self.changed = True
+        self._metadata_changed = True
