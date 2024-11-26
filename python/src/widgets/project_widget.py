@@ -1,18 +1,10 @@
 import anywidget
 import traitlets
 from .projects import get_project, get_scenario, save_scenario, get_document, get_file, save_document, save_file, list_projects, ScenarioMetadata, save_scenario_metadata
-import pathlib
+from .config import get_widget_paths
 
-_DEV = True  # switch to False for production
-
-if _DEV:
-    # from `npx vite`
-    ESM = "http://localhost:5173/src/components/ProjectMenuWidget.tsx?anywidget"
-    CSS = pathlib.Path(__file__).parent / ".." / ".." / ".." / "js"  / "src" / "css" / "styles.css"
-else:
-    ESM = pathlib.Path(__file__).parent / "static" / "ProjectMenuWidget.mjs"
-    CSS = pathlib.Path(__file__).parent / "static" / "style.css"
-
+# Get environment-appropriate paths
+ESM, CSS = get_widget_paths("ProjectMenuWidget")
 
 class ProjectBrowserBase(anywidget.AnyWidget):
     

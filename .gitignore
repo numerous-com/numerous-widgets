@@ -9,3 +9,7 @@ __pycache__
 src/widget/static
 python/src/collections
 node_modules
+
+# Environment files
+.env
+.env.local

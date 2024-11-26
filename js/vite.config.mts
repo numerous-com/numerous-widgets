@@ -5,19 +5,18 @@ import anywidget from "@anywidget/vite";
 export default defineConfig({
 	plugins: [anywidget()],
 	build: {
-		outDir: "../pythonsrc/widget/static",
+		outDir: "../python/src/widgets/static",
 		lib: {
-			entry: ["src/components/ProjectMenuWidget.tsx"],
+			entry: ["src/components/ProjectMenuWidget.tsx", "src/components/widgets/NumberInputWidget.tsx"],
 			formats: ["es"],
 		},
 		rollupOptions: {
 			output: {
 				assetFileNames: (assetInfo) => {
-					// Place CSS files in the same directory as the JS
-					if (assetInfo.name.endsWith('.css')) {
+					if (assetInfo.name?.endsWith('.css')) {
 						return '[name][extname]';
 					}
-					return assetInfo.name;
+					return assetInfo.name ?? 'unknown';
 				},
 			},
 		},

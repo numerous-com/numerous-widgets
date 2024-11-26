@@ -1,0 +1,28 @@
+Metadata-Version: 2.1
+Name: widgets
+Version: 0.0.0
+Description-Content-Type: text/markdown
+Requires-Dist: anywidget
+Provides-Extra: dev
+Requires-Dist: anywidget[dev]; extra == "dev"
+Requires-Dist: python-dotenv; extra == "dev"
+Provides-Extra: marimo
+Requires-Dist: marimo; extra == "marimo"
+Provides-Extra: numerous
+Requires-Dist: numerous; extra == "numerous"
+
+# Widgets
+
+## Installation of Python Package
+
+```sh
+pip install .
+```
+
+## Usage
+
+Example of using the `NumberWidget`:
+
+```python
+from widgets import NumberWidget
+```

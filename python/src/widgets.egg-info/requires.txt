@@ -1,0 +1,11 @@
+anywidget
+
+[dev]
+anywidget[dev]
+python-dotenv
+
+[marimo]
+marimo
+
+[numerous]
+numerous

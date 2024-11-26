@@ -12,7 +12,7 @@ def __():
 
 @app.cell
 def __():
-    from widget import ProjectsMenuWidget, ScenarioInputWidget
+    from widgets import ProjectsMenuWidget, ScenarioInputWidget
     return ProjectsMenuWidget, ScenarioInputWidget
 
 
@@ -91,20 +91,13 @@ def __():
 
 @app.cell
 def __():
-    from widget.number_widget import NumberWidget
+    from widgets.number_widget import NumberWidget
     return (NumberWidget,)
 
 
 @app.cell
 def __(NumberWidget, mo):
-    number_widget = NumberWidget({
-        "ui_label": "My Number",
-        "ui_tooltip": "This is a number.",
-        "default": 1,
-        "start": 0,
-        "stop": 10,
-        "step": 1
-    })
+    number_widget = NumberWidget("My Number")
     mo.ui.anywidget(number_widget)
     return (number_widget,)
 

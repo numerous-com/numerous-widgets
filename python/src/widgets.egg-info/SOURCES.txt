@@ -1,0 +1,14 @@
+README.md
+pyproject.toml
+src/widgets/__init__.py
+src/widgets/config.py
+src/widgets/number_widget.py
+src/widgets/project_widget.py
+src/widgets/projects.py
+src/widgets/scenario_input_widget.py
+src/widgets/stress_test_projects.py
+src/widgets.egg-info/PKG-INFO
+src/widgets.egg-info/SOURCES.txt
+src/widgets.egg-info/dependency_links.txt
+src/widgets.egg-info/requires.txt
+src/widgets.egg-info/top_level.txt

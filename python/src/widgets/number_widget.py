@@ -1,18 +1,10 @@
 import anywidget
 import traitlets
-import pathlib
 from typing import Dict, Union
+from .config import get_widget_paths
 
-_DEV = True  # switch to False for production
-
-if _DEV:
-    # from `npx vite`
-    ESM = "http://localhost:5173/src/components/widgets/NumberInputWidget.tsx?anywidget"
-    CSS = pathlib.Path(__file__).parent / ".." / ".." / ".." / "js"  / "src" / "css" / "styles.css"
-
-else:
-    ESM = pathlib.Path(__file__).parent / "static" / "NumberWidget.mjs"
-    CSS = pathlib.Path(__file__).parent / "static" / "style.css"
+# Get environment-appropriate paths
+ESM, CSS = get_widget_paths("widgets/NumberInputWidget")
 
 class NumberWidget(anywidget.AnyWidget):
     # Define traitlets for the widget properties
@@ -29,18 +21,17 @@ class NumberWidget(anywidget.AnyWidget):
 
     def __init__(
         self,
-        *,
-        ui_label: str,
-        ui_tooltip: str,
-        default: float,
-        start: float,
-        stop: float,
-        step: float,
+        label: str,
+        tooltip: str = None,
+        default: float = 0.0,
+        start: float = 0.0,
+        stop: float = 100.0,
+        step: float = 1.0,
     ):
         # Initialize with keyword arguments
         super().__init__(
-            ui_label=ui_label,
-            ui_tooltip=ui_tooltip,
+            ui_label=label,
+            ui_tooltip=tooltip if tooltip is not None else "",
             value=default,
             start=start,
             stop=stop,
@@ -58,8 +49,8 @@ class NumberWidget(anywidget.AnyWidget):
             NumberWidget: A new widget instance
         """
         return NumberWidget(
-            ui_label=config["ui_label"],
-            ui_tooltip=config["ui_tooltip"],
+            label=config["label"],
+            tooltip=config["tooltip"],
             default=config["default"],
             start=config["start"],
             stop=config["stop"],
