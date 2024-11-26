@@ -1,6 +1,7 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import { NumberInput } from "../ui/NumberInput";
+import '../../css/styles.css';
 
 function NumberWidget() {
     // Model states

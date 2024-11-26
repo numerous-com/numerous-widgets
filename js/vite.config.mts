@@ -7,7 +7,8 @@ export default defineConfig({
 	build: {
 		outDir: "../python/src/widgets/static",
 		lib: {
-			entry: ["src/components/ProjectMenuWidget.tsx", "src/components/widgets/NumberInputWidget.tsx"],
+			//entry: ["src/components/ProjectMenuWidget.tsx"],
+			entry: ["src/components/widgets/NumberInputWidget.tsx"],
 			formats: ["es"],
 		},
 		rollupOptions: {
