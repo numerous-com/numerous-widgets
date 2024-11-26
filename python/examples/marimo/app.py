@@ -13,7 +13,9 @@ def __():
 @app.cell
 def __():
     from widgets import ProjectsMenuWidget
-    return (ProjectsMenuWidget,)
+    from widgets.number_widget import NumberWidget
+    from widgets.drop_down_widget import DropDownWidget
+    return DropDownWidget, NumberWidget, ProjectsMenuWidget
 
 
 @app.cell
@@ -91,8 +93,7 @@ def __():
 
 @app.cell
 def __():
-    from widgets.number_widget import NumberWidget
-    return (NumberWidget,)
+    return
 
 
 @app.cell
@@ -100,6 +101,13 @@ def __(NumberWidget, mo):
     number_widget = NumberWidget("My Number")
     mo.ui.anywidget(number_widget)
     return (number_widget,)
+
+
+@app.cell
+def __(DropDownWidget, mo):
+    dropdown_widget = DropDownWidget("Hello", options=["1", "2", "3"])
+    mo.ui.anywidget(dropdown_widget)
+    return (dropdown_widget,)
 
 
 if __name__ == "__main__":
