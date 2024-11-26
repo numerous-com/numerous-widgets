@@ -1,8 +1,8 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
-import { ProjectMenu } from "./ProjectMenu";
+import { ProjectMenu } from "../ProjectMenu";
 
-import '../css/styles.css';
+import '../../css/styles.css';
 
 function ProjectMenuWidget() {
 	console.log("ProjectMenuWidget loaded");

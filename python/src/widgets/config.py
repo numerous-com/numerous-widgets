@@ -16,7 +16,7 @@ GLOBAL_CSS = ROOT_DIR / "js" / "src" / "css" / "styles.css"
 
 # Development server configuration
 DEV_SERVER = os.getenv("VITE_DEV_SERVER", "http://localhost:5173")
-DEV_COMPONENT_PATH = f"{DEV_SERVER}/src/components"
+DEV_COMPONENT_PATH = f"{DEV_SERVER}/src/components/widgets"
 
 def get_widget_paths(component_name: str) -> tuple[Union[str, pathlib.Path], pathlib.Path]:
     """
