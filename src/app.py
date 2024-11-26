@@ -12,8 +12,8 @@ def __():
 
 @app.cell
 def __():
-    from widget import ProjectsMenuWidget
-    return (ProjectsMenuWidget,)
+    from widget import ProjectsMenuWidget, ScenarioInputWidget
+    return ProjectsMenuWidget, ScenarioInputWidget
 
 
 @app.cell
@@ -47,6 +47,50 @@ def __(mo, widget_):
 @app.cell
 def __():
     # Input suggestions
+    return
+
+
+@app.cell
+def __():
+    #input_widget_ = ScenarioInputWidget()
+    #input_widget = mo.ui.anywidget(input_widget_)
+    return
+
+
+@app.cell
+def __():
+    #input_widget
+    return
+
+
+@app.cell
+def __(ProjectsMenuWidget, mo):
+    project_widgets = []
+
+    for i in range(100):
+        widgeti = ProjectsMenuWidget()
+        mo_widgeti = mo.ui.anywidget(widgeti)
+        project_widgets.append(mo_widgeti)
+
+    mo.vstack(project_widgets)
+    return i, mo_widgeti, project_widgets, widgeti
+
+
+@app.cell
+def __(mo):
+    button_widgets = []
+
+    for j in range(100):
+        mo_buttoni = mo.ui.button()
+
+        button_widgets.append(mo_buttoni)
+
+    mo.vstack(button_widgets)
+    return button_widgets, j, mo_buttoni
+
+
+@app.cell
+def __():
     return
 
 
