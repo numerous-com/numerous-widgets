@@ -7,5 +7,5 @@ __pycache__
 .ipynb_checkpoints
 
 src/widget/static
-src/collections
+python/src/collections
 node_modules

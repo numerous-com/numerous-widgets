@@ -7,8 +7,8 @@ _DEV = True  # switch to False for production
 
 if _DEV:
     # from `npx vite`
-    ESM = "http://localhost:5173/js/components/NumberWidget.tsx?anywidget"
-    CSS = pathlib.Path(__file__).parent.joinpath("number_widget/number_widget.css")
+    ESM = "http://localhost:5173/src/components/widgets/NumberInputWidget.tsx?anywidget"
+    CSS = pathlib.Path(__file__).parent / ".." / ".." / ".." / "js"  / "src" / "css" / "styles.css"
 
 else:
     ESM = pathlib.Path(__file__).parent / "static" / "NumberWidget.mjs"
@@ -27,12 +27,40 @@ class NumberWidget(anywidget.AnyWidget):
     _esm = ESM
     _css = CSS
 
-    def __init__(self, config: Dict[str, Union[str, float]]):
-        # Initialize with the merged configuration
+    def __init__(
+        self,
+        *,
+        ui_label: str,
+        ui_tooltip: str,
+        default: float,
+        start: float,
+        stop: float,
+        step: float,
+    ):
+        # Initialize with keyword arguments
         super().__init__(
+            ui_label=ui_label,
+            ui_tooltip=ui_tooltip,
+            value=default,
+            start=start,
+            stop=stop,
+            step=step,
+        )
+
+    @staticmethod
+    def from_dict(config: Dict[str, Union[str, float]]) -> "NumberWidget":
+        """Creates a NumberWidget instance from a configuration dictionary.
+        
+        Args:
+            config: Dictionary containing widget configuration parameters
+        
+        Returns:
+            NumberWidget: A new widget instance
+        """
+        return NumberWidget(
             ui_label=config["ui_label"],
             ui_tooltip=config["ui_tooltip"],
-            value=config["default"],
+            default=config["default"],
             start=config["start"],
             stop=config["stop"],
             step=config["step"],

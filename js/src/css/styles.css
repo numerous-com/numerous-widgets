@@ -1,3 +1,16 @@
+:root {
+  /* UI Widget Colors */
+  --ui-widget-primary-text: #333333;
+  --ui-widget-tooltip-icon: #666666;
+  --ui-widget-tooltip-background: #333333;
+  --ui-widget-border-color: #dddddd;
+  --ui-widget-primary-background: #ffffff;
+  --ui-widget-secondary-background: #f5f5f5;
+  --ui-widget-hover-background: #e9ecef;
+  --ui-widget-focus-border: #0066cc;
+  --ui-widget-focus-shadow: 0 0 0 2px rgba(0, 102, 204, 0.25);
+}
+
 /* Base styles */
 .app {
     max-width: 1200px;
@@ -114,6 +127,108 @@
   
   button.secondary:hover {
     background-color: #f5f5f5;
+  }
+  
+  /* Number input styles */
+  .number-input-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .number-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--ui-widget-primary-text);
+    font-size: 14px;
+    margin-bottom: 0;
+  }
+  
+  .tooltip-icon {
+    cursor: help;
+    font-size: 1.2em;
+    color: var(--ui-widget-tooltip-icon);
+    position: relative;
+  }
+  
+  /* Tooltip styles */
+  .tooltip-icon::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 8px;
+    background-color: var(--ui-widget-tooltip-background);
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 1000;
+  }
+  
+  .tooltip-icon:hover::after {
+    visibility: visible;
+    opacity: 1;
+  }
+  
+  .input-wrapper {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid var(--ui-widget-border-color);
+    border-radius: 4px;
+    background-color: var(--ui-widget-primary-background);
+    width: auto;
+  }
+  
+  .input-wrapper:focus-within {
+    border-color: var(--ui-widget-focus-border);
+    box-shadow: var(--ui-widget-focus-shadow);
+  }
+  
+  input[type="number"] {
+    width: 80px;
+    padding: 4px 8px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    text-align: center;
+    background-color: var(--ui-widget-primary-background);
+  }
+  
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+  .buttons {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+  }
+  
+  .step-button {
+    padding: 4px 8px;
+    border: none;
+    background: var(--ui-widget-secondary-background);
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+  }
+  
+  .step-button:hover {
+    background-color: var(--ui-widget-hover-background);
+  }
+  
+  .step-button.down {
+    border-right: 1px solid var(--ui-widget-border-color);
   }
   
   /* Responsive adjustments */

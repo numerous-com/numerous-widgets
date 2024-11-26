@@ -1,3 +1,0 @@
-anywidget[dev]
-marimo
-numerous

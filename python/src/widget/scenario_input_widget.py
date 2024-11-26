@@ -8,8 +8,8 @@ _DEV = True  # switch to False for production
 
 if _DEV:
     # from `npx vite`
-    ESM = "http://localhost:5173/js/components/ScenarioInputWidget.tsx?anywidget"
-    CSS = pathlib.Path(__file__).parent / ".." / ".." / "css" / "styles.css"
+    ESM = "http://localhost:5173/src/components/ScenarioInputWidget.tsx?anywidget"
+    CSS = pathlib.Path(__file__).parent / ".." / ".." / ".." / "js"  / "src" / "css" / "styles.css"
 else:
     ESM = pathlib.Path(__file__).parent / "static" / "ScenarioInputWidget.mjs"
     CSS = pathlib.Path(__file__).parent / "static" / "style.css"

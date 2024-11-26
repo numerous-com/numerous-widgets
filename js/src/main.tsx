@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ProjectMenu } from './components/ProjectMenu';
-import '../css/styles.css';
+import './css/styles.css';
 
 const App = () => {
   const [projects, setProjects] = useState([

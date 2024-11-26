@@ -5,9 +5,9 @@ import anywidget from "@anywidget/vite";
 export default defineConfig({
 	plugins: [anywidget()],
 	build: {
-		outDir: "src/widget/static",
+		outDir: "../pythonsrc/widget/static",
 		lib: {
-			entry: ["js/components/ProjectMenuWidget.tsx"],
+			entry: ["src/components/ProjectMenuWidget.tsx"],
 			formats: ["es"],
 		},
 		rollupOptions: {

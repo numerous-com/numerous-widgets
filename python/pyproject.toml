@@ -5,8 +5,14 @@ build-backend = "hatchling.build"
 [project]
 name = "widget"
 version = "0.0.0"
-dependencies = ["anywidget"]
+dependencies = ["anywidget", "marimo", "numerous"]
 readme = "README.md"
+
+[project.optional-dependencies]
+dev = ["anywidget[dev]"]
+
+[dependency-groups]
+dev = ["anywidget[dev]"]
 
 # For projects not using `uv`, you can install these development dependencies with:
 # `pip install -e ".[dev]"`
