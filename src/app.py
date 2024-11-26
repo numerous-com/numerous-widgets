@@ -64,34 +64,49 @@ def __():
 
 
 @app.cell
-def __(ProjectsMenuWidget, mo):
-    project_widgets = []
+def __():
+    #project_widgets = []
 
-    for i in range(100):
-        widgeti = ProjectsMenuWidget()
-        mo_widgeti = mo.ui.anywidget(widgeti)
-        project_widgets.append(mo_widgeti)
+    #for i in range(100):
+    #    widgeti = ProjectsMenuWidget()
+    #    mo_widgeti = mo.ui.anywidget(widgeti)
+    #    project_widgets.append(mo_widgeti)
 
-    mo.vstack(project_widgets)
-    return i, mo_widgeti, project_widgets, widgeti
-
-
-@app.cell
-def __(mo):
-    button_widgets = []
-
-    for j in range(100):
-        mo_buttoni = mo.ui.button()
-
-        button_widgets.append(mo_buttoni)
-
-    mo.vstack(button_widgets)
-    return button_widgets, j, mo_buttoni
+    #mo.vstack(project_widgets)
+    return
 
 
 @app.cell
 def __():
+    #button_widgets = []
+
+    #for j in range(100):
+    #    mo_buttoni = mo.ui.button()
+
+     #   button_widgets.append(mo_buttoni)
+
+    #mo.vstack(button_widgets)
     return
+
+
+@app.cell
+def __():
+    from widget.number_widget import NumberWidget
+    return (NumberWidget,)
+
+
+@app.cell
+def __(NumberWidget, mo):
+    number_widget = NumberWidget({
+        "ui_label": "My Number",
+        "ui_tooltip": "This is a number.",
+        "default": 1,
+        "start": 0,
+        "stop": 10,
+        "step": 1
+    })
+    mo.ui.anywidget(number_widget)
+    return (number_widget,)
 
 
 if __name__ == "__main__":
