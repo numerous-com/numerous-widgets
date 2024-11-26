@@ -381,7 +381,8 @@
   
   /* Add new dropdown styles */
   .dropdown-container {
-    width: 100%;
+    width: auto;
+    display: inline-block;
   }
   
   .dropdown-label {
@@ -395,14 +396,15 @@
   
   .select-wrapper {
     position: relative;
-    width: 100%;
+    width: auto;
     height: 36px;
     z-index: 9998;
   }
   
   .custom-select {
     position: relative;
-    width: 100%;
+    width: auto;
+    min-width: 150px;
     height: 100%;
     border: 1px solid var(--ui-widget-border-color);
     border-radius: 4px;
@@ -456,12 +458,12 @@
   }
   
   .options-container {
-    display: block;
     position: absolute;
     top: 100%;
     margin-top: 4px;
     left: 0;
-    right: 0;
+    min-width: 100%;
+    width: max-content;
     background: var(--ui-widget-primary-background);
     border: 1px solid var(--ui-widget-border-color);
     border-radius: 4px;
@@ -469,6 +471,7 @@
     overflow-y: auto;
     z-index: 9999;
     box-shadow: var(--ui-widget-dropdown-shadow);
+    white-space: nowrap;
   }
   
   .option {
@@ -476,8 +479,7 @@
     font-size: 14px;
     cursor: pointer;
     background-color: var(--ui-widget-primary-background);
-    position: relative;
-    z-index: 9999;
+    white-space: nowrap;
   }
   
   .option:hover {
