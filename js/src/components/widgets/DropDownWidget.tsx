@@ -12,7 +12,19 @@ function DropDownWidget() {
     const [uiLabel] = useModelState<string>("ui_label");
     const [uiTooltip] = useModelState<string>("ui_tooltip");
     const [elementId] = useModelState<string>("element_id");
+    const [shouldFallback, setShouldFallback] = React.useState(false);
     const portalContainer = usePortalContainer(elementId);
+
+    // Add fallback timer
+    React.useEffect(() => {
+        if (elementId && !portalContainer) {
+            const fallbackTimer = setTimeout(() => {
+                setShouldFallback(true);
+            }, 2000); // 2 second timeout
+
+            return () => clearTimeout(fallbackTimer);
+        }
+    }, [elementId, portalContainer]);
 
     const dropdown = (
         <DropDown
@@ -24,7 +36,21 @@ function DropDownWidget() {
         />
     );
 
-    return elementId && portalContainer ? createPortal(dropdown, portalContainer) : dropdown;
+    if (!elementId) {
+        return dropdown;
+    }
+
+    if (!portalContainer) {
+        // Return null during initial setup, but fall back to regular render if it takes too long
+        return shouldFallback ? dropdown : null;
+    }
+
+    try {
+        return createPortal(dropdown, portalContainer);
+    } catch (error) {
+        console.error('Portal creation failed:', error);
+        return dropdown;
+    }
 }
 
 export default {

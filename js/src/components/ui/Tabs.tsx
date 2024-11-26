@@ -20,18 +20,32 @@ export function Tabs({
 }: TabsProps) {
     const tabElements = React.useRef<{ [key: string]: HTMLDivElement | null }>({});
 
-    React.useEffect(() => {
-        const event = new CustomEvent('marimo:tabs-mounted', {
-            detail: { 
-                tabIds,
-                elements: Object.fromEntries(
-                    Object.entries(tabElements.current)
-                        .filter(([_, el]) => el !== null)
-                )
-            }
-        });
-        document.dispatchEvent(event);
+    // Dispatch event whenever tabs or elements change
+    const dispatchMountEvent = React.useCallback(() => {
+        const elements = Object.fromEntries(
+            Object.entries(tabElements.current)
+                .filter(([_, el]) => el !== null)
+        );
+        
+        // Only dispatch if we have all elements ready
+        if (Object.keys(elements).length === Object.keys(tabIds).length) {
+            const event = new CustomEvent('marimo:tabs-mounted', {
+                detail: { tabIds, elements }
+            });
+            document.dispatchEvent(event);
+        }
     }, [tabIds]);
+
+    // Initial mount
+    React.useEffect(() => {
+        dispatchMountEvent();
+    }, [dispatchMountEvent]);
+
+    // Re-dispatch when tab elements change
+    const setTabRef = React.useCallback((tabId: string, el: HTMLDivElement | null) => {
+        tabElements.current[tabId] = el;
+        dispatchMountEvent();
+    }, [dispatchMountEvent]);
 
     return (
         <div className="tabs-container">
@@ -58,7 +72,7 @@ export function Tabs({
                     return (
                         <div
                             key={tab}
-                            ref={el => tabElements.current[tabId] = el}
+                            ref={el => setTabRef(tabId, el)}
                             id={tabId}
                             className={`tab-content ${tab === value ? 'active' : 'hidden'}`}
                             data-tab={tab}

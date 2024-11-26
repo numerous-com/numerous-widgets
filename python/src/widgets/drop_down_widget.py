@@ -36,19 +36,13 @@ class DropDownWidget(PortalWidget):
 
     @staticmethod
     def from_dict(config: Dict[str, Union[str, List[str]]]) -> "DropDownWidget":
-        """Creates a DropDownWidget instance from a configuration dictionary.
-        
-        Args:
-            config: Dictionary containing widget configuration parameters
-        
-        Returns:
-            DropDownWidget: A new widget instance
-        """
+        """Creates a DropDownWidget instance from a configuration dictionary."""
         return DropDownWidget(
             label=config["ui_label"],
             tooltip=config["ui_tooltip"],
             default=config["default"],
             options=config["options"],
+            element_id=config.get("element_id"),
         )
 
     @property

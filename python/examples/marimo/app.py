@@ -112,17 +112,17 @@ def __(NumberWidget, mo):
 
 
 @app.cell
-def __(DropDownWidget, mo):
-    dropdown_widget = DropDownWidget("Hello", options=["1", "2", "3"])
-    mo.ui.anywidget(dropdown_widget)
-    return (dropdown_widget,)
+def __(TabsWidget, mo):
+    tabs_widget = mo.ui.anywidget(TabsWidget("Tabs", ["Tab1", "Tab2"]))
+    tabs_widget
+    return (tabs_widget,)
 
 
 @app.cell
-def __(TabsWidget, mo):
-    tabs_widget = TabsWidget("Tabs", ["Tab1", "Tab2"])
-    mo.ui.anywidget(tabs_widget)
-    return (tabs_widget,)
+def __(DropDownWidget, mo, tabs_widget):
+    dropdown_widget = DropDownWidget("Hello", options=["1", "2", "3"], element_id=tabs_widget.tab_ids["Tab1"])
+    mo.ui.anywidget(dropdown_widget)
+    return (dropdown_widget,)
 
 
 @app.cell

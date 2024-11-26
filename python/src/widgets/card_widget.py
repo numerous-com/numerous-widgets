@@ -1,16 +1,15 @@
-import anywidget
-import traitlets
 from typing import Dict, Union
+import traitlets
+from .base import PortalWidget
 from .config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("CardWidget")
 
-class CardWidget(anywidget.AnyWidget):
+class CardWidget(PortalWidget):
     # Define traitlets for the widget properties
     title = traitlets.Unicode().tag(sync=True)
     content = traitlets.Unicode().tag(sync=True)
-    element_id = traitlets.Unicode(allow_none=True).tag(sync=True)
 
     # Load the JavaScript and CSS from external files
     _esm = ESM
@@ -31,14 +30,7 @@ class CardWidget(anywidget.AnyWidget):
 
     @staticmethod
     def from_dict(config: Dict[str, Union[str, None]]) -> "CardWidget":
-        """Creates a CardWidget instance from a configuration dictionary.
-        
-        Args:
-            config: Dictionary containing widget configuration parameters
-        
-        Returns:
-            CardWidget: A new widget instance
-        """
+        """Creates a CardWidget instance from a configuration dictionary."""
         return CardWidget(
             content=config["content"],
             title=config.get("title"),
