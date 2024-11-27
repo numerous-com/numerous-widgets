@@ -3,11 +3,12 @@ import { Tooltip } from './Tooltip';
 
 interface TabsProps {
     value: string;
-    tabs: string[];
+    tabs: {[key: string]: string};
     uiLabel: string;
     uiTooltip: string;
-    tabIds: {[key: string]: string};
+    contentUpdated: boolean;
     onChange: (value: string) => void;
+    setContentUpdated?: (updated: boolean) => void;
 }
 
 export function Tabs({
@@ -15,37 +16,15 @@ export function Tabs({
     tabs,
     uiLabel,
     uiTooltip,
-    tabIds,
+    contentUpdated,
     onChange,
+    setContentUpdated,
 }: TabsProps) {
-    const tabElements = React.useRef<{ [key: string]: HTMLDivElement | null }>({});
-
-    // Dispatch event whenever tabs or elements change
-    const dispatchMountEvent = React.useCallback(() => {
-        const elements = Object.fromEntries(
-            Object.entries(tabElements.current)
-                .filter(([_, el]) => el !== null)
-        );
-        
-        // Only dispatch if we have all elements ready
-        if (Object.keys(elements).length === Object.keys(tabIds).length) {
-            const event = new CustomEvent('marimo:tabs-mounted', {
-                detail: { tabIds, elements }
-            });
-            document.dispatchEvent(event);
-        }
-    }, [tabIds]);
-
-    // Initial mount
     React.useEffect(() => {
-        dispatchMountEvent();
-    }, [dispatchMountEvent]);
-
-    // Re-dispatch when tab elements change
-    const setTabRef = React.useCallback((tabId: string, el: HTMLDivElement | null) => {
-        tabElements.current[tabId] = el;
-        dispatchMountEvent();
-    }, [dispatchMountEvent]);
+        if (contentUpdated && setContentUpdated) {
+            setContentUpdated(false);
+        }
+    }, [contentUpdated, setContentUpdated]);
 
     return (
         <div className="tabs-container">
@@ -57,31 +36,24 @@ export function Tabs({
             )}
             <div className="tabs-list">
                 <div className="tabs-row">
-                    {tabs.map(tab => (
+                    {Object.keys(tabs).map(tab => (
                         <div
                             key={tab}
-                            className={`tab ${tab === value ? 'active' : ''}`}
+                            className={`tab ${value === tab ? 'active' : ''}`}
                             onClick={() => onChange(tab)}
                         >
                             {tab}
                         </div>
                     ))}
                 </div>
-                {tabs.map(tab => {
-                    const tabId = tabIds[tab];
-                    return (
-                        <div
-                            key={tab}
-                            ref={el => setTabRef(tabId, el)}
-                            id={tabId}
-                            className={`tab-content ${tab === value ? 'active' : 'hidden'}`}
-                            data-tab={tab}
-                            data-marimo-tab="true"
-                        >
-                            <div data-widget="tab-content-wrapper"></div>
-                        </div>
-                    );
-                })}
+                {Object.entries(tabs).map(([tab, content]) => (
+                    <div
+                        key={tab}
+                        className={`tab-content ${value === tab ? 'active' : 'hidden'}`}
+                        data-tab={tab}
+                        dangerouslySetInnerHTML={{ __html: content || '' }}
+                    />
+                ))}
             </div>
         </div>
     );

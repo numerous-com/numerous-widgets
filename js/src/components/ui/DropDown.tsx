@@ -20,23 +20,15 @@ export function DropDown({
     const dropdownRef = React.useRef<HTMLDivElement>(null);
     const optionsRef = React.useRef<HTMLDivElement>(null);
 
-    React.useEffect(() => {
-        console.log('Dropdown state:', {
-            isOpen,
-            value,
-            options,
-            optionsRefExists: !!optionsRef.current
-        });
-    }, [isOpen, value, options]);
 
     const handleOptionClick = (option: string) => {
-        console.log('Option clicked:', option);
+
         onChange(option);
         setIsOpen(false);
     };
 
     const toggleDropdown = () => {
-        console.log('Toggling dropdown, current state:', isOpen);
+
         setIsOpen(!isOpen);
     };
 
@@ -62,8 +54,8 @@ export function DropDown({
                     style={{ display: isOpen ? 'block' : 'none' }}
                 >
                     {options.map(option => {
-                        console.log('Rendering option:', option);
-                        return (
+
+return (
                             <div
                                 key={option}
                                 className={`option ${option === value ? 'selected' : ''}`}

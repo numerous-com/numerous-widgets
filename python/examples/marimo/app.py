@@ -57,109 +57,42 @@ def __(mo, widget_):
 
 
 @app.cell
-def __():
-    # Input suggestions
-    return
-
-
-@app.cell
-def __():
-    #input_widget_ = ScenarioInputWidget()
-    #input_widget = mo.ui.anywidget(input_widget_)
-    return
-
-
-@app.cell
-def __():
-    #input_widget
-    return
-
-
-@app.cell
-def __():
-    #project_widgets = []
-
-    #for i in range(100):
-    #    widgeti = ProjectsMenuWidget()
-    #    mo_widgeti = mo.ui.anywidget(widgeti)
-    #    project_widgets.append(mo_widgeti)
-
-    #mo.vstack(project_widgets)
-    return
-
-
-@app.cell
-def __():
-    #button_widgets = []
-
-    #for j in range(100):
-    #    mo_buttoni = mo.ui.button()
-
-     #   button_widgets.append(mo_buttoni)
-
-    #mo.vstack(button_widgets)
-    return
-
-
-@app.cell
-def __():
-    return
-
-
-@app.cell
 def __(NumberWidget, mo):
     number_widget = NumberWidget("My Number")
-    mo.ui.anywidget(number_widget)
-    return (number_widget,)
+    number_widget_a = mo.ui.anywidget(number_widget)
+    return number_widget, number_widget_a
 
 
 @app.cell
-def __(TabsWidget, mo):
-    tabs_widget = mo.ui.anywidget(TabsWidget("Tabs", ["Tab1", "Tab2"]))
+def __():
+    def on_click2(event):
+
+        ...
+        #number_widget_a.value['value'] += 1
+    return (on_click2,)
+
+
+@app.cell
+def __(mo, on_click2):
+    button_for_tab3 = mo.ui.button(label="tab button!", on_click=on_click2)
+    return (button_for_tab3,)
+
+
+@app.cell
+def __(DropDownWidget, TabsWidget, button_for_tab3, mo, number_widget_a):
+    tabs_widget = mo.ui.anywidget(TabsWidget("Tabs", {
+        "Tab1": number_widget_a, 
+        "Tab2": mo.ui.anywidget(DropDownWidget("Hello", options=["1", "2", "3"])),
+        "Tab3": button_for_tab3
+
+    }))
     tabs_widget
     return (tabs_widget,)
 
 
 @app.cell
-def __(DropDownWidget, mo, tabs_widget):
-    dropdown_widget = DropDownWidget("Hello", options=["1", "2", "3"], parent=tabs_widget.get("Tab1"))
-    mo.ui.anywidget(dropdown_widget)
-    return (dropdown_widget,)
-
-
-@app.cell
-def __(DropDownWidget, card_widget, mo):
-    dropdown_widget2 = DropDownWidget("Hello2", options=["1", "2", "3"], parent=card_widget)
-    mo.ui.anywidget(dropdown_widget2)
-    return (dropdown_widget2,)
-
-
-@app.cell
-def __(tabs_widget):
-    tabs_widget.tab_elements
-    return
-
-
-@app.cell
-def __(CardWidget, mo):
-    card_widget = mo.ui.anywidget(CardWidget("teeq3434te"))
-    card_widget
-    return (card_widget,)
-
-
-@app.cell
-def __(HTMLWidget, mo):
-    def on_click(event):
-        print("Hello")
-    button1 = mo.ui.button(label="hello", on_click=on_click)
-    html_widget = HTMLWidget(button1.text)
-    mo.ui.anywidget(html_widget)
-    return button1, html_widget, on_click
-
-
-@app.cell
-def __(button1):
-    button1.text
+def __(number_widget_a):
+    number_widget_a.value
     return
 
 
