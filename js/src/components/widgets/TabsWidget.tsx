@@ -22,6 +22,18 @@ function TabsWidget({ model }: { model?: any }) {
         }
     }, [widgetId, activeTab]);
 
+    // Initialize with stored tab or first tab if no active tab is set
+    React.useEffect(() => {
+        const storedTab = getActiveTab(widgetId);
+        if (storedTab) {
+            setModelActiveTab(storedTab);
+        } else if (!activeTab && tabs && Object.keys(tabs).length > 0) {
+            const firstTab = Object.keys(tabs)[0];
+            setModelActiveTab(firstTab);
+            setActiveTab(widgetId, firstTab);
+        }
+    }, [tabs, activeTab]);
+
     const handleTabChange = (newValue: string) => {
         setActiveTab(widgetId, newValue);     // Update global store
         setModelActiveTab(newValue);          // Update model state

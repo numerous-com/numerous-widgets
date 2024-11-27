@@ -18,7 +18,9 @@ def __():
     from widgets.tabs_widget import TabsWidget
     from widgets.card_widget import CardWidget
     from widgets.html_widget import HTMLWidget
+    from widgets.button_widget import ButtonWidget
     return (
+        ButtonWidget,
         CardWidget,
         DropDownWidget,
         HTMLWidget,
@@ -42,6 +44,36 @@ def __(widget):
 
 
 @app.cell
+def __(CardWidget, NumberWidget, mo):
+    number_widget = NumberWidget("My Number")
+    number_widget_a = mo.ui.anywidget(number_widget)
+    card_number = mo.ui.anywidget(CardWidget(content=number_widget_a))
+    return card_number, number_widget, number_widget_a
+
+
+@app.cell
+def __(
+    DropDownWidget,
+    TabsWidget,
+    button_for_tab3,
+    button_n,
+    card,
+    card_number,
+    mo,
+):
+    tabs_widget = mo.ui.anywidget(TabsWidget("Tabs", {
+        "Tab1": card_number, 
+        "Tab2": mo.ui.anywidget(DropDownWidget("Hello", options=["1", "2", "3"])),
+        "Tab3": button_for_tab3,
+        "Tab4": button_n,
+        "Tab5": card
+
+    }))
+    tabs_widget
+    return (tabs_widget,)
+
+
+@app.cell
 def __(mo, widget_):
     def onclick(event):
         widget_.set_document("doc3", {"content": 1})
@@ -57,10 +89,15 @@ def __(mo, widget_):
 
 
 @app.cell
-def __(NumberWidget, mo):
-    number_widget = NumberWidget("My Number")
-    number_widget_a = mo.ui.anywidget(number_widget)
-    return number_widget, number_widget_a
+def __(ButtonWidget, do_action, mo):
+    button_n = mo.ui.anywidget(ButtonWidget("sdfsdf", on_click=do_action))
+    return (button_n,)
+
+
+@app.cell
+def __(mo, on_click2):
+    button_for_tab3 = mo.ui.button(label="tab button!", on_click=on_click2)
+    return (button_for_tab3,)
 
 
 @app.cell
@@ -73,21 +110,22 @@ def __():
 
 
 @app.cell
-def __(mo, on_click2):
-    button_for_tab3 = mo.ui.button(label="tab button!", on_click=on_click2)
-    return (button_for_tab3,)
+def __(ButtonWidget, mo, on_click2):
+    card_button = mo.ui.anywidget(ButtonWidget(label="submit", on_click=on_click2))
+    return (card_button,)
 
 
 @app.cell
-def __(DropDownWidget, TabsWidget, button_for_tab3, mo, number_widget_a):
-    tabs_widget = mo.ui.anywidget(TabsWidget("Tabs", {
-        "Tab1": number_widget_a, 
-        "Tab2": mo.ui.anywidget(DropDownWidget("Hello", options=["1", "2", "3"])),
-        "Tab3": button_for_tab3
+def __(CardWidget, card_button, mo):
+    card = mo.ui.anywidget(CardWidget(content=card_button))
+    return (card,)
 
-    }))
-    tabs_widget
-    return (tabs_widget,)
+
+@app.cell
+def __():
+    def do_action(event):
+        ...
+    return (do_action,)
 
 
 @app.cell
