@@ -1,12 +1,18 @@
 import anywidget
 import traitlets
-from typing import Dict, Union, List
+from typing import Dict, Union, List, Optional
+from .base import PortalWidget
 from .config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("TabsWidget")
 
-class TabsWidget(anywidget.AnyWidget):
+class TabContainer:
+    """A container widget for a single tab."""
+    def __init__(self, element_id: str):
+        self.element_id = element_id
+
+class TabsWidget(PortalWidget):
     # Define traitlets for the widget properties
     ui_label = traitlets.Unicode().tag(sync=True)
     ui_tooltip = traitlets.Unicode().tag(sync=True)
@@ -25,6 +31,7 @@ class TabsWidget(anywidget.AnyWidget):
         tabs: List[str],
         tooltip: str = None,
         default: str = None,
+        parent: Optional[PortalWidget] = None,
     ):
         # Use a more predictable ID format
         tab_ids = {
@@ -39,23 +46,30 @@ class TabsWidget(anywidget.AnyWidget):
             value=default if default is not None else tabs[0],
             tabs=tabs,
             tab_ids=tab_ids,
+            parent=parent,
         )
+        
+        # Create tab containers
+        self._tab_containers = {
+            tab: TabContainer(element_id=tab_ids[tab])
+            for tab in tabs
+        }
+
+    def get(self, tab: str) -> TabContainer:
+        """Get a container widget for a specific tab that can be used as a parent."""
+        if tab not in self.tab_ids:
+            raise KeyError(f"Tab '{tab}' not found. Available tabs: {', '.join(self.tab_ids.keys())}")
+        return self._tab_containers[tab]
 
     @staticmethod
     def from_dict(config: Dict[str, Union[str, List[str]]]) -> "TabsWidget":
-        """Creates a TabsWidget instance from a configuration dictionary.
-        
-        Args:1
-            config: Dictionary containing widget configuration parameters
-        
-        Returns:
-            TabsWidget: A new widget instance
-        """
+        """Creates a TabsWidget instance from a configuration dictionary."""
         return TabsWidget(
             label=config["ui_label"],
             tooltip=config["ui_tooltip"],
             default=config["default"],
             tabs=config["tabs"],
+            parent=config.get("parent"),
         )
 
     @property

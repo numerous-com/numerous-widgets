@@ -17,9 +17,11 @@ def __():
     from widgets.drop_down_widget import DropDownWidget
     from widgets.tabs_widget import TabsWidget
     from widgets.card_widget import CardWidget
+    from widgets.html_widget import HTMLWidget
     return (
         CardWidget,
         DropDownWidget,
+        HTMLWidget,
         NumberWidget,
         ProjectsMenuWidget,
         TabsWidget,
@@ -120,9 +122,16 @@ def __(TabsWidget, mo):
 
 @app.cell
 def __(DropDownWidget, mo, tabs_widget):
-    dropdown_widget = DropDownWidget("Hello", options=["1", "2", "3"], element_id=tabs_widget.tab_ids["Tab1"])
+    dropdown_widget = DropDownWidget("Hello", options=["1", "2", "3"], parent=tabs_widget.get("Tab1"))
     mo.ui.anywidget(dropdown_widget)
     return (dropdown_widget,)
+
+
+@app.cell
+def __(DropDownWidget, card_widget, mo):
+    dropdown_widget2 = DropDownWidget("Hello2", options=["1", "2", "3"], parent=card_widget)
+    mo.ui.anywidget(dropdown_widget2)
+    return (dropdown_widget2,)
 
 
 @app.cell
@@ -132,11 +141,26 @@ def __(tabs_widget):
 
 
 @app.cell
-def __(CardWidget, mo, tabs_widget):
-    card_widget = CardWidget("teerte", "sfsfd", element_id=tabs_widget.tab_ids["Tab2"])
-    card_widget_ = mo.ui.anywidget(card_widget)
-    card_widget_
-    return card_widget, card_widget_
+def __(CardWidget, mo):
+    card_widget = mo.ui.anywidget(CardWidget("teeq3434te"))
+    card_widget
+    return (card_widget,)
+
+
+@app.cell
+def __(HTMLWidget, mo):
+    def on_click(event):
+        print("Hello")
+    button1 = mo.ui.button(label="hello", on_click=on_click)
+    html_widget = HTMLWidget(button1.text)
+    mo.ui.anywidget(html_widget)
+    return button1, html_widget, on_click
+
+
+@app.cell
+def __(button1):
+    button1.text
+    return
 
 
 if __name__ == "__main__":

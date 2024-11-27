@@ -28,8 +28,8 @@ class PortalErrorBoundary extends React.Component<
 
 function CardWidget() {
     const [title] = useModelState<string>("title");
-    const [content] = useModelState<string>("content");
     const [elementId] = useModelState<string>("element_id");
+    const [parentId] = useModelState<string>("parent_id");
     const [shouldFallback, setShouldFallback] = React.useState(false);
     const portalContainer = usePortalContainer(elementId);
 
@@ -46,8 +46,8 @@ function CardWidget() {
 
     const card = (
         <PortalErrorBoundary>
-            <Card title={title}>
-                {content}
+            <Card title={title} parentId={parentId}>
+                <div data-marimo-content="true"></div>
             </Card>
         </PortalErrorBoundary>
     );

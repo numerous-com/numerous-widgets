@@ -1,4 +1,4 @@
-from typing import Dict, Union, List
+from typing import Dict, Union, List, Optional
 import traitlets
 from .base import PortalWidget
 from .config import get_widget_paths
@@ -23,7 +23,7 @@ class DropDownWidget(PortalWidget):
         options: List[str],
         tooltip: str = None,
         default: str = None,
-        element_id: str = None,
+        parent: Optional[PortalWidget] = None,
     ):
         # Initialize with keyword arguments
         super().__init__(
@@ -31,7 +31,7 @@ class DropDownWidget(PortalWidget):
             ui_tooltip=tooltip if tooltip is not None else "",
             value=default if default is not None else options[0],
             options=options,
-            element_id=element_id,
+            parent=parent,
         )
 
     @staticmethod
@@ -42,7 +42,7 @@ class DropDownWidget(PortalWidget):
             tooltip=config["ui_tooltip"],
             default=config["default"],
             options=config["options"],
-            element_id=config.get("element_id"),
+            parent=config.get("parent"),
         )
 
     @property
