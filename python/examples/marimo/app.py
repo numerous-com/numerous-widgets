@@ -94,5 +94,24 @@ def __(map):
     return
 
 
+@app.cell
+def __(aw, wi):
+    progress = aw(wi.ProgressBar(label="Hello"))
+    progress
+    return (progress,)
+
+
+@app.cell
+def __(progress):
+    progress.val = 75
+    return
+
+
+@app.cell
+def __(progress):
+    progress.value
+    return
+
+
 if __name__ == "__main__":
     app.run()
