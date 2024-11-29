@@ -1,6 +1,6 @@
 {
 	"scripts": {
-		"dev": "npm run build -- --sourcemap=inline --watch",
+		"dev": "vite",
 		"build": "vite build",
 		"typecheck": "tsc --noEmit"
 	},

@@ -31,7 +31,7 @@ def get_widget_paths(component_name: str) -> tuple[Union[str, pathlib.Path], pat
     if IS_DEV:
         esm = f"{DEV_COMPONENT_PATH}/{component_name}.tsx?anywidget"
         css = GLOBAL_CSS
-        css = STATIC_DIR / "style.css"
+        #css = STATIC_DIR / "style.css"
 
     else:
         esm = STATIC_DIR / f"{component_name}.mjs"

@@ -5,6 +5,8 @@ import postcssCssVariables from 'postcss-css-variables';
 // Get the widget name from environment variable
 const widgetName = process.env.WIDGET_NAME || 'ButtonWidget';
 
+// Get current environment
+const isDevelopment = process.env.NODE_ENV === 'development';
 
 export default defineConfig({
 	plugins: [anywidget()],
@@ -23,7 +25,7 @@ export default defineConfig({
 			},
 			cssCodeSplit: false,
 			minify: true,
-			cssMinify: {
+			cssMinify: isDevelopment ? false : {
 				preset: ['default', {
 					cssVariables: false
 				}]
@@ -32,10 +34,11 @@ export default defineConfig({
 	css: {
 		postcss: {
 			plugins: [
-				postcssCssVariables({
-					preserve: false // This will remove the CSS variables
+				// Only process CSS variables in production
+				!isDevelopment && postcssCssVariables({
+					preserve: false
 				})
-			]
+			].filter(Boolean)
 		}
 	},
 	define: {
