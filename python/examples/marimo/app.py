@@ -7,14 +7,14 @@ app = marimo.App(width="medium")
 @app.cell
 def __():
     import marimo as mo
-    aw = mo.ui.anywidget
-    return aw, mo
+    return (mo,)
 
 
 @app.cell
-def __():
+def __(mo):
     import widgets as wi
-    return (wi,)
+    aw = mo.ui.anywidget
+    return aw, wi
 
 
 @app.cell
@@ -25,22 +25,22 @@ def __():
 
 
 @app.cell
-def __(aw, wi):
-    number = aw(wi.Number(label="Number", tooltip="This is a number"))
+def __(wi):
+    number = wi.Number(label="Number", tooltip="This is a number")
     number
     return (number,)
 
 
 @app.cell
-def __(aw, wi):
-    drop_down = aw(wi.DropDown(label="Select", tooltip="sdfsd", options=["Option 1", "Option 2"]))
+def __(wi):
+    drop_down = wi.DropDown(label="Select", tooltip="sdfsd", options=["Option 1", "Option 2"])
     drop_down
     return (drop_down,)
 
 
 @app.cell
-def __(aw, wi):
-    button = aw(wi.Button(label="ok", tooltip="The button"))
+def __(wi):
+    button = wi.Button(label="ok", tooltip="The button")
     button
     return (button,)
 
@@ -65,8 +65,32 @@ def __(content, tabs, wi):
 
 
 @app.cell
-def __(wi):
-    wi.CheckBox("Check box")
+def __(aw, wi):
+    aw(wi.CheckBox("Check box"))
+    return
+
+
+@app.cell
+def __(aw, mo, wi):
+    map = aw(wi.MapSelector(points={
+            'nyc': [-73.985428, 40.748817],    # New York
+            'paris': [2.294481, 48.858370],     # Paris
+            'tokyo': [139.839478, 35.652832]    # Tokyo
+        }, center= [2.294481, 48.858370], zoom=8))
+
+    mo.Html(wi.card(map))
+    return (map,)
+
+
+@app.cell
+def __(map):
+    map.location_clicked
+    return
+
+
+@app.cell
+def __(map):
+    map.selected_value
     return
 
 
