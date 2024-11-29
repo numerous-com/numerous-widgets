@@ -51,4 +51,8 @@ class Button(anywidget.AnyWidget):
             disabled=config.get("disabled", False),
         )
     
+    @property
+    def val(self) -> bool:
+        return self.value
+    
     

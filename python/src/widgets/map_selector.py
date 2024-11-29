@@ -7,6 +7,22 @@ from .config import get_widget_paths
 ESM, CSS = get_widget_paths("MapSelectorWidget")
 
 class MapSelector(anywidget.AnyWidget):
+
+    """
+    A widget for selecting a point on a map.
+
+    The widget is initialized with a dictionary of points, where each point is a tuple of longitude and latitude.
+    The widget also has a center and zoom level, which can be specified at initialization.
+
+    The selected point can be accessed via the `selected_value` property.
+
+    The last location clicked can be accessed via the `location_clicked` property.
+
+    Args:
+        points: A dictionary of points, where each point is a tuple of longitude and latitude.
+        center: The center of the map, as a tuple of longitude and latitude.
+        zoom: The zoom level of the map.
+    """
     # Define traitlets for the widget properties
     points = traitlets.Dict({}).tag(sync=True)
     value = traitlets.Unicode('').tag(sync=True)
@@ -35,5 +51,9 @@ class MapSelector(anywidget.AnyWidget):
 
     @property
     def selected_value(self) -> str:
-        """Returns the currently selected point ID."""
+        """Returns the currently selected point ID.
+        
+        Returns:
+            str: The ID of the currently selected point.
+        """
         return self.value

@@ -7,6 +7,16 @@ from .config import get_widget_paths
 ESM, CSS = get_widget_paths("NumberInputWidget")
 
 class Number(anywidget.AnyWidget):
+    """
+    A widget for selecting a numeric value.
+
+    The selected value can be accessed via the `selected_value` property.
+
+    Args:
+        label: The label of the number input.
+        tooltip: The tooltip of the number input.
+        default: The default value of the number input.
+    """
     # Define traitlets for the widget properties
     ui_label = traitlets.Unicode().tag(sync=True)
     ui_tooltip = traitlets.Unicode().tag(sync=True)
@@ -38,34 +48,29 @@ class Number(anywidget.AnyWidget):
             step=step,
         )
 
-    @staticmethod
-    def from_dict(config: Dict[str, Union[str, float]]) -> "Number":
-        """Creates a NumberWidget instance from a configuration dictionary.
-        
-        Args:
-            config: Dictionary containing widget configuration parameters
-        
-        Returns:
-            NumberWidget: A new widget instance
-        """
-        return Number(
-            label=config["label"],
-            tooltip=config["tooltip"],
-            default=config["default"],
-            start=config["start"],
-            stop=config["stop"],
-            step=config["step"],
-        )
-
     @property
     def selected_value(self) -> float:
-        """Returns the currently selected numeric value."""
+        """Returns the currently selected numeric value.
+        
+        Returns:
+            float: The currently selected numeric value.
+        """
         return self.value
     
     @property
-    def val(self):
+    def val(self) -> float:
+        """Returns the currently selected numeric value.
+        
+        Returns:
+            float: The currently selected numeric value.
+        """
         return self.value
     
     @val.setter
-    def val(self, value):
+    def val(self, value: float):
+        """Sets the currently selected numeric value.
+        
+        Args:
+            value: The new value to set.
+        """
         self.value = value

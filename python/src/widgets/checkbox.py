@@ -7,6 +7,16 @@ from .config import get_widget_paths
 ESM, CSS = get_widget_paths("CheckBoxWidget")
 
 class CheckBox(anywidget.AnyWidget):
+    """
+    A widget for selecting a boolean value.
+    
+    The selected value can be accessed via the `selected_value` property.
+    
+    Args:
+        label: The label of the checkbox.
+        tooltip: The tooltip of the checkbox.
+        default: The default value of the checkbox.
+    """
     # Define traitlets for the widget properties
     ui_label = traitlets.Unicode().tag(sync=True)
     ui_tooltip = traitlets.Unicode().tag(sync=True)
@@ -27,22 +37,6 @@ class CheckBox(anywidget.AnyWidget):
             ui_label=label,
             ui_tooltip=tooltip if tooltip is not None else "",
             value=default,
-        )
-
-    @staticmethod
-    def from_dict(config: Dict[str, Union[str, bool]]) -> "CheckBox":
-        """Creates a CheckBox instance from a configuration dictionary.
-        
-        Args:
-            config: Dictionary containing widget configuration parameters
-        
-        Returns:
-            CheckBox: A new widget instance
-        """
-        return CheckBox(
-            label=config["label"],
-            tooltip=config.get("tooltip", ""),
-            default=config.get("default", False),
         )
 
     @property

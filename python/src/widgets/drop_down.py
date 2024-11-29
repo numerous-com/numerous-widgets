@@ -7,6 +7,16 @@ import anywidget
 ESM, CSS = get_widget_paths("DropDownWidget")
 
 class DropDown(anywidget.AnyWidget):
+    """
+    A widget for selecting an option from a list of options.
+
+    The selected option can be accessed via the `selected_value` property.
+
+    Args:
+        options: A list of options to select from.
+        label: The label of the dropdown.
+        tooltip: The tooltip of the dropdown.
+    """
     # Define traitlets for the widget properties
     ui_label = traitlets.Unicode().tag(sync=True)
     ui_tooltip = traitlets.Unicode().tag(sync=True)
@@ -36,17 +46,12 @@ class DropDown(anywidget.AnyWidget):
             options=options,
         )
 
-    @staticmethod
-    def from_dict(config: Dict[str, Union[str, List[str]]]) -> "DropDown":
-        """Creates a DropDownWidget instance from a configuration dictionary."""
-        return DropDown(
-            label=config["ui_label"],
-            tooltip=config["ui_tooltip"],
-            default=config["default"],
-            options=config["options"],
-        )
-
     @property
     def selected_value(self) -> str:
         """Returns the currently selected option."""
         return self.selected_key
+    
+    @property
+    def val(self) -> str:
+        """Returns the currently selected option."""
+        return self.selected_value
