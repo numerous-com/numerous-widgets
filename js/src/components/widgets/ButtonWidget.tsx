@@ -4,25 +4,29 @@ import { Button } from "../ui/Button";
 import '../../css/styles.css';
 
 function ButtonWidget() {
-    const [label] = useModelState<string>("label");
     const [uiLabel] = useModelState<string>("ui_label");
     const [uiTooltip] = useModelState<string>("ui_tooltip");
     const [clicked, setClicked] = useModelState<number>("clicked");
+    const [disabled] = useModelState<boolean>("disabled");
+    const [value, setValue] = useModelState<boolean>("value");
 
-    const handleClick = () => {
-        setClicked(clicked + 1);
-    };
+    const handleClick = React.useCallback(() => {
+        const newClicked = clicked + 1;
+        setClicked(newClicked);
+        setValue(newClicked > 0);
+    }, [clicked, setClicked, setValue]);
 
     return (
         <Button
-            label={label}
-            uiLabel={uiLabel}
-            uiTooltip={uiTooltip}
+           label={uiLabel}
+            tooltip={uiTooltip}
             onClick={handleClick}
+            disabled={disabled}
+            value={value}
         />
     );
 }
 
 export default {
     render: createRender(ButtonWidget)
-} 
+}

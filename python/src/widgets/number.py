@@ -6,7 +6,7 @@ from .config import get_widget_paths
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("NumberInputWidget")
 
-class NumberWidget(anywidget.AnyWidget):
+class Number(anywidget.AnyWidget):
     # Define traitlets for the widget properties
     ui_label = traitlets.Unicode().tag(sync=True)
     ui_tooltip = traitlets.Unicode().tag(sync=True)
@@ -39,7 +39,7 @@ class NumberWidget(anywidget.AnyWidget):
         )
 
     @staticmethod
-    def from_dict(config: Dict[str, Union[str, float]]) -> "NumberWidget":
+    def from_dict(config: Dict[str, Union[str, float]]) -> "Number":
         """Creates a NumberWidget instance from a configuration dictionary.
         
         Args:
@@ -48,7 +48,7 @@ class NumberWidget(anywidget.AnyWidget):
         Returns:
             NumberWidget: A new widget instance
         """
-        return NumberWidget(
+        return Number(
             label=config["label"],
             tooltip=config["tooltip"],
             default=config["default"],
@@ -61,3 +61,11 @@ class NumberWidget(anywidget.AnyWidget):
     def selected_value(self) -> float:
         """Returns the currently selected numeric value."""
         return self.value
+    
+    @property
+    def val(self):
+        return self.value
+    
+    @val.setter
+    def val(self, value):
+        self.value = value

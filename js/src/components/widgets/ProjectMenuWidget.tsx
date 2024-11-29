@@ -71,5 +71,5 @@ function ProjectMenuWidget() {
 }
 
 export default {
-	render: createRender(ProjectMenuWidget)
-};
+    render: createRender(ProjectMenuWidget)
+}

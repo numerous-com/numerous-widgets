@@ -1,7 +1,7 @@
 {
 	"scripts": {
 		"dev": "npm run build -- --sourcemap=inline --watch",
-		"build": "esbuild js/components/ProjectMenuWidget.tsx --minify --format=esm --bundle --outdir=src/widget/static",
+		"build": "vite build",
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
@@ -17,6 +17,7 @@
 		"@types/react-dom": "^18.3.1",
 		"@vitejs/plugin-react": "^4.3.3",
 		"esbuild": "^0.24.0",
+		"postcss-css-variables": "^0.19.0",
 		"typescript": "^5.6.3",
 		"vite": "^5.4.11"
 	}

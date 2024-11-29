@@ -74,7 +74,7 @@ class ProjectBrowserBase(anywidget.AnyWidget):
         else:
             return get_file(self.selected_project_id, self.selected_scenario_id, name)
         
-class ProjectsMenuWidget(ProjectBrowserBase):
+class ProjectsMenu(ProjectBrowserBase):
     _esm = ESM
     _css = CSS
     

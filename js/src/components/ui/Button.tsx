@@ -3,28 +3,32 @@ import { Tooltip } from './Tooltip';
 
 interface ButtonProps {
     label: string;
-    uiLabel: string;
-    uiTooltip: string;
+    tooltip: string;
     onClick: () => void;
+    disabled?: boolean;
+    value?: boolean;
 }
 
 export function Button({ 
     label, 
-    uiLabel, 
-    uiTooltip, 
-    onClick 
+    tooltip, 
+    onClick,
+    disabled = false,
+    value = false
 }: ButtonProps) {
     return (
         <div className="button-container">
-            {uiLabel && (
+            {label && (
                 <label className="button-label">
-                    <span>{uiLabel}</span>
-                    {uiTooltip && <Tooltip tooltip={uiTooltip} />}
+                    <span>{label}</span>
+                    {tooltip && <Tooltip tooltip={tooltip} />}
                 </label>
             )}
             <button 
                 className="widget-button"
                 onClick={onClick}
+                disabled={disabled}
+                aria-pressed={value}
             >
                 {label}
             </button>

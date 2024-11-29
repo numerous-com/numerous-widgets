@@ -1,26 +1,42 @@
 import { defineConfig } from "vite";
-//import react from "@vitejs/plugin-react";
 import anywidget from "@anywidget/vite";
+import postcssCssVariables from 'postcss-css-variables';
+
+// Get the widget name from environment variable
+const widgetName = process.env.WIDGET_NAME || 'ButtonWidget';
+
 
 export default defineConfig({
 	plugins: [anywidget()],
 	build: {
 		outDir: "../python/src/widgets/static",
-		lib: {
-			//entry: ["src/components/ProjectMenuWidget.tsx"],
-			entry: ["src/components/widgets/NumberInputWidget.tsx"],
-			formats: ["es"],
-		},
-		rollupOptions: {
-			output: {
-				assetFileNames: (assetInfo) => {
-					if (assetInfo.name?.endsWith('.css')) {
-						return '[name][extname]';
-					}
-					return assetInfo.name ?? 'unknown';
+			lib: {
+				entry: [`src/components/widgets/${widgetName}.tsx`],
+				formats: ["es"],
+			},
+			rollupOptions: {
+				output: {
+					assetFileNames: "style.css",
+					entryFileNames: "[name].mjs",
+					chunkFileNames: "[name]-[hash].mjs",
 				},
 			},
-		},
+			cssCodeSplit: false,
+			minify: true,
+			cssMinify: {
+				preset: ['default', {
+					cssVariables: false
+				}]
+			}
+	},
+	css: {
+		postcss: {
+			plugins: [
+				postcssCssVariables({
+					preserve: false // This will remove the CSS variables
+				})
+			]
+		}
 	},
 	define: {
 		'process.env': {},

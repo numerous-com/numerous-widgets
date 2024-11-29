@@ -2,15 +2,15 @@ import * as React from "react";
 import { Tooltip } from './Tooltip';
 
 interface DropDownProps {
-    value: string;
+    selected_key: string;
     options: string[];
     uiLabel: string;
     uiTooltip: string;
-    onChange: (value: string) => void;
+    onChange: (selected_key: string) => void;
 }
 
 export function DropDown({ 
-    value, 
+    selected_key, 
     options, 
     uiLabel, 
     uiTooltip, 
@@ -45,7 +45,7 @@ export function DropDown({
                     tabIndex={0}
                     onClick={toggleDropdown}
                 >
-                    <div className="selected-value">{value}</div>
+                    <div className="selected-value">{selected_key}</div>
                     <div className="dropdown-arrow"></div>
                 </div>
                 <div 
@@ -58,7 +58,7 @@ export function DropDown({
 return (
                             <div
                                 key={option}
-                                className={`option ${option === value ? 'selected' : ''}`}
+                                className={`option ${option === selected_key ? 'selected' : ''}`}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     handleOptionClick(option);

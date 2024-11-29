@@ -3,7 +3,7 @@ import { Tooltip } from './Tooltip';
 
 interface TabsProps {
     value: string;
-    tabs: {[key: string]: string};
+    tabs: string[];
     uiLabel: string;
     uiTooltip: string;
     contentUpdated: boolean;
@@ -34,9 +34,10 @@ export function Tabs({
                     {uiTooltip && <Tooltip tooltip={uiTooltip} />}
                 </label>
             )}
+            
             <div className="tabs-list">
                 <div className="tabs-row">
-                    {Object.keys(tabs).map(tab => (
+                    {tabs.map(tab => (
                         <div
                             key={tab}
                             className={`tab ${value === tab ? 'active' : ''}`}
@@ -46,14 +47,7 @@ export function Tabs({
                         </div>
                     ))}
                 </div>
-                {Object.entries(tabs).map(([tab, content]) => (
-                    <div
-                        key={tab}
-                        className={`tab-content ${value === tab ? 'active' : 'hidden'}`}
-                        data-tab={tab}
-                        dangerouslySetInnerHTML={{ __html: content || '' }}
-                    />
-                ))}
+                
             </div>
         </div>
     );

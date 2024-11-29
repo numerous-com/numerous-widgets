@@ -6,10 +6,8 @@ Requires-Dist: anywidget
 Provides-Extra: dev
 Requires-Dist: anywidget[dev]; extra == "dev"
 Requires-Dist: python-dotenv; extra == "dev"
-Provides-Extra: marimo
-Requires-Dist: marimo; extra == "marimo"
-Provides-Extra: numerous
-Requires-Dist: numerous; extra == "numerous"
+Requires-Dist: marimo; extra == "dev"
+Requires-Dist: numerous; extra == "dev"
 
 # Widgets
 
