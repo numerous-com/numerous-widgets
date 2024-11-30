@@ -864,4 +864,207 @@
     margin: 2em 0;
   }
 
+  .task-button-container {
+    display: inline-block;
+  }
+
+  .task-button {
+    position: relative;
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+  }
+
+  .task-button:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  .task-button .button-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+  }
+
+  /* State-specific colors */
+  .task-button.idle .button-icon {
+    color: #3b82f6; /* Using the blue color instead of gray */
+  }
+
+  .task-button.running .button-icon {
+    color: #3b82f6; /* Blue for running state */
+  }
+
+  .task-button.completed .button-icon {
+    color: #10b981; /* Green for completed state */
+  }
+
+  .task-button.failed .button-icon {
+    color: #ef4444; /* Red for failed state */
+  }
+
+  /* Progress ring styles */
+  .progress-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: rotate(-90deg);
+  }
+
+  .progress-ring-background {
+    stroke: #e0e0e0;
+  }
+
+  .progress-ring-circle {
+    transition: stroke-dashoffset 0.1s;
+  }
+
+  /* Progress ring colors and animations for different states */
+  .task-button.idle .progress-ring-circle {
+    stroke: #3b82f6; /* Using the blue color instead of gray */
+    opacity: 0.3;
+    animation: idle-pulse 2s ease-in-out infinite;
+  }
+
+  .task-button.idle .button-icon {
+    color: #3b82f6; /* Matching blue color for the play icon */
+  }
+
+  .task-button.running .progress-ring-circle {
+    stroke: #3b82f6;
+    opacity: 1;
+    animation: progress-pulse 1.5s ease-in-out infinite;
+  }
+
+  .task-button.completed .progress-ring-circle {
+    stroke: #10b981;
+    opacity: 1;
+  }
+
+  .task-button.failed .progress-ring-circle {
+    stroke: #ef4444;
+    opacity: 1;
+  }
+
+  /* Animation keyframes */
+  @keyframes idle-pulse {
+    0% {
+        opacity: 0.2;
+        stroke-width: 3px;
+    }
+    50% {
+        opacity: 0.4;
+        stroke-width: 3.5px;
+    }
+    100% {
+        opacity: 0.2;
+        stroke-width: 3px;
+    }
+  }
+
+  @keyframes progress-pulse {
+    0% {
+        stroke-width: 3px;
+        opacity: 1;
+    }
+    50% {
+        stroke-width: 4px;
+        opacity: 0.5;
+    }
+    100% {
+        stroke-width: 3px;
+        opacity: 1;
+    }
+  }
+
+  /* Animation styles */
+  .check-icon {
+    animation: check-appear 0.3s ease-out;
+  }
+
+  .x-icon {
+    animation: x-appear 0.3s ease-out;
+  }
+
+  @keyframes check-appear {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+  }
+
+  @keyframes x-appear {
+    from {
+        transform: scale(0) rotate(-180deg);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1) rotate(0);
+        opacity: 1;
+    }
+  }
+
+  /* State-specific colors */
+  .task-button.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .task-button.disabled .progress-ring-circle {
+    stroke: #94a3b8;
+    opacity: 0.3;
+  }
+
+  .task-button.disabled .button-icon {
+    color: #94a3b8;
+  }
+
+  .timer-dot {
+    display: inline-block;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .timer-dot:hover {
+    transform: scale(1.05);
+  }
+
+  /* Add these new styles */
+  .task-button.completed:hover,
+  .task-button.failed:hover {
+    opacity: 0.8;
+  }
+
+  .reset-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .task-button .play-icon {
+    width: 24px;
+    height: 24px;
+    color: #3b82f6; /* Blue color to match the idle state */
+  }
+
+  /* Adjust the play icon position */
+  .task-button.idle .play-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Hide play icon when not in idle state */
+  .task-button:not(.idle) .play-icon {
+    display: none;
+  }
+
 
