@@ -249,30 +249,47 @@
   }
   
   /* Modal styles */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
+  [data-radix-popper-content-wrapper] {
+    z-index: 9999 !important;
   }
   
-  .modal-container {
-    display: flex;
-    flex-direction: column;
-    padding: 1.5rem;
-    gap: 1rem;
-    max-height: 90vh;
-    height: auto;
-    width: 90%;
-    max-width: 1200px;
-    background-color: white;
+  [data-radix-dialog-overlay] {
+    position: fixed !important;
+    inset: 0 !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    z-index: 9998 !important;
+  }
+  
+  [data-radix-dialog-content] {
+    position: fixed !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 9999 !important;
+    background-color: var(--ui-widget-primary-background);
     border-radius: 8px;
-    border: 1px solid #ddd;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--ui-widget-dropdown-shadow);
+    min-width: 32rem;
+    max-width: 90vw;
+    max-height: 85vh;
+    overflow: auto;
+  }
+  
+  .task-detail-modal {
+    background-color: var(--ui-widget-primary-background);
+    padding: 24px;
+    border-radius: 8px;
+    width: 100%;
     position: relative;
+  }
+  
+  /* Ensure modal content is visible */
+  .modal-header,
+  .progress-section,
+  .controls-section,
+  .logs-section {
+    position: relative;
+    z-index: 10000;
   }
   
   .modal-close-button {
@@ -1065,6 +1082,187 @@
   /* Hide play icon when not in idle state */
   .task-button:not(.idle) .play-icon {
     display: none;
+  }
+
+  /* Task Detail Modal styles */
+  .task-detail-modal {
+    padding: 24px;
+    max-width: 600px;
+    width: 100%;
+    background-color: var(--ui-widget-primary-background);
+    border-radius: 8px;
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--ui-widget-primary-text);
+  }
+
+  .close-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: var(--ui-widget-secondary-text);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+
+  .close-button:hover {
+    background-color: var(--ui-widget-hover-background);
+  }
+
+  .progress-section {
+    margin-bottom: 24px;
+  }
+
+  .progress-bar {
+    height: 8px;
+    background: var(--ui-widget-secondary-background);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--ui-widget-focus-border);
+    transition: width 0.3s ease;
+  }
+
+  .progress-text {
+    font-size: 14px;
+    color: var(--ui-widget-secondary-text);
+  }
+
+  .controls-section {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .control-button {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    background-color: var(--ui-widget-primary-background);
+    border: 1px solid var(--ui-widget-border-color);
+    color: var(--ui-widget-primary-text);
+  }
+
+  .control-button:hover:not(:disabled) {
+    background-color: var(--ui-widget-hover-background);
+  }
+
+  .control-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .logs-section {
+    background: var(--ui-widget-secondary-background);
+    border-radius: 4px;
+    padding: 16px;
+  }
+
+  .logs-section h3 {
+    margin: 0 0 12px 0;
+    font-size: 1rem;
+    color: var(--ui-widget-primary-text);
+  }
+
+  .logs-container {
+    max-height: 300px;
+    overflow-y: auto;
+    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+    font-size: 0.9rem;
+  }
+
+  .log-entry {
+    padding: 4px 0;
+    color: var(--ui-widget-primary-text);
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  /* Task Button Container styles */
+  .task-button-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .expand-button {
+    padding: 4px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+    color: var(--ui-widget-secondary-text);
+  }
+
+  .expand-button:hover:not(:disabled) {
+    opacity: 1;
+  }
+
+  .expand-button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .expand-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+
+  .font-semibold {
+    font-weight: 600;
+  }
+
+  .text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+
+  .text-gray-500 {
+    color: var(--ui-widget-secondary-text);
+  }
+
+  /* Update Dialog styles */
+  [data-radix-popper-content-wrapper] {
+    z-index: 9999 !important;
+  }
+
+  [data-radix-dialog-overlay] {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+  }
+
+  [data-radix-dialog-content] {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
   }
 
 

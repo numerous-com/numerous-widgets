@@ -194,6 +194,30 @@ class ProcessTask:
     def completed(self) -> bool:
         return self._progress.value >= 1.0
 
+    def reset(self) -> None:
+        """Reset the task's state to initial conditions.
+        
+        This clears all queues, resets progress, and clears any stored results or exceptions.
+        If a process is running, it will be stopped first.
+        """
+        print("Resetting task")
+        if self._process and self._process.is_alive():
+            self.stop()
+            
+        # Clear all queues
+        while not self._result_queue.empty():
+            self._result_queue.get()
+        while not self._exception_queue.empty():
+            self._exception_queue.get()
+        while not self._log_queue.empty():
+            self._log_queue.get()
+            
+        # Reset internal state
+        self._progress.value = 0.0
+        self._return_value = None
+        self._exception = None
+        self._process = None
+
 # Example subclass implementation
 from time import sleep
 class Simulation(ProcessTask):

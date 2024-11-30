@@ -40,7 +40,7 @@ def __(aw, simulation, wi):
         print("Start")
         simulation.start(10.0, 1, 0)
 
-    task_widget = aw(wi.Task(on_start=on_start, on_stop=simulation.stop))
+    task_widget = aw(wi.Task(on_start=on_start, on_stop=simulation.stop, on_reset=simulation.reset))
     task_widget
     return on_start, task_widget
 

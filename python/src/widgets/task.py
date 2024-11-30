@@ -30,15 +30,18 @@ class Task(anywidget.AnyWidget):
         self,
         on_start: Optional[Callable[[], None]] = None,
         on_stop: Optional[Callable[[], None]] = None,
+        on_reset: Optional[Callable[[], None]] = None,
         disabled: bool = False
     ):
         super().__init__()
         self._on_start = on_start
         self._on_stop = on_stop
+        self._on_reset = on_reset
         self.is_disabled = disabled
         
-        # Observe changes to is_running to trigger callbacks
+        # Observe changes to is_running and started to trigger callbacks
         self.observe(self._handle_running_change, names=['is_running'])
+        self.observe(self._handle_started_change, names=['started'])
     
     def _handle_running_change(self, change):
         """Internal handler for running state changes"""
@@ -50,6 +53,13 @@ class Task(anywidget.AnyWidget):
         else:  # Stopped running
             if self._on_stop:
                 self._on_stop()
+    
+    def _handle_started_change(self, change):
+        """Internal handler for started state changes"""
+        if change['new'] == False and change['old'] == True:  # Changed from True to False
+            # This indicates a reset from the UI
+            if self._on_reset:
+                self._on_reset()
     
     def set_progress(self, value: float):
         """Sets the progress value (0.0 to 1.0)"""
@@ -89,11 +99,16 @@ class Task(anywidget.AnyWidget):
     def reset(self):
         """Resets the widget to its initial state"""
         if not self.is_disabled:
+            # Reset all state variables atomically
+            self.progress = 0.0
             self.is_running = False
             self.is_completed = False
             self.is_failed = False
             self.started = False
-            self.progress = 0.0
+            
+            # Call the reset callback if provided
+            if self._on_reset:
+                self._on_reset()
     
     def enable(self):
         """Enables the task widget"""

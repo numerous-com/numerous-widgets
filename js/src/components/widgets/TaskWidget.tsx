@@ -8,20 +8,23 @@ function TaskWidget() {
     const [isCompleted, setIsCompleted] = useModelState<boolean>("is_completed");
     const [isFailed, setIsFailed] = useModelState<boolean>("is_failed");
     const [isDisabled] = useModelState<boolean>("is_disabled");
+    const [started, setStarted] = useModelState<boolean>("started");
     const [progress, setProgress] = useModelState<number>("progress");
-    const [started, setStarted] = React.useState(false);
 
-    const handleReset = () => {
+    const handleReset = async () => {
+        setProgress(0);
         setIsRunning(false);
         setIsCompleted(false);
         setIsFailed(false);
         setStarted(false);
-        setProgress(0);
+
     };
 
     const handleStart = () => {
-        setIsRunning(true);
-        setStarted(true);
+        if (!isRunning && !isCompleted && !isFailed) {
+            setIsRunning(true);
+            setStarted(true);
+        }
     };
 
     return (
@@ -33,8 +36,12 @@ function TaskWidget() {
             started={started}
             progress={progress}
             onStart={handleStart}
-            onStop={() => setIsRunning(false)}
+            onStop={() => {
+                setIsRunning(false);
+                setProgress(0);
+            }}
             onReset={handleReset}
+            taskName="Task"
         />
     );
 }

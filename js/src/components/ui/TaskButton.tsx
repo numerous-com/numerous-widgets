@@ -1,4 +1,5 @@
 import * as React from "react";
+import { TaskDetailModal } from "./TaskModal";
 
 interface TaskButtonProps {
     isRunning: boolean;
@@ -10,6 +11,9 @@ interface TaskButtonProps {
     onStart: () => void;
     onStop: () => void;
     onReset: () => void;
+    onExpand?: () => void;
+    taskName: string;
+    logs?: string[];
 }
 
 export function TaskButton({ 
@@ -21,7 +25,10 @@ export function TaskButton({
     progress, 
     onStart, 
     onStop,
-    onReset
+    onReset,
+    onExpand = () => {},
+    taskName,
+    logs = []
 }: TaskButtonProps) {
     const size = 40;
     const strokeWidth = 3;
@@ -31,6 +38,7 @@ export function TaskButton({
     const progressOffset = circumference * (1 - progress);
 
     const [isHovering, setIsHovering] = React.useState(false);
+    const [isModalOpen, setIsModalOpen] = React.useState(false);
 
     const getButtonState = () => {
         if (isDisabled) return 'disabled';
@@ -45,9 +53,22 @@ export function TaskButton({
             onStop();
         } else if ((isCompleted || isFailed) || (started && !isRunning)) {
             onReset();
+            return;
         } else if (!started) {
             onStart();
         }
+    };
+
+    const handleExpand = () => {
+        setIsModalOpen(true);
+        onExpand?.();
+    };
+
+    const getStatus = () => {
+        if (isCompleted) return 'completed';
+        if (isFailed) return 'failed';
+        if (isRunning) return 'running';
+        return 'idle';
     };
 
     return (
@@ -119,6 +140,27 @@ export function TaskButton({
                     )}
                 </div>
             </button>
+            <button 
+                className="expand-button"
+                onClick={handleExpand}
+                disabled={isDisabled}
+            >
+                <svg viewBox="0 0 24 24" fill="currentColor" className="expand-icon" width="16" height="16">
+                    <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+                </svg>
+            </button>
+
+            <TaskDetailModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                taskName={taskName}
+                progress={progress}
+                status={getStatus()}
+                logs={logs}
+                onStart={onStart}
+                onStop={onStop}
+                onReset={onReset}
+            />
         </div>
     );
 } 
