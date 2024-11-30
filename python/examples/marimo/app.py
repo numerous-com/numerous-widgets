@@ -103,13 +103,35 @@ def __(aw, wi):
 
 @app.cell
 def __(progress):
-    progress.val = 75
+    progress.val = 50
     return
 
 
 @app.cell
 def __(progress):
     progress.value
+    return
+
+
+@app.cell
+def __(aw, wi):
+    markdown_drawer = aw(wi.MarkdownDrawer("Docs", content="# Hello World"))
+    markdown_drawer
+    return (markdown_drawer,)
+
+
+@app.cell
+def __(markdown_drawer):
+    markdown_drawer.content = """# Documentation for the System Designer
+
+    1. Test
+    2. Test more
+
+    ## section
+    sfsfds
+    ### Hello
+    sfdsfd
+    """
     return
 
 

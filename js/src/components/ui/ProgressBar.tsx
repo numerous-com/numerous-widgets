@@ -8,11 +8,9 @@ interface ProgressBarProps {
 }
 
 export function ProgressBar({ value, uiLabel, uiTooltip }: ProgressBarProps) {
-    console.log("value");
-    console.log(value);
+
     // Ensure value is between 0 and 100
     const clampedValue = Math.min(Math.max(value, 0), 100);
-    console.log(clampedValue);
     return (
         <div className="progress-bar-container">
             {uiLabel && (
