@@ -254,7 +254,7 @@ class Simulation(ProcessTask):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, stop_message="Simulation was stopped.", **kwargs)
 
-    def run(self, duration: float, input1: float, input2: float) -> Tuple[str, List[float], List[float]]:
+    def run(self, duration: float, input1: float, input2: float, do_raise: bool = False) -> Tuple[str, List[float], List[float]]:
         """Run the simulation.
 
         Args:
@@ -278,7 +278,9 @@ class Simulation(ProcessTask):
         print(self._progress.value)
         self._progress.value = 0.0
         iterations = int(duration * 10)
-        raise ValueError("Test exception")
+
+        if do_raise:
+            raise ValueError("Test exception")
 
         print("it")
         print(iterations)
@@ -302,6 +304,14 @@ class Simulation(ProcessTask):
         return "Simulation complete!", t, result
 
 def sync_with_task(task_widget: TaskWidget, process_task: ProcessTask) -> None:
+    """Synchronize the task widget with the process task
+    
+    This function synchronizes the task widget with the process task by updating the progress, logs, and error state.
+
+    Args:
+        task_widget (TaskWidget): The task widget to synchronize
+        process_task (ProcessTask): The process task to synchronize with
+    """
     task_widget.progress = process_task.progress
     log_entries = process_task.log_entries
 
@@ -316,16 +326,30 @@ def sync_with_task(task_widget: TaskWidget, process_task: ProcessTask) -> None:
         task_widget.complete()
 
 
-def process_task_control(process_task: ProcessTask, on_start: Callable, update_interval: float = 1.0) -> Tuple[TaskWidget, Timer]:
+def process_task_control(process_task: ProcessTask, on_start: Callable, on_stop: Callable=None, update_interval: float = 1.0) -> Tuple[TaskWidget, Timer]:
+    """Control a process task with a task widget
+    
+    This function creates a task widget and a timer to synchronize the task widget with the process task.
 
+    Args:
+        process_task (ProcessTask): The process task to control
+        on_start (Callable): Callback function for when the task starts
+        on_stop (Callable): Callback function for when the task stops
+        update_interval (float): The interval between syncs in seconds
 
-    task_widget = TaskWidget(on_start=on_start, on_stop=process_task.stop, on_reset=process_task.reset)
-
-
-    def update_progress():
+    Returns:
+        Tuple[TaskWidget, Timer]: A tuple containing the task widget and timer
+    """
+    def _sync_with_task(task_widget: TaskWidget):
 
         sync_with_task(task_widget, process_task)
 
-    timer = Timer(callback=update_progress, active=True, interval=update_interval)
+    def _on_stop():
+        process_task.stop()
+        if on_stop is not None:
+            on_stop()
+        
 
-    return task_widget, timer
+    task_widget = TaskWidget(on_start=on_start, on_stop=_on_stop, on_reset=process_task.reset, on_sync=_sync_with_task, sync_interval=update_interval)
+
+    return task_widget

@@ -30,23 +30,17 @@ def __(Simulation):
 
 
 @app.cell
-def __(process_task_control, simulation):
+def __(aw, process_task_control, simulation):
     def on_start():
         simulation.start(10.0, 1, 0)
 
-    task, timer = process_task_control(simulation, on_start=on_start)
-    return on_start, task, timer
+    task = aw(process_task_control(simulation, on_start=on_start))
+    task
+    return on_start, task
 
 
 @app.cell
-def __(aw, timer):
-    aw(timer)
-    return
-
-
-@app.cell
-def __(aw, task):
-    aw(task)
+def __():
     return
 
 
