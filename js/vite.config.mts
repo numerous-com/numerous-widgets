@@ -1,6 +1,9 @@
 import { defineConfig } from "vite";
 import anywidget from "@anywidget/vite";
 import postcssCssVariables from 'postcss-css-variables';
+import postcssImport from 'postcss-import';
+import postcssUrl from 'postcss-url';
+import purgecss from 'postcss-purgecss';
 
 // Get the widget name from environment variable
 const widgetName = process.env.WIDGET_NAME || 'ButtonWidget';
@@ -18,7 +21,7 @@ export default defineConfig({
 			},
 			rollupOptions: {
 				output: {
-					assetFileNames: "style.css",
+					assetFileNames: `${widgetName}.css`,
 					entryFileNames: "[name].mjs",
 					chunkFileNames: "[name]-[hash].mjs",
 				},
@@ -34,9 +37,19 @@ export default defineConfig({
 	css: {
 		postcss: {
 			plugins: [
+				postcssImport(),
+				postcssUrl(),
 				// Only process CSS variables in production
 				!isDevelopment && postcssCssVariables({
 					preserve: false
+				}),
+				// Add PurgeCSS to remove unused styles
+				!isDevelopment && purgecss({
+					content: [
+						`./src/components/widgets/${widgetName}.tsx`,
+						'./src/**/*.{js,jsx,ts,tsx}',
+					],
+					defaultExtractor: content => content.match(/[\w-/:]+(?<!:)/g) || []
 				})
 			].filter(Boolean)
 		}

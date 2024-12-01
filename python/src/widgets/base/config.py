@@ -45,6 +45,6 @@ def get_widget_paths(component_name: str) -> tuple[Union[str, pathlib.Path], pat
 
     else:
         esm = STATIC_DIR / f"{component_name}.mjs"
-        css = CSS
+        css = STATIC_DIR / f"{component_name}.css"
     
     return esm, css
