@@ -13,11 +13,16 @@ if ($currentPolicy -eq "Restricted") {
 # List of widget names (without the .tsx extension)
 $widgets = @(
     "ButtonWidget",
+    "CheckBoxWidget",
     "DropDownWidget",
+    "MapSelectorWidget",
+    "MarkdownDrawerWidget",
     "NumberInputWidget",
+    "ProgressBarWidget",
     "ProjectMenuWidget",
     "TabsWidget",
-    "CheckBoxWidget"
+    "TaskWidget",
+    "TimerWidget"
 )
 
 # Create output directory if it doesn't exist
