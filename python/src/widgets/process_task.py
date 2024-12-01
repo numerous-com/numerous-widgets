@@ -73,18 +73,38 @@ class ProcessTask:
                 sys.stdout = StreamToQueue(self._log_queue)
                 sys.stderr = StreamToQueue(self._log_queue)
 
-        
-            result = self.run(*args, **kwargs)
-            self._result_queue.put(result)
-            self._progress.value = 1.0  # Mark as complete
+            try:
+                result = self.run(*args, **kwargs)
+                self._result_queue.put(result)
+            except Exception as e:
+                # Log the exception details
+                self._log_queue.put((datetime.now(), "error", "process", f"Error in run(): {str(e)}"))
+                self._log_queue.put((datetime.now(), "error", "process", f"Traceback:\n{traceback.format_exc()}"))
+                # Put the exception in the queue
+                self._exception_queue.put((datetime.now(), e, traceback.format_exc()))
+                raise  # Re-raise to ensure the process exits with error
+            finally:
+                # Always mark as complete, even if there was an error
+                self._progress.value = 1.0
+
         except Exception as e:
+            # Catch any exceptions that might occur in the stdout/stderr redirection
+            self._log_queue.put((datetime.now(), "error", "process", f"Error in wrapper: {str(e)}"))
+            self._log_queue.put((datetime.now(), "error", "process", f"Traceback:\n{traceback.format_exc()}"))
             self._exception_queue.put((datetime.now(), e, traceback.format_exc()))
+            raise
         finally:
-            
+            # Always restore stdout/stderr
             if self.capture_stdout:
-                # Restore original stdout/stderr
                 sys.stdout = sys.__stdout__
                 sys.stderr = sys.__stderr__
+            
+            # Ensure queues are flushed
+            try:
+                while not self._log_queue.empty():
+                    time.sleep(0.1)
+            except:
+                pass
 
     def log(self, message: str) -> None:
         """Add a log entry to the queue.
