@@ -18,6 +18,8 @@ from .base.markdown_drawer import MarkdownDrawer
 from .base.task import Task
 from .base.timer import Timer
 
+from .task.process_task import process_task_control, ProcessTask, SubprocessTask
+
 try:
     import numerous
     from .numerous.project import ProjectsMenu
