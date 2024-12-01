@@ -237,7 +237,7 @@ class ProcessTask:
 
     def reset(self) -> None:
         """Reset the task's state to initial conditions."""
-        print("Resetting task")
+
         if self._process and self._process.is_alive():
             self.stop()
             
