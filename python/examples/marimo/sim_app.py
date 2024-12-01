@@ -6,13 +6,8 @@ app = marimo.App(width="medium")
 
 @app.cell
 def __():
-    from widgets.process_task import Simulation
-    return (Simulation,)
-
-
-@app.cell
-def __():
-    return
+    from widgets.process_task import Simulation, process_task_control
+    return Simulation, process_task_control
 
 
 @app.cell
@@ -35,26 +30,24 @@ def __(Simulation):
 
 
 @app.cell
-def __(aw, simulation, wi):
+def __(process_task_control, simulation):
     def on_start():
-        print("Start")
         simulation.start(10.0, 1, 0)
 
-    task_widget = aw(wi.Task(on_start=on_start, on_stop=simulation.stop, on_reset=simulation.reset))
-    task_widget
-    return on_start, task_widget
+    task, timer = process_task_control(simulation, on_start=on_start)
+    return on_start, task, timer
 
 
 @app.cell
-def __(aw, simulation, task_widget, wi):
-    def update_progress():
-        task_widget.progress = simulation.progress
-        if simulation.completed:
-            task_widget.complete()
+def __(aw, timer):
+    aw(timer)
+    return
 
-    timer = aw(wi.Timer(callback=update_progress, active=True, interval=1))
-    timer
-    return timer, update_progress
+
+@app.cell
+def __(aw, task):
+    aw(task)
+    return
 
 
 @app.cell
@@ -100,12 +93,6 @@ def __(mo, task_widget):
 
     mo.ui.button(label="Enable", on_click=on_enable)
     return (on_enable,)
-
-
-@app.cell
-def __(task_widget):
-    task_widget.started
-    return
 
 
 if __name__ == "__main__":

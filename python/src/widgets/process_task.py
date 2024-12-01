@@ -5,7 +5,9 @@ import traceback
 import sys
 import io
 from datetime import datetime
-
+from .task import Task as TaskWidget
+from .timer import Timer
+from typing import Callable
 
 class ProcessTask:
     """A base class for running long-running tasks in a separate process with progress tracking.
@@ -39,6 +41,8 @@ class ProcessTask:
         self.stop_message: str = stop_message
         self.capture_stdout: bool = capture_stdout
         self.run_in_process: bool = run_in_process
+        self.exc: Optional[Exception] = None
+        self.tb: Optional[str] = None
 
     def _run_wrapper(self, *args: Any, **kwargs: Any) -> None:
         """Internal wrapper method to handle task execution and exception handling.
@@ -47,57 +51,67 @@ class ProcessTask:
             *args: Variable length argument list to pass to run().
             **kwargs: Arbitrary keyword arguments to pass to run().
         """
-        if self.capture_stdout:
-            # Redirect stdout and stderr to capture all output
-            class StreamToQueue:
-                def __init__(self, queue):
-                    self.queue = queue
-                    self.original_stdout = sys.stdout
-
-                def write(self, text):
-                    if text.strip():  # Only queue non-empty strings
-                        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-                        self.queue.put(f"[{timestamp}] [stdout] {text.strip()}")
-                    self.original_stdout.write(text)
-
-                def flush(self):
-                    self.original_stdout.flush()
-
-            sys.stdout = StreamToQueue(self._log_queue)
-            sys.stderr = StreamToQueue(self._log_queue)
-
         try:
+            if self.capture_stdout:
+                # Redirect stdout and stderr to capture all output
+                class StreamToQueue:
+                    def __init__(self, queue):
+                        self.queue = queue
+                        self.original_stdout = sys.stdout
+
+                    def write(self, text):
+                        if text.strip():  # Only queue non-empty strings
+                            timestamp = datetime.now()
+                            self.queue.put((timestamp, "stdout", "process", text.strip()))
+                        self.original_stdout.write(text)
+
+                    def flush(self):
+                        self.original_stdout.flush()
+
+                sys.stdout = StreamToQueue(self._log_queue)
+                sys.stderr = StreamToQueue(self._log_queue)
+
+        
             result = self.run(*args, **kwargs)
             self._result_queue.put(result)
-        except Exception as e:
-            self._exception_queue.put((e, traceback.format_exc()))
-        finally:
             self._progress.value = 1.0  # Mark as complete
+        except Exception as e:
+            self._exception_queue.put((datetime.now(), e, traceback.format_exc()))
+        finally:
+            
             if self.capture_stdout:
                 # Restore original stdout/stderr
                 sys.stdout = sys.__stdout__
                 sys.stderr = sys.__stderr__
 
     def log(self, message: str) -> None:
-        """Add a timestamped log message to the queue.
+        """Add a log entry to the queue.
 
         Args:
             message (str): The message to add to the log queue.
         """
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-        self._log_queue.put(f"[{timestamp}] {message}")
+        self._log_queue.put((datetime.now(), "info", "task", message))
 
     @property
-    def logs(self) -> str:
+    def log_strings(self) -> str:
         """Get all accumulated log messages.
 
         Returns:
-            str: A string containing all log messages, joined by newlines.
+            str: A string containing all formatted log messages, joined by newlines.
         """
         messages = []
         while not self._log_queue.empty():
-            messages.append(self._log_queue.get())
+            timestamp, type_, source, message = self._log_queue.get()
+            formatted_time = timestamp.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+            messages.append(f"[{formatted_time}] [{type_}] [{source}] {message}")
         return '\n'.join(messages)
+    
+    @property
+    def log_entries(self) -> List[Tuple[datetime, str, str, str]]:
+        entries = []
+        while not self._log_queue.empty():
+            entries.append(self._log_queue.get())
+        return entries
 
     def run(self, *args: Any, **kwargs: Any) -> Any:
         """Override this method in subclasses to define the simulation."""
@@ -119,9 +133,7 @@ class ProcessTask:
                 self._process = multiprocessing.Process(
                     target=self._run_wrapper, args=args, kwargs=kwargs
                 )
-                print(f"Starting process")
                 self._process.start()
-                print(f"Process started")
         else:
             # Run directly in the same thread
             self._run_wrapper(*args, **kwargs)
@@ -134,7 +146,10 @@ class ProcessTask:
         if self._process and self._process.is_alive():
             self._process.terminate()
             self._process.join()  # Ensure process is terminated
-            self._exception = RuntimeError(self.stop_message)
+            try:
+                raise RuntimeError(self.stop_message)
+            except Exception as e:
+                self._exception_queue.put((datetime.now(), e, traceback.format_exc()))
 
     def join(self) -> None:
         if self._process:
@@ -173,21 +188,27 @@ class ProcessTask:
             self._return_value = self._result_queue.get()
 
         if not self._exception_queue.empty():
-            exc, tb = self._exception_queue.get()
+            timestamp, exc, tb = self._exception_queue.get()  # Unpack all three values
             raise RuntimeError(f"Exception in process:\n{tb}") from exc
 
         return self._return_value
 
     @property
-    def exception(self) -> Optional[Exception]:
+    def exception(self) -> Optional[Union[Tuple[Exception, str], Tuple[Exception, str, datetime]]]:
         """Get any exception that occurred during task execution.
 
         Returns:
-            Exception: The exception that occurred, or None if no exception occurred.
+            Optional[Union[Tuple[Exception, str], Tuple[datetime, Exception, str]]]: 
+                A tuple containing (timestamp, exception, traceback) if available,
+                or (exception, traceback) if using cached values,
+                or None if no exception occurred.
         """
         if not self._exception_queue.empty():
-            exc, tb = self._exception_queue.get()
-            return exc
+            self.exception_timestamp, self.exc, self.tb = self._exception_queue.get()
+            return self.exc, self.tb, self.exception_timestamp
+        
+        if self.exc is not None:
+            return self.exc, self.tb, self.exception_timestamp
         return None
     
     @property
@@ -217,6 +238,9 @@ class ProcessTask:
         self._return_value = None
         self._exception = None
         self._process = None
+        self.exc = None
+        self.tb = None
+        self.exception_timestamp = None
 
 # Example subclass implementation
 from time import sleep
@@ -254,6 +278,7 @@ class Simulation(ProcessTask):
         print(self._progress.value)
         self._progress.value = 0.0
         iterations = int(duration * 10)
+        raise ValueError("Test exception")
 
         print("it")
         print(iterations)
@@ -275,3 +300,32 @@ class Simulation(ProcessTask):
             print("!")
 
         return "Simulation complete!", t, result
+
+def sync_with_task(task_widget: TaskWidget, process_task: ProcessTask) -> None:
+    task_widget.progress = process_task.progress
+    log_entries = process_task.log_entries
+
+    if process_task.exception is not None:
+        task_widget.set_error(*process_task.exception)
+        
+    if process_task.exception is None and task_widget.error is not None:
+        task_widget.clear_error()
+        
+    task_widget.add_logs(log_entries)
+    if process_task.completed and process_task.exception is None:
+        task_widget.complete()
+
+
+def process_task_control(process_task: ProcessTask, on_start: Callable, update_interval: float = 1.0) -> Tuple[TaskWidget, Timer]:
+
+
+    task_widget = TaskWidget(on_start=on_start, on_stop=process_task.stop, on_reset=process_task.reset)
+
+
+    def update_progress():
+
+        sync_with_task(task_widget, process_task)
+
+    timer = Timer(callback=update_progress, active=True, interval=update_interval)
+
+    return task_widget, timer

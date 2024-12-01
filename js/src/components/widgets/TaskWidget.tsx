@@ -10,6 +10,12 @@ function TaskWidget() {
     const [isDisabled] = useModelState<boolean>("is_disabled");
     const [started, setStarted] = useModelState<boolean>("started");
     const [progress, setProgress] = useModelState<number>("progress");
+    const [logs, setLogs] = useModelState<[string, string, string, string][]>("logs");
+    const [error] = useModelState<{
+        message: string;
+        traceback?: string;
+        timestamp: string;
+    } | null>("error");
 
     const handleReset = async () => {
         setProgress(0);
@@ -17,7 +23,7 @@ function TaskWidget() {
         setIsCompleted(false);
         setIsFailed(false);
         setStarted(false);
-
+        setLogs([]);
     };
 
     const handleStart = () => {
@@ -42,6 +48,8 @@ function TaskWidget() {
             }}
             onReset={handleReset}
             taskName="Task"
+            error={error ?? undefined}
+            logs={logs || []}
         />
     );
 }

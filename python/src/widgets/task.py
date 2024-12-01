@@ -1,6 +1,7 @@
 import anywidget
 import traitlets
-from typing import Callable, Optional
+from typing import Callable, Optional, List, Tuple, Dict
+from datetime import datetime
 from .config import get_widget_paths
 
 # Get environment-appropriate paths
@@ -21,6 +22,8 @@ class Task(anywidget.AnyWidget):
     is_disabled = traitlets.Bool(default_value=False).tag(sync=True)
     started = traitlets.Bool(default_value=False).tag(sync=True)
     progress = traitlets.Float(default_value=0.0).tag(sync=True)
+    logs = traitlets.List(default_value=[]).tag(sync=True)  # Will store tuples as lists for JSON serialization
+    error = traitlets.Dict(allow_none=True, default_value=None).tag(sync=True)  # Will store error details
     
     # Load the JavaScript and CSS
     _esm = ESM
@@ -38,6 +41,7 @@ class Task(anywidget.AnyWidget):
         self._on_stop = on_stop
         self._on_reset = on_reset
         self.is_disabled = disabled
+        self.error = None  # Initialize as None instead of empty dict
         
         # Observe changes to is_running and started to trigger callbacks
         self.observe(self._handle_running_change, names=['is_running'])
@@ -105,7 +109,8 @@ class Task(anywidget.AnyWidget):
             self.is_completed = False
             self.is_failed = False
             self.started = False
-            
+            self.logs = []
+            self.clear_error()
             # Call the reset callback if provided
             if self._on_reset:
                 self._on_reset()
@@ -117,3 +122,44 @@ class Task(anywidget.AnyWidget):
     def disable(self):
         """Disables the task widget"""
         self.is_disabled = True
+    
+    def add_log(self, message: str, log_type: str = "info", source: str = "system"):
+        """
+        Add a log entry with timestamp, type, source, and message.
+        
+        Args:
+            message: The log message text
+            log_type: Type of log ('info', 'error', 'warning', etc.)
+            source: Source of the log message
+        """
+        timestamp = datetime.now().isoformat()
+        # Convert to list for JSON serialization
+        log_entry = [timestamp, log_type, source, message]
+        self.logs = self.logs + [log_entry]
+
+    def add_logs(self, logs: List[Tuple[str, str, str, str]]):
+        """Add multiple log entries"""
+        if len(logs) > 0:
+            self.logs = self.logs + logs
+
+    def set_logs(self, logs: List[Tuple[str, str, str, str]]):
+        """Set the logs to a new list"""
+        self.logs = logs
+    
+    def clear_logs(self):
+        """Clear all logs"""
+        self.logs = []
+    
+    def set_error(self, message: str, traceback: Optional[str] = None, timestamp: Optional[str] = datetime.now()):
+        """Set an error message and optional traceback"""
+
+        self.error = {
+            'message': str(message),
+            'traceback': str(traceback),
+            'timestamp': str(timestamp.isoformat())
+        }
+        self.fail()
+    
+    def clear_error(self):
+        """Clear the current error"""
+        self.error = None  # Set to None instead of empty dict

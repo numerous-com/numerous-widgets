@@ -13,7 +13,12 @@ interface TaskButtonProps {
     onReset: () => void;
     onExpand?: () => void;
     taskName: string;
-    logs?: string[];
+    error?: {
+        message: string;
+        traceback?: string;
+        timestamp: string;
+    };
+    logs?: [string, string, string, string][];
 }
 
 export function TaskButton({ 
@@ -28,6 +33,7 @@ export function TaskButton({
     onReset,
     onExpand = () => {},
     taskName,
+    error,
     logs = []
 }: TaskButtonProps) {
     const size = 40;
@@ -157,6 +163,7 @@ export function TaskButton({
                 progress={progress}
                 status={getStatus()}
                 logs={logs}
+                error={error}
                 onStart={onStart}
                 onStop={onStop}
                 onReset={onReset}
