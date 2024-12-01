@@ -8,6 +8,7 @@ from datetime import datetime
 from .task import Task as TaskWidget
 from .timer import Timer
 from typing import Callable
+import subprocess
 
 class ProcessTask:
     """A base class for running long-running tasks in a separate process with progress tracking.
@@ -33,6 +34,7 @@ class ProcessTask:
                  run_in_process: bool = True) -> None:
         self._process: Optional[multiprocessing.Process] = None
         self._progress = multiprocessing.Value("d", 0.0)
+        self._stop_flag = multiprocessing.Value('i', 0)
         self._result_queue: multiprocessing.Queue = multiprocessing.Queue()
         self._exception_queue: multiprocessing.Queue = multiprocessing.Queue()
         self._log_queue: multiprocessing.Queue = multiprocessing.Queue()
@@ -139,13 +141,11 @@ class ProcessTask:
             self._run_wrapper(*args, **kwargs)
 
     def stop(self) -> None:
-        """Stop the running task forcefully.
-
-        Terminates the process if it's running and sets an exception with the stop message.
-        """
+        """Stop the running task forcefully."""
+        self._stop_flag.value = 1
         if self._process and self._process.is_alive():
             self._process.terminate()
-            self._process.join()  # Ensure process is terminated
+            self._process.join()
             try:
                 raise RuntimeError(self.stop_message)
             except Exception as e:
@@ -216,15 +216,12 @@ class ProcessTask:
         return self._progress.value >= 1.0
 
     def reset(self) -> None:
-        """Reset the task's state to initial conditions.
-        
-        This clears all queues, resets progress, and clears any stored results or exceptions.
-        If a process is running, it will be stopped first.
-        """
+        """Reset the task's state to initial conditions."""
         print("Resetting task")
         if self._process and self._process.is_alive():
             self.stop()
             
+        self._stop_flag.value = 0
         # Clear all queues
         while not self._result_queue.empty():
             self._result_queue.get()
@@ -241,6 +238,142 @@ class ProcessTask:
         self.exc = None
         self.tb = None
         self.exception_timestamp = None
+
+class SubprocessTask(ProcessTask):
+    """ProcessTask subclass for running shell commands using subprocess.
+    
+    Captures stdout and stderr, with progress parsing from stdout.
+    """
+    
+    def __init__(self, *args, progress_parser: Optional[Callable[[str], Optional[float]]]=None, **kwargs) -> None:
+        """Initialize the subprocess task.
+        
+        Args:
+            progress_parser: Callable that takes a stdout line and returns a float progress value (0-1) 
+                           or None if the line doesn't contain progress info
+            *args: Additional arguments passed to ProcessTask
+            **kwargs: Additional keyword arguments passed to ProcessTask
+        """
+        super().__init__(*args, stop_message="Process was terminated.", **kwargs)
+        self._progress_parser = progress_parser
+        
+    def run(self, cmd: Union[str, List[str]], shell: bool = False, cwd: Optional[str] = None) -> Tuple[str, str]:
+        """Run a shell command and capture its output."""
+        process = None
+        try:
+            # Start process
+            process = subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                shell=shell,
+                cwd=cwd,
+                text=True,
+                bufsize=1,
+                universal_newlines=True
+            )
+            
+            stdout_lines = []
+            stderr_lines = []
+            
+            import msvcrt
+            import os
+            
+            def read_nonblocking(pipe):
+                """Read from pipe without blocking."""
+                from queue import Empty
+                from threading import Thread
+                from queue import Queue
+                
+                line_queue = Queue()
+                
+                def reader():
+                    try:
+                        line = pipe.readline()
+                        if line:
+                            line_queue.put(line)
+                    except (IOError, ValueError):
+                        pass
+                
+                # Start reader thread
+                thread = Thread(target=reader)
+                thread.daemon = True
+                thread.start()
+                
+                # Wait briefly for data
+                try:
+                    return line_queue.get(timeout=0.1)
+                except Empty:
+                    return None
+            
+            # Handle output while process runs
+            while True:
+                if self._stop_flag.value == 1:
+                    process.terminate()
+                    break
+                
+                # Read stdout
+                stdout_line = read_nonblocking(process.stdout)
+                if stdout_line:
+                    stdout_lines.append(stdout_line)
+                    self._log_queue.put((datetime.now(), "stdout", "process", stdout_line.strip()))
+                    if self._progress_parser:
+                        progress = self._progress_parser(stdout_line)
+                        if progress is not None:
+                            self._progress.value = progress
+                
+                # Read stderr
+                stderr_line = read_nonblocking(process.stderr)
+                if stderr_line:
+                    stderr_lines.append(stderr_line)
+                    self._log_queue.put((datetime.now(), "stderr", "process", stderr_line.strip()))
+                
+                # Check if process has finished
+                retcode = process.poll()
+                if retcode is not None:
+                    # Get any remaining output
+                    try:
+                        remaining_stdout, remaining_stderr = process.communicate(timeout=1)
+                        if remaining_stdout:
+                            for line in remaining_stdout.splitlines(True):
+                                stdout_lines.append(line)
+                                self._log_queue.put((datetime.now(), "stdout", "process", line.strip()))
+                        if remaining_stderr:
+                            for line in remaining_stderr.splitlines(True):
+                                stderr_lines.append(line)
+                                self._log_queue.put((datetime.now(), "stderr", "process", line.strip()))
+                    except subprocess.TimeoutExpired:
+                        process.kill()
+                        remaining_stdout, remaining_stderr = process.communicate()
+                    
+                    if retcode != 0:
+                        stdout_str = ''.join(stdout_lines)
+                        stderr_str = ''.join(stderr_lines)
+                        error = subprocess.CalledProcessError(
+                            retcode, cmd, 
+                            stdout_str,
+                            stderr_str
+                        )
+                        self._log_queue.put((datetime.now(), "error", "process", 
+                                           f"Process failed with exit code {retcode}\n{stderr_str}"))
+                        raise error
+                    break
+                
+                # Small sleep to prevent CPU hogging
+                time.sleep(0.1)
+
+            return ''.join(stdout_lines), ''.join(stderr_lines)
+            
+        except Exception as e:
+            # Ensure we capture and log any exceptions
+            self._log_queue.put((datetime.now(), "error", "process", f"Error: {str(e)}"))
+            if process and process.poll() is None:
+                process.kill()
+                try:
+                    process.communicate(timeout=1)
+                except subprocess.TimeoutExpired:
+                    pass
+            raise
 
 # Example subclass implementation
 from time import sleep

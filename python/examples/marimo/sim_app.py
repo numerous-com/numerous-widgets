@@ -6,8 +6,8 @@ app = marimo.App(width="medium")
 
 @app.cell
 def __():
-    from widgets.process_task import Simulation, process_task_control
-    return Simulation, process_task_control
+    from widgets.process_task import Simulation, process_task_control, SubprocessTask
+    return Simulation, SubprocessTask, process_task_control
 
 
 @app.cell
@@ -40,53 +40,19 @@ def __(aw, process_task_control, simulation):
 
 
 @app.cell
-def __():
-    return
+def __(SubprocessTask):
+    subprocess_task = SubprocessTask()
+    return (subprocess_task,)
 
 
 @app.cell
-def __(mo, task_widget):
-    def on_complete(event):
-        task_widget.complete()
+def __(aw, process_task_control, subprocess_task):
+    def on_start_cmd():
+        subprocess_task.start("ipconfig")
 
-    mo.ui.button(label="Complete", on_click=on_complete)
-    return (on_complete,)
-
-
-@app.cell
-def __(mo, task_widget):
-    def on_fail(event):
-        task_widget.fail()
-
-    mo.ui.button(label="Fail", on_click=on_fail)
-    return (on_fail,)
-
-
-@app.cell
-def __(mo, task_widget):
-    def on_reset(event):
-        task_widget.reset()
-
-    mo.ui.button(label="Reset", on_click=on_reset)
-    return (on_reset,)
-
-
-@app.cell
-def __(mo, task_widget):
-    def on_disable(event):
-        task_widget.disable()
-
-    mo.ui.button(label="Dislabe", on_click=on_disable)
-    return (on_disable,)
-
-
-@app.cell
-def __(mo, task_widget):
-    def on_enable(event):
-        task_widget.enable()
-
-    mo.ui.button(label="Enable", on_click=on_enable)
-    return (on_enable,)
+    process_task = aw(process_task_control(subprocess_task, on_start=on_start_cmd))
+    process_task
+    return on_start_cmd, process_task
 
 
 if __name__ == "__main__":
