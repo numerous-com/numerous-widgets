@@ -273,38 +273,30 @@ class SubprocessTask(ProcessTask):
                 universal_newlines=True
             )
             
+            from queue import Queue
+            from threading import Thread
+            
+            stdout_queue = Queue()
+            stderr_queue = Queue()
+            
+            def pipe_reader(pipe, queue):
+                """Continuously read from pipe and put lines into queue."""
+                try:
+                    for line in iter(pipe.readline, ''):
+                        queue.put(line)
+                finally:
+                    pipe.close()
+            
+            # Start reader threads
+            stdout_thread = Thread(target=pipe_reader, args=(process.stdout, stdout_queue))
+            stderr_thread = Thread(target=pipe_reader, args=(process.stderr, stderr_queue))
+            stdout_thread.daemon = True
+            stderr_thread.daemon = True
+            stdout_thread.start()
+            stderr_thread.start()
+            
             stdout_lines = []
             stderr_lines = []
-            
-            import msvcrt
-            import os
-            
-            def read_nonblocking(pipe):
-                """Read from pipe without blocking."""
-                from queue import Empty
-                from threading import Thread
-                from queue import Queue
-                
-                line_queue = Queue()
-                
-                def reader():
-                    try:
-                        line = pipe.readline()
-                        if line:
-                            line_queue.put(line)
-                    except (IOError, ValueError):
-                        pass
-                
-                # Start reader thread
-                thread = Thread(target=reader)
-                thread.daemon = True
-                thread.start()
-                
-                # Wait briefly for data
-                try:
-                    return line_queue.get(timeout=0.1)
-                except Empty:
-                    return None
             
             # Handle output while process runs
             while True:
@@ -312,9 +304,9 @@ class SubprocessTask(ProcessTask):
                     process.terminate()
                     break
                 
-                # Read stdout
-                stdout_line = read_nonblocking(process.stdout)
-                if stdout_line:
+                # Process all available stdout
+                while not stdout_queue.empty():
+                    stdout_line = stdout_queue.get_nowait()
                     stdout_lines.append(stdout_line)
                     self._log_queue.put((datetime.now(), "stdout", "process", stdout_line.strip()))
                     if self._progress_parser:
@@ -322,29 +314,27 @@ class SubprocessTask(ProcessTask):
                         if progress is not None:
                             self._progress.value = progress
                 
-                # Read stderr
-                stderr_line = read_nonblocking(process.stderr)
-                if stderr_line:
+                # Process all available stderr
+                while not stderr_queue.empty():
+                    stderr_line = stderr_queue.get_nowait()
                     stderr_lines.append(stderr_line)
                     self._log_queue.put((datetime.now(), "stderr", "process", stderr_line.strip()))
                 
                 # Check if process has finished
                 retcode = process.poll()
                 if retcode is not None:
-                    # Get any remaining output
-                    try:
-                        remaining_stdout, remaining_stderr = process.communicate(timeout=1)
-                        if remaining_stdout:
-                            for line in remaining_stdout.splitlines(True):
-                                stdout_lines.append(line)
-                                self._log_queue.put((datetime.now(), "stdout", "process", line.strip()))
-                        if remaining_stderr:
-                            for line in remaining_stderr.splitlines(True):
-                                stderr_lines.append(line)
-                                self._log_queue.put((datetime.now(), "stderr", "process", line.strip()))
-                    except subprocess.TimeoutExpired:
-                        process.kill()
-                        remaining_stdout, remaining_stderr = process.communicate()
+                    # Process any remaining output
+                    time.sleep(0.1)  # Give threads a chance to finish reading
+                    
+                    while not stdout_queue.empty():
+                        stdout_line = stdout_queue.get_nowait()
+                        stdout_lines.append(stdout_line)
+                        self._log_queue.put((datetime.now(), "stdout", "process", stdout_line.strip()))
+                        
+                    while not stderr_queue.empty():
+                        stderr_line = stderr_queue.get_nowait()
+                        stderr_lines.append(stderr_line)
+                        self._log_queue.put((datetime.now(), "stderr", "process", stderr_line.strip()))
                     
                     if retcode != 0:
                         stdout_str = ''.join(stdout_lines)
@@ -369,10 +359,6 @@ class SubprocessTask(ProcessTask):
             self._log_queue.put((datetime.now(), "error", "process", f"Error: {str(e)}"))
             if process and process.poll() is None:
                 process.kill()
-                try:
-                    process.communicate(timeout=1)
-                except subprocess.TimeoutExpired:
-                    pass
             raise
 
 # Example subclass implementation
