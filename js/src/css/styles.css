@@ -711,9 +711,10 @@
 
   .progress-fill {
     height: 100%;
-    background-color: var(--ui-widget-focus-border);
+    background-color: #3b82f6;
     border-radius: 4px;
     transition: width 0.3s ease;
+    opacity: 1 !important;
   }
 
   .progress-value {

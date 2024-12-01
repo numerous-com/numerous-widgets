@@ -23,6 +23,7 @@ interface TaskDetailModalProps {
         traceback?: string;
         timestamp: string;
     };
+    autoScroll?: boolean;
 }
 
 export function TaskDetailModal({
@@ -32,7 +33,17 @@ export function TaskDetailModal({
     progress,
     logs = [],
     error,
+    autoScroll = true,
 }: TaskDetailModalProps) {
+    const logsContainerRef = React.useRef<HTMLDivElement>(null);
+    const [isAutoScrollEnabled, setIsAutoScrollEnabled] = React.useState(autoScroll);
+
+    React.useEffect(() => {
+        if (isAutoScrollEnabled && logsContainerRef.current) {
+            logsContainerRef.current.scrollTop = logsContainerRef.current.scrollHeight;
+        }
+    }, [logs, isAutoScrollEnabled]);
+
     if (!isOpen) return null;
 
     const handleOverlayClick = (e: React.MouseEvent) => {
@@ -103,7 +114,10 @@ export function TaskDetailModal({
                     )}
 
                     <div className="w-full">
-                        <div className="logs-container bg-gray-50 rounded-lg p-4 max-h-[300px] overflow-y-auto border border-gray-100">
+                        <div 
+                            ref={logsContainerRef}
+                            className="logs-container bg-gray-50 rounded-lg p-4 max-h-[300px] overflow-y-auto border border-gray-100"
+                        >
                             {logs.map(([timestamp, type, source, message], index) => (
                                 <div key={index} className="log-entry py-1 font-mono text-sm flex gap-2">
                                     <span className="text-gray-400">{formatTimestamp(timestamp)}</span>
@@ -115,12 +129,23 @@ export function TaskDetailModal({
                         </div>
                     </div>
 
-                    <button 
-                        className="px-8 py-2.5 bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors duration-200 font-medium text-white shadow-sm"
-                        onClick={onClose}
-                    >
-                        Close
-                    </button>
+                    <div className="flex items-center space-x-6">
+                        <label className="flex items-center space-x-2 text-sm text-gray-600">
+                            <input
+                                type="checkbox"
+                                checked={isAutoScrollEnabled}
+                                onChange={(e) => setIsAutoScrollEnabled(e.target.checked)}
+                                className="rounded text-blue-500 focus:ring-blue-500"
+                            />
+                            <span>Track updates</span>
+                        </label>
+                        <button 
+                            className="px-8 py-2.5 bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors duration-200 font-medium text-white shadow-sm"
+                            onClick={onClose}
+                        >
+                            Close
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
