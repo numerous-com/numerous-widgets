@@ -6,14 +6,21 @@ try:
 except importlib.metadata.PackageNotFoundError:
     __version__ = "unknown"
 
-from .button import Button
-from .drop_down import DropDown
-from .number import Number
-from .tabs import Tabs, tabs_active_page_content
-from .checkbox import CheckBox
-from .map_selector import MapSelector
-from .card import card
-from .progress_bar import ProgressBar
-from .markdown_drawer import MarkdownDrawer
-from .task import Task
-from .timer import Timer
+from .base.button import Button
+from .base.drop_down import DropDown
+from .base.number import Number
+from .base.tabs import Tabs, tabs_active_page_content
+from .base.checkbox import CheckBox
+from .base.map_selector import MapSelector
+from .base.card import card
+from .base.progress_bar import ProgressBar
+from .base.markdown_drawer import MarkdownDrawer
+from .base.task import Task
+from .base.timer import Timer
+
+try:
+    import numerous
+    from .numerous.project import ProjectsMenu
+except ImportError:
+    pass
+

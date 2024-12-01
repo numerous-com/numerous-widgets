@@ -5,18 +5,18 @@ dependencies = ["anywidget"]
 classifiers = ["Programming Language :: Python :: 3"]
 readme = "README.md"
 
-[project.optional-dependencies]
-dev = ["anywidget[dev]", "python-dotenv", "marimo", "numerous"]
 
 [tool.setuptools]
 packages.find = {where = ["python/src"]}
 
-[dependency-groups]
+[project.optional-dependencies]
 dev = [
     "anywidget[dev]",
     "python-dotenv",
     "numerous",
     "pytest",
+    "ruff==0.6.4",
+    "mypy==1.11.2",
     "coverage==7.6.1",
     "twine==5.1.1",
     "mkdocs==1.6.0",

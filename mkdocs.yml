@@ -1,4 +1,4 @@
-site_name: numerous-sdk docs
+site_name: numerous-widgets docs
 nav:
   - Home: README.md
   - Our Website: https://numerous.com
@@ -6,6 +6,8 @@ nav:
   - Our PyPI Page: https://pypi.org/project/numerous-widgets/
   - Platform Docs: https://numerous.com/docs
   - API Reference:
+    - Widgets: widgets.md
+    - Process Task: process_task.md
     
 
 theme: readthedocs

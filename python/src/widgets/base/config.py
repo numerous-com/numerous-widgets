@@ -10,8 +10,8 @@ load_dotenv()
 IS_DEV = os.getenv("WIDGET_ENV", "development").lower() == "development"
 
 # Base paths
-ROOT_DIR = pathlib.Path(__file__).parent.parent.parent.parent
-STATIC_DIR = pathlib.Path(__file__).parent / "static"
+ROOT_DIR = pathlib.Path(__file__).parent.parent.parent.parent.parent
+STATIC_DIR = pathlib.Path(__file__).parent.parent / "static"
 GLOBAL_CSS = open(ROOT_DIR / "js" / "src" / "css" / "styles.css", "r").read()
 
 # Development server configuration
