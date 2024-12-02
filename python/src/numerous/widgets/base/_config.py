@@ -9,7 +9,7 @@ try:
     load_dotenv()
 
     # Default to development mode if not set
-    IS_DEV = os.getenv("WIDGET_ENV", "development").lower() == "development"
+    IS_DEV = os.getenv("WIDGET_ENV", "production").lower() == "development"
 
 except ImportError:
     IS_DEV = False
