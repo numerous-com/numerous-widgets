@@ -381,66 +381,6 @@ class SubprocessTask(ProcessTask):
                 process.kill()
             raise
 
-# Example subclass implementation
-from time import sleep
-class Simulation(ProcessTask):
-    """Example simulation class demonstrating Task usage.
-
-    A simple simulation that calculates changes in a value over time based on
-    power input and loss factors.
-    """
-
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, stop_message="Simulation was stopped.", **kwargs)
-
-    def run(self, duration: float, input1: float, input2: float, do_raise: bool = False) -> Tuple[str, List[float], List[float]]:
-        """Run the simulation.
-
-        Args:
-            duration (float): The duration of the simulation in seconds.
-            input1 (float): Initial value for y.
-            input2 (float): Power input value.
-
-        Returns:
-            tuple: A tuple containing (str, list, list):
-                - Status message
-                - Time points list
-                - Result values list
-        """
-        y = input1
-        power = input2
-        result = []
-        t = []
-        print("Dur")
-        print(duration)
-
-        print(self._progress.value)
-        self._progress.value = 0.0
-        iterations = int(duration * 10)
-
-        if do_raise:
-            raise ValueError("Test exception")
-
-        print("it")
-        print(iterations)
-        for i in range(iterations):
-            print(i)
-            loss = y * 0.01
-            dy = power/10 - loss
-            y += dy
-
-            result.append(y)
-            t.append(i/10)
-
-            if self._progress.value >= 1.0:
-                break
-            self._progress.value = i / (duration * 10)
-            self.log(f"Progress: {self._progress.value:.2%}")  # Using log instead of print
-            print(f"STD OUT Progress: {self._progress.value:.2%}")
-            sleep(0.1)
-            print("!")
-
-        return "Simulation complete!", t, result
 
 def sync_with_task(task_widget: TaskWidget, process_task: ProcessTask) -> None:
     """Synchronize the task widget with the process task
@@ -468,7 +408,7 @@ def sync_with_task(task_widget: TaskWidget, process_task: ProcessTask) -> None:
 def process_task_control(process_task: ProcessTask, on_start: Callable, on_stop: Callable=None, update_interval: float = 1.0) -> Tuple[TaskWidget, Timer]:
     """Control a process task with a task widget
     
-    This function creates a task widget and a timer to synchronize the task widget with the process task.
+    This function creates a task widget to synchronize the task widget with the process task.
 
     Args:
         process_task (ProcessTask): The process task to control
@@ -477,7 +417,7 @@ def process_task_control(process_task: ProcessTask, on_start: Callable, on_stop:
         update_interval (float): The interval between syncs in seconds
 
     Returns:
-        Tuple[TaskWidget, Timer]: A tuple containing the task widget and timer
+        TaskWidget: The task widget
     """
     def _sync_with_task(task_widget: TaskWidget):
 
