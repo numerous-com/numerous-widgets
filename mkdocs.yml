@@ -17,6 +17,8 @@ plugins:
       default_handler: "python"
       handlers:
         python:
+          setup_commands:
+            - "import sys; sys.path.insert(0, '.')"
           paths: [.]
           import:
             - https://docs.python.org/3/objects.inv

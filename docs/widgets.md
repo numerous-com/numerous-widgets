@@ -2,39 +2,39 @@
 
 The widgets are available in the `widgets` module.
 
-## ::: widgets.Number
+## ::: numerous.widgets.Number
     options:
         show_root_heading: true
 
-## ::: widgets.CheckBox
+## ::: numerous.widgets.CheckBox
     options:
         show_root_heading: true
 
-## ::: widgets.DropDown
+## ::: numerous.widgets.DropDown
     options:
         show_root_heading: true
 
-## ::: widgets.Button
+## ::: numerous.widgets.Button
     options:
         show_root_heading: true
 
-## ::: widgets.ProgressBar
+## ::: numerous.widgets.ProgressBar
     options:
         show_root_heading: true
 
-## ::: widgets.Tabs
+## ::: numerous.widgets.Tabs
     options:
         show_root_heading: true
 
-## ::: widgets.Timer
+## ::: numerous.widgets.Timer
     options:
         show_root_heading: true
 
-## ::: widgets.Task
+## ::: numerous.widgets.Task
     options:
         show_root_heading: true
 
-## ::: widgets.MapSelector
+## ::: numerous.widgets.MapSelector
     options:
         show_root_heading: true
 
