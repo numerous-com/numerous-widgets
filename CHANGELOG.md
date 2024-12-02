@@ -2,6 +2,19 @@
 
 
 
+## v0.0.5 (2024-12-02)
+
+### Fix
+
+* fix(widgets): remove tabStorage ([`55f6955`](https://github.com/numerous-com/numerous-widgets/commit/55f69555763a761a3cc35f90502ca66b16e99326))
+
+* fix(cicd): js folder as cwd ([`2a4132f`](https://github.com/numerous-com/numerous-widgets/commit/2a4132f10296ded961c43488ac6b887a04ce679d))
+
+* fix(cicd): build from js folder ([`2c0df5d`](https://github.com/numerous-com/numerous-widgets/commit/2c0df5d2060fa8a49cfb981f57a8444cbfe95236))
+
+* fix(cicd): Add build step to build widgets from js folder ([`cd9134d`](https://github.com/numerous-com/numerous-widgets/commit/cd9134d73be8bd2b0098789bf8685f0eb05253aa))
+
+
 ## v0.0.4 (2024-12-02)
 
 ### Fix
