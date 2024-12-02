@@ -2,6 +2,13 @@
 
 
 
+## v0.0.4 (2024-12-02)
+
+### Fix
+
+* fix(docs): Update references to code ([`99816ec`](https://github.com/numerous-com/numerous-widgets/commit/99816ec2cae40cf21147c942f7cd4cf3797872e5))
+
+
 ## v0.0.3 (2024-12-02)
 
 ### Fix
