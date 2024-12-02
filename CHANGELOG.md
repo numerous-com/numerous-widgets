@@ -2,6 +2,13 @@
 
 
 
+## v0.0.2 (2024-12-02)
+
+### Fix
+
+* fix(cicd): removed aws ([`2101c1e`](https://github.com/numerous-com/numerous-widgets/commit/2101c1e03bff124df060a3fa6afd633d2b8a7fef))
+
+
 ## v0.0.1 (2024-12-02)
 
 ### Fix
