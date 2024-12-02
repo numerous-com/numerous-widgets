@@ -15,7 +15,12 @@ plugins:
   - search
   - mkdocstrings:
       default_handler: "python"
-      rendering:
-        show_source: true
-        show_full_signature: true
-        show_root_heading: true
+      handlers:
+        python:
+          paths: [.]
+          import:
+            - https://docs.python.org/3/objects.inv
+          rendering:
+            show_source: true
+            show_full_signature: true
+            show_root_heading: true

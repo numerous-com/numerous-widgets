@@ -45,7 +45,26 @@ jobs:
       - run: coverage run -m pytest -vv python/tests/
       - run: coverage report | grep 'TOTAL' | awk '{print "COVERAGE_PCT=" $4}' >> $GITHUB_ENV
       # TODO: publish coverage report
+  build-widgets:
+    name: Build Widgets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build widgets
+        run: bash js/build-widgets.sh
+      - name: Upload built widgets
+        uses: actions/upload-artifact@v4
+        with:
+          name: widgets
+          path: python/src/widgets/static/*.mjs
   build:
+    needs: build-widgets
     timeout-minutes: 15
     runs-on: ubuntu-latest
     name: Build package
@@ -76,6 +95,7 @@ jobs:
     needs: 
       #- lint
       - test
+      - build-widgets
       - build
     steps:
       - uses: actions/checkout@v4
