@@ -1,6 +1,6 @@
 [project]
 name = "numerous-widgets"
-version = "0.0.2"
+version = "0.0.1"
 dependencies = ["anywidget"]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -8,6 +8,11 @@ classifiers = [
     "Intended Audience :: Developers"
 ]
 readme = "README.md"
+authors = [
+  { name="Lasse Thomsen, Numerous ApS", email="lasse.thomsen@numerous.com" },
+]
+description = "Widgets and patterns for building apps using frameworks like Panel, Marimo, and Jupyter based on the AnyWidget library."
+requires-python = ">=3.11"
 
 [tool.setuptools]
 package-dir = {"" = "python/src"}
@@ -58,3 +63,7 @@ exclude_commit_patterns = [
     '''Merged? .*''',
     '''initial commit''',
 ]
+
+[project.urls]
+Homepage = "https://github.com/pypa/sampleproject"
+Issues = "https://github.com/pypa/sampleproject/issues"
