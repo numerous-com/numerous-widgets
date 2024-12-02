@@ -42,7 +42,7 @@ jobs:
           python-version: '3.12' 
           cache: 'pip'
       - run: pip install -e .[dev]
-      - run: coverage run -m pytest -vv tests/
+      - run: coverage run -m pytest -vv python/tests/
         env:
           NUMEROUS_FILES_AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY_ID }}
           NUMEROUS_FILES_AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
