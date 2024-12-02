@@ -1,13 +1,20 @@
 [project]
 name = "numerous-widgets"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = ["anywidget"]
-classifiers = ["Programming Language :: Python :: 3"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers"
+]
 readme = "README.md"
 
-
 [tool.setuptools]
-packages.find = {where = ["python/src"]}
+package-dir = {"" = "python/src"}
+packages.find = {where = ["python/src"], include = ["numerous.*"]}
+
+[tool.setuptools.package-data]
+"numerous.widgets" = ["static/*.mjs", "static/*.css"]
 
 [project.optional-dependencies]
 dev = [

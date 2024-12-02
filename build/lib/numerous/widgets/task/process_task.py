@@ -5,8 +5,8 @@ import traceback
 import sys
 import io
 from datetime import datetime
-from widgets import Task as TaskWidget
-from widgets import Timer
+from .. import Task as TaskWidget
+from .. import Timer
 from typing import Callable
 import subprocess
 
