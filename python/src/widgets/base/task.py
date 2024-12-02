@@ -2,7 +2,7 @@ import anywidget
 import traitlets
 from typing import Callable, Optional, List, Tuple, Dict
 from datetime import datetime
-from .config import get_widget_paths
+from ._config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("TaskWidget")

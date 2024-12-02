@@ -2,7 +2,7 @@ import anywidget
 import traitlets
 from typing import Dict, Union, List, Optional
 import anywidget
-from .config import get_widget_paths
+from ._config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("TabsWidget")

@@ -1,6 +1,6 @@
 from typing import Dict, Union, List, Optional
 import traitlets
-from .config import get_widget_paths
+from ._config import get_widget_paths
 import anywidget
 
 # Get environment-appropriate paths
@@ -55,3 +55,14 @@ class DropDown(anywidget.AnyWidget):
     def val(self) -> str:
         """Returns the currently selected option."""
         return self.selected_value
+    
+    def get_value(self):
+        return self.selected_value
+    
+    def set_value(self, value):
+        self.selected_key = value
+        self.selected_value = value
+
+    @property
+    def name(self):
+        return self.ui_label

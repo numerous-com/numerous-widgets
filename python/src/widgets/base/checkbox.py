@@ -1,7 +1,7 @@
 import anywidget
 import traitlets
 from typing import Dict, Union
-from .config import get_widget_paths
+from ._config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("CheckBoxWidget")
@@ -50,4 +50,10 @@ class CheckBox(anywidget.AnyWidget):
     
     @val.setter
     def val(self, value):
+        self.value = value
+
+    def get_value(self):
+        return self.value
+    
+    def set_value(self, value):
         self.value = value
