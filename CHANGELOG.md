@@ -2,6 +2,13 @@
 
 
 
+## v0.0.3 (2024-12-02)
+
+### Fix
+
+* fix(project): Added author and description ([`125fe39`](https://github.com/numerous-com/numerous-widgets/commit/125fe39bdb0bab99e28b86aa094ef93d2e7d63df))
+
+
 ## v0.0.2 (2024-12-02)
 
 ### Fix
