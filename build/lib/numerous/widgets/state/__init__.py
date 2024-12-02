@@ -1,3 +1,3 @@
-from ._handler import StateHandler
+from .model import StateModel, number_field
 
-__all__ = ["StateHandler"]
+__all__ = ["StateModel", "number_field"]

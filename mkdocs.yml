@@ -8,7 +8,7 @@ nav:
   - API Reference:
     - Widgets: widgets.md
     - Process Task: process_task.md
-    
+    - State Model: state_model.md
 
 theme: readthedocs
 plugins:

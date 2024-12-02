@@ -1,7 +1,7 @@
 [project]
 name = "numerous-widgets"
 version = "0.0.7"
-dependencies = ["anywidget"]
+dependencies = ["anywidget", "pydantic"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Development Status :: 2 - Pre-Alpha",
