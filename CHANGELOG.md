@@ -2,6 +2,15 @@
 
 
 
+## v0.0.8 (2024-12-02)
+
+### Fix
+
+* fix(tests): Remove unused test ([`4fcd06e`](https://github.com/numerous-com/numerous-widgets/commit/4fcd06ed0fa3b4093baed0fcddd6e3038fd9a1e2))
+
+* fix(state): Created a StateModel to generate ui widgets from a pydantic model and sync it. ([`086157a`](https://github.com/numerous-com/numerous-widgets/commit/086157ab2f3706dc6c75c0b53106393d0ad17f3b))
+
+
 ## v0.0.7 (2024-12-02)
 
 ### Fix
