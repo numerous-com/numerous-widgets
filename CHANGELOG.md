@@ -2,6 +2,13 @@
 
 
 
+## v0.0.6 (2024-12-02)
+
+### Fix
+
+* fix(docs): setup with namespace package ([`0c6ddc0`](https://github.com/numerous-com/numerous-widgets/commit/0c6ddc03783e9dec4e73ed52e09c5b6d26234b66))
+
+
 ## v0.0.5 (2024-12-02)
 
 ### Fix
