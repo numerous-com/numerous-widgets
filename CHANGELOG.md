@@ -2,6 +2,13 @@
 
 
 
+## v0.0.7 (2024-12-02)
+
+### Fix
+
+* fix(widgets): Update to process task docs and docstrings ([`57576ad`](https://github.com/numerous-com/numerous-widgets/commit/57576ad2e45ba5083fd26e43e01b1427ab82dbe4))
+
+
 ## v0.0.6 (2024-12-02)
 
 ### Fix
