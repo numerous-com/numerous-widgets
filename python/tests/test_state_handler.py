@@ -1,6 +1,6 @@
 import pytest
 from typing import Any
-from widgets.state import StateHandler
+from numerous.widgets.state import StateHandler
 
 class IO:
     def __init__(self, value: Any, name: str):
