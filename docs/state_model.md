@@ -27,6 +27,18 @@ model.validate("number", 10)
 
 model.validate("number", 101)
 # False
+
+model_widget.val = 55
+model.revert()
+# model.number = 10
+
+new_model = MyModel(number=150)
+# raises ValidationError
+
+new_model.number = 20
+model.apply_values(new_model)
+# model.number = 20
+# number_widget.val = 20
 ```
 
 ## ::: numerous.widgets.state.StateModel
