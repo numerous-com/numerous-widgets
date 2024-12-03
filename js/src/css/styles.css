@@ -413,8 +413,22 @@ button[role="option"]:last-child {
 }
 
 .dropdown-container {
-  width: auto;
+  width: 100%;
   display: inline-block;
+}
+
+.dropdown-container.fit-to-content {
+  width: auto;
+}
+
+.dropdown-container.fit-to-content .custom-select {
+  min-width: 150px;
+  width: auto;
+}
+
+.dropdown-container:not(.fit-to-content) .selected-value,
+.dropdown-container:not(.fit-to-content) .option {
+  text-align: right;
 }
 
 .dropdown-label {

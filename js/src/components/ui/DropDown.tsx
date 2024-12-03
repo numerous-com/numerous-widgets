@@ -7,6 +7,7 @@ interface DropDownProps {
     uiLabel: string;
     uiTooltip: string;
     onChange: (selected_key: string) => void;
+    fitToContent: boolean;
 }
 
 export function DropDown({ 
@@ -14,7 +15,8 @@ export function DropDown({
     options, 
     uiLabel, 
     uiTooltip, 
-    onChange 
+    onChange,
+    fitToContent
 }: DropDownProps) {
     const [isOpen, setIsOpen] = React.useState(false);
     const dropdownRef = React.useRef<HTMLDivElement>(null);
@@ -33,7 +35,7 @@ export function DropDown({
     };
 
     return (
-        <div className="dropdown-container">
+        <div className={`dropdown-container ${fitToContent ? 'fit-to-content' : ''}`}>
             <label className="dropdown-label">
                 <span>{uiLabel}</span>
                 {uiTooltip && <Tooltip tooltip={uiTooltip} />}

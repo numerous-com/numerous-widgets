@@ -10,23 +10,23 @@ function DropDownWidget() {
     const [options] = useModelState<string[]>("options");
     const [uiLabel] = useModelState<string>("ui_label");
     const [uiTooltip] = useModelState<string>("ui_tooltip");
+    const [fitToContent] = useModelState<boolean>("fit_to_content");
     
     const handleChange = (value: string) => {
         setSelectedKey(value);
         setSelectedValue(value);
     };
 
-    const dropdown = (
+    return (
         <DropDown
             selected_key={selected_key}
             options={options}
             uiLabel={uiLabel}
             uiTooltip={uiTooltip}
             onChange={handleChange}
+            fitToContent={fitToContent}
         />
     );
-
-    return dropdown;
 }
 
 export default {

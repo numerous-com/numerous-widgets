@@ -23,6 +23,7 @@ class DropDown(anywidget.AnyWidget):
     selected_key = traitlets.Unicode().tag(sync=True)
     selected_value = traitlets.Unicode().tag(sync=True)
     options = traitlets.List().tag(sync=True)
+    fit_to_content = traitlets.Bool(default_value=False).tag(sync=True)
 
     # Load the JavaScript and CSS from external files
     _esm = ESM
@@ -35,6 +36,7 @@ class DropDown(anywidget.AnyWidget):
         label: str = None,
         tooltip: str = None,
         default: str = None,
+        fit_to_content: bool = False,
     ):
         # Initialize with keyword arguments
         default_key = default if default is not None else options[0]
@@ -44,6 +46,7 @@ class DropDown(anywidget.AnyWidget):
             selected_key=default_key,
             selected_value=default_key,
             options=options,
+            fit_to_content=fit_to_content,
         )
 
     @property
