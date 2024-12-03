@@ -2,6 +2,18 @@
 
 
 
+## v0.0.15 (2024-12-03)
+
+### Fix
+
+* fix(DropDown): add fitToContent prop for responsive design
+
+- Introduced a new `fitToContent` prop in the DropDown component to allow dynamic sizing based on content.
+- Updated the DropDownWidget to utilize the new prop from model state.
+- Enhanced CSS styles to support the responsive layout, adjusting width based on the `fitToContent` class.
+- Improved overall usability and flexibility of the DropDown component. ([`03a2e57`](https://github.com/numerous-com/numerous-widgets/commit/03a2e57e50f7c79e613e00c02419cd88367e8854))
+
+
 ## v0.0.14 (2024-12-03)
 
 ### Fix
