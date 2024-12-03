@@ -2,6 +2,13 @@
 
 
 
+## v0.0.10 (2024-12-03)
+
+### Fix
+
+* fix(docs): update example ([`e647976`](https://github.com/numerous-com/numerous-widgets/commit/e647976f2739b547c88329e78bacdd2a4da271c9))
+
+
 ## v0.0.9 (2024-12-03)
 
 ### Documentation
