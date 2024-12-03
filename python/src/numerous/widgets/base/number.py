@@ -24,6 +24,7 @@ class Number(anywidget.AnyWidget):
     start = traitlets.Float().tag(sync=True)
     stop = traitlets.Float().tag(sync=True)
     step = traitlets.Float().tag(sync=True)
+    valid = traitlets.Bool().tag(sync=True)
 
     # Load the JavaScript and CSS from external files
     _esm = ESM
@@ -47,6 +48,7 @@ class Number(anywidget.AnyWidget):
             stop=stop,
             step=step,
         )
+        self.observe(self._validate_value, 'value')
 
     @property
     def selected_value(self) -> float:
@@ -74,3 +76,7 @@ class Number(anywidget.AnyWidget):
             value: The new value to set.
         """
         self.value = value
+
+    def _validate_value(self, change):
+        """Validate the current value and update the valid property."""
+        self.valid = self.start <= change['new'] <= self.stop

@@ -1266,4 +1266,8 @@
     z-index: 9999;
   }
 
+  .number-input-container.invalid input[type="number"] {
+    border-color: red;
+  }
+
 

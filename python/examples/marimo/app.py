@@ -12,7 +12,7 @@ def __():
 
 @app.cell
 def __(mo):
-    import widgets as wi
+    import numerous.widgets as wi
     aw = mo.ui.anywidget
     return aw, wi
 
@@ -25,10 +25,16 @@ def __():
 
 
 @app.cell
-def __(wi):
-    number = wi.Number(label="Number", tooltip="This is a number")
+def __(aw, wi):
+    number = aw(wi.Number(label="Number", tooltip="This is a number", start=0, stop=1, step=.1))
     number
     return (number,)
+
+
+@app.cell
+def __(number):
+    number.value = 11
+    return
 
 
 @app.cell

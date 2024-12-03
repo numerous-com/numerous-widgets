@@ -7,10 +7,10 @@ try:
 
     # Load environment variables from .env file
     load_dotenv()
-
-    # Default to development mode if not set
+    # Default to production mode if not set
     IS_DEV = os.getenv("WIDGET_ENV", "production").lower() == "development"
-
+    if IS_DEV:
+        print("RUNNING IN DEVELOPMENT MODE")
 except ImportError:
     IS_DEV = False
 
@@ -18,7 +18,7 @@ except ImportError:
 STATIC_DIR = pathlib.Path(__file__).parent.parent / "static"
 
 if IS_DEV:
-    ROOT_DIR = pathlib.Path(__file__).parent.parent.parent.parent.parent
+    ROOT_DIR = pathlib.Path(__file__).parent.parent.parent.parent.parent.parent
     CSS = open(ROOT_DIR / "js" / "src" / "css" / "styles.css", "r").read()
 
     # Development server configuration

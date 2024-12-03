@@ -9,6 +9,8 @@ interface NumberInputProps {
     uiLabel: string;
     uiTooltip: string;
     onChange: (value: number) => void;
+    onChangeValid: (valid: boolean) => void;
+    valid: boolean;
 }
 
 export function NumberInput({ 
@@ -18,7 +20,9 @@ export function NumberInput({
     step, 
     uiLabel, 
     uiTooltip, 
-    onChange 
+    valid,
+    onChange,
+    onChangeValid 
 }: NumberInputProps) {
     // Local state for button acceleration
     const [stepMultiplier, setStepMultiplier] = React.useState(1);
@@ -57,12 +61,33 @@ export function NumberInput({
         const stepDecimals = getStepDecimals(step);
         
         if (newValue === '' || isNaN(Number(newValue))) {
-            onChange(value || 0);
+            // Reset to last valid value instead of 0
+            onChange(value);
+            onChangeValid(true);
             return;
         }
 
-        const validValue = validateAndAdjustValue(Number(newValue));
+        const numValue = Number(newValue);
+        const isValid = start <= numValue && numValue <= stop;
+        
+        if (!isValid) {
+            // If invalid, don't update the value and mark as invalid
+            onChangeValid(false);
+            return;
+        }
+
+        const validValue = validateAndAdjustValue(numValue);
         onChange(validValue);
+        onChangeValid(true);
+    };
+
+    // Add blur handler to force valid value on blur
+    const handleBlur = () => {
+        if (!valid) {
+            // Reset to last valid value
+            onChange(validateAndAdjustValue(value));
+            onChangeValid(true);
+        }
     };
 
     // Add button press handlers
@@ -102,7 +127,7 @@ export function NumberInput({
     }, []);
 
     return (
-        <div className="number-input-container">
+        <div className={`number-input-container ${valid ? '' : 'invalid'}`}>
             <div className="input-wrapper">
                 <label className="number-label">
                     <span>{uiLabel}</span>
@@ -115,7 +140,7 @@ export function NumberInput({
                     max={stop}
                     step={step}
                     onChange={(e) => updateValue(e.target.value)}
-                    onBlur={(e) => updateValue(e.target.value)}
+                    onBlur={handleBlur}
                 />
                 <div className="buttons">
                     <button 
