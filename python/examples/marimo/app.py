@@ -18,23 +18,10 @@ def __(mo):
 
 
 @app.cell
-def __():
-    #projects_menu = aw(wi.ProjectsMenu())
-    #projects_menu
-    return
-
-
-@app.cell
 def __(aw, wi):
     number = aw(wi.Number(label="Number", tooltip="This is a number", start=0, stop=10, default=1, step=.1))
     number
     return (number,)
-
-
-@app.cell
-def __(number):
-    number.valid
-    return
 
 
 @app.cell
@@ -50,19 +37,9 @@ def __(wi):
 
 
 @app.cell
-def __():
-    return
-
-
-@app.cell
-def __(aw, button, content, drop_down, mo, number):
-    content = [aw(number), aw(drop_down), aw(button), mo.vstack(content)]
+def __(aw, button, drop_down, mo, number):
+    content = [aw(number), aw(drop_down), aw(button), mo.vstack([aw(number)])]
     return (content,)
-
-
-@app.cell
-def __():
-    return
 
 
 @app.cell
