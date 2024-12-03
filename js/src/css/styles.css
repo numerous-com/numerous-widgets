@@ -1328,4 +1328,14 @@ select::-ms-expand {
   color: #ef4444;
 }
 
+.container {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.container.hidden {
+  display: none;
+}
+
 

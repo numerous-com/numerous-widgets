@@ -13,7 +13,7 @@ from .base.tabs import Tabs, render_tab_content
 from .base.checkbox import CheckBox
 from .base.map_selector import MapSelector
 from .base.card import card
-from .base.container import container
+from .base.container import container, side_by_side_container
 from .base.progress_bar import ProgressBar
 from .base.markdown_drawer import MarkdownDrawer
 from .base.task import Task
