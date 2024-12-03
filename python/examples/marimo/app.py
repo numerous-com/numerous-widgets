@@ -26,14 +26,14 @@ def __():
 
 @app.cell
 def __(aw, wi):
-    number = aw(wi.Number(label="Number", tooltip="This is a number", start=0, stop=1, step=.1))
+    number = aw(wi.Number(label="Number", tooltip="This is a number", start=0, stop=10, default=1, step=.1))
     number
     return (number,)
 
 
 @app.cell
 def __(number):
-    number.value = 11
+    number.valid
     return
 
 

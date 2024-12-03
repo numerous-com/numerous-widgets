@@ -48,7 +48,6 @@ class Number(anywidget.AnyWidget):
             stop=stop,
             step=step,
         )
-        self.observe(self._validate_value, 'value')
 
     @property
     def selected_value(self) -> float:
@@ -77,6 +76,8 @@ class Number(anywidget.AnyWidget):
         """
         self.value = value
 
+    @traitlets.observe('value')
     def _validate_value(self, change):
-        """Validate the current value and update the valid property."""
         self.valid = self.start <= change['new'] <= self.stop
+
+  

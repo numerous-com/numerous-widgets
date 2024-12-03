@@ -9,8 +9,6 @@ interface NumberInputProps {
     uiLabel: string;
     uiTooltip: string;
     onChange: (value: number) => void;
-    onChangeValid: (valid: boolean) => void;
-    valid: boolean;
 }
 
 export function NumberInput({ 
@@ -20,114 +18,32 @@ export function NumberInput({
     step, 
     uiLabel, 
     uiTooltip, 
-    valid,
-    onChange,
-    onChangeValid 
+    onChange 
 }: NumberInputProps) {
-    // Local state for button acceleration
-    const [stepMultiplier, setStepMultiplier] = React.useState(1);
-    const intervalRef = React.useRef<NodeJS.Timeout | null>(null);
-    const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+    const isValid = start <= value && value <= stop;
 
-    const getStepDecimals = (stepValue: number): number => {
-        const str = stepValue.toString();
-        return str.includes('.') ? str.split('.')[1].length : 0;
+    // Helper function to coerce to nearest step multiple and round to step precision
+    const coerceToStep = (val: number): number => {
+        const steps = Math.round((val - start) / step);
+        const coercedValue = start + (steps * step);
+        return parseFloat(coercedValue.toFixed(getDecimalPlaces(step)));
     };
 
-    const formatToStepPrecision = (num: number, decimals: number): number => {
-        return Number(num.toFixed(decimals));
+    // Function to determine the number of decimal places in the step
+    const getDecimalPlaces = (num: number): number => {
+        const match = ('' + num).match(/(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/);
+        if (!match) { return 0; }
+        return Math.max(0, (match[1] ? match[1].length : 0) - (match[2] ? +match[2] : 0));
     };
 
-    const validateAndAdjustValue = (inputValue: number): number => {
-        if (!start || !stop || !step) return inputValue;
-        
-        const stepDecimals = getStepDecimals(step);
-        let newValue = formatToStepPrecision(inputValue, stepDecimals);
-        
-        // Clamp value between start and stop
-        newValue = Math.max(start, Math.min(stop, newValue));
-        
-        // Adjust to nearest step multiple
-        const stepsFromStart = Math.round((newValue - start) / step);
-        newValue = formatToStepPrecision(start + (stepsFromStart * step), stepDecimals);
-        
-        // Final clamp
-        return Math.max(start, Math.min(stop, newValue));
+    // Handle input change with step coercion
+    const handleChange = (newValue: number) => {
+        const coercedValue = coerceToStep(newValue);
+        onChange(coercedValue);
     };
-
-    const updateValue = (newValue: string | number) => {
-        if (!step) return;
-        
-        const stepDecimals = getStepDecimals(step);
-        
-        if (newValue === '' || isNaN(Number(newValue))) {
-            // Reset to last valid value instead of 0
-            onChange(value);
-            onChangeValid(true);
-            return;
-        }
-
-        const numValue = Number(newValue);
-        const isValid = start <= numValue && numValue <= stop;
-        
-        if (!isValid) {
-            // If invalid, don't update the value and mark as invalid
-            onChangeValid(false);
-            return;
-        }
-
-        const validValue = validateAndAdjustValue(numValue);
-        onChange(validValue);
-        onChangeValid(true);
-    };
-
-    // Add blur handler to force valid value on blur
-    const handleBlur = () => {
-        if (!valid) {
-            // Reset to last valid value
-            onChange(validateAndAdjustValue(value));
-            onChangeValid(true);
-        }
-    };
-
-    // Add button press handlers
-    const handleButtonPress = (direction: number) => {
-        if (!step) return;
-        
-        // Initial update
-        updateValue(value + (direction * step * stepMultiplier));
-        
-        // Start acceleration after delay
-        timeoutRef.current = setTimeout(() => {
-            intervalRef.current = setInterval(() => {
-                setStepMultiplier(prev => Math.min(prev + 0.5, 10));
-                updateValue(value + (direction * step * stepMultiplier));
-            }, 50);
-        }, 500);
-    };
-
-    const handleButtonRelease = () => {
-        if (intervalRef.current) {
-            clearInterval(intervalRef.current);
-            intervalRef.current = null;
-        }
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-            timeoutRef.current = null;
-        }
-        setStepMultiplier(1);
-    };
-
-    // Cleanup on unmount
-    React.useEffect(() => {
-        return () => {
-            if (intervalRef.current) clearInterval(intervalRef.current);
-            if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        };
-    }, []);
 
     return (
-        <div className={`number-input-container ${valid ? '' : 'invalid'}`}>
+        <div className={`number-input-container ${!isValid ? 'invalid' : ''}`}>
             <div className="input-wrapper">
                 <label className="number-label">
                     <span>{uiLabel}</span>
@@ -139,34 +55,28 @@ export function NumberInput({
                     min={start}
                     max={stop}
                     step={step}
-                    onChange={(e) => updateValue(e.target.value)}
-                    onBlur={handleBlur}
+                    onChange={(e) => handleChange(Number(e.target.value))}
                 />
                 <div className="buttons">
                     <button 
                         className="step-button"
-                        onMouseDown={() => handleButtonPress(-1)}
-                        onMouseUp={handleButtonRelease}
-                        onMouseLeave={handleButtonRelease}
-                        onTouchStart={() => handleButtonPress(-1)}
-                        onTouchEnd={handleButtonRelease}
-                        onTouchCancel={handleButtonRelease}
+                        onClick={() => handleChange(value - step)}
                     >
                         −
                     </button>
                     <button 
                         className="step-button"
-                        onMouseDown={() => handleButtonPress(1)}
-                        onMouseUp={handleButtonRelease}
-                        onMouseLeave={handleButtonRelease}
-                        onTouchStart={() => handleButtonPress(1)}
-                        onTouchEnd={handleButtonRelease}
-                        onTouchCancel={handleButtonRelease}
+                        onClick={() => handleChange(value + step)}
                     >
                         +
                     </button>
                 </div>
             </div>
+            {!isValid && (
+                <div className="validation-message">
+                    Value must be between {start} and {stop}
+                </div>
+            )}
         </div>
     );
 }

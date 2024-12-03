@@ -133,9 +133,9 @@
   
   /* Number input styles */
   .number-input-container {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
   }
   
   .number-label {
@@ -1268,6 +1268,40 @@
 
   .number-input-container.invalid input[type="number"] {
     border-color: red;
+  }
+
+  .number-input-container.invalid .input-wrapper {
+    border-color: #ef4444;  /* Red border for invalid state */
+  }
+
+  .validation-message {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #fff;
+    border: 1px solid #ef4444;
+    padding: 4px 8px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    white-space: nowrap;
+    margin-bottom: 4px;
+    color: #ef4444;
+    font-size: 12px;
+    display: none;
+  }
+
+  .number-input-container.invalid:hover .validation-message {
+    display: block;
+  }
+
+  .number-input-container.invalid .input-wrapper {
+    border-color: #ef4444;
+  }
+
+  .number-input-container.invalid input[type="number"] {
+    color: #ef4444;
   }
 
 

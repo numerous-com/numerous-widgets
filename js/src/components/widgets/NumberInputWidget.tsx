@@ -11,7 +11,6 @@ function NumberWidget() {
     const [step] = useModelState<number>("step");
     const [uiLabel] = useModelState<string>("ui_label");
     const [uiTooltip] = useModelState<string>("ui_tooltip");
-    const [valid, setValid] = useModelState<boolean>("valid");
 
     return (
         <NumberInput
@@ -21,10 +20,10 @@ function NumberWidget() {
             step={step}
             uiLabel={uiLabel}
             uiTooltip={uiTooltip}
-            valid={valid}
+
             onChange={setValue}
-            onChangeValid={setValid}
-        />
+
+            />
     );
 }
 
