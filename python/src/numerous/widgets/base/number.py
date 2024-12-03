@@ -26,6 +26,9 @@ class Number(anywidget.AnyWidget):
     step = traitlets.Float().tag(sync=True)
     valid = traitlets.Bool().tag(sync=True)
 
+    # New traitlet to control layout mode
+    fit_to_content = traitlets.Bool(default_value=False).tag(sync=True)
+
     # Load the JavaScript and CSS from external files
     _esm = ESM
     _css = CSS
@@ -38,6 +41,7 @@ class Number(anywidget.AnyWidget):
         start: float = 0.0,
         stop: float = 100.0,
         step: float = 1.0,
+        fit_to_content: bool = False,
     ):
         # Initialize with keyword arguments
         super().__init__(
@@ -47,6 +51,7 @@ class Number(anywidget.AnyWidget):
             start=start,
             stop=stop,
             step=step,
+            fit_to_content=fit_to_content,
         )
 
     @property

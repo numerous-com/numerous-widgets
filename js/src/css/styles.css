@@ -133,8 +133,23 @@ button.secondary:hover {
 
 .number-input-container {
   position: relative;
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
   vertical-align: top;
+}
+
+.number-input-container.fit-to-content {
+  width: fit-content;
+  display: inline-flex;
+}
+
+.number-input-container.fit-to-content .input-wrapper {
+  width: auto;
+}
+
+.number-input-container:not(.fit-to-content) input[type="number"] {
+  text-align: right;
 }
 
 .number-label {

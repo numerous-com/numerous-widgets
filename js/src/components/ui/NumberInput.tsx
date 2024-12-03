@@ -18,8 +18,9 @@ export function NumberInput({
     step, 
     uiLabel, 
     uiTooltip, 
-    onChange 
-}: NumberInputProps) {
+    onChange,
+    fitToContent
+}: NumberInputProps & { fitToContent: boolean }) {
     const isValid = start <= value && value <= stop;
 
     // Helper function to coerce to nearest step multiple and round to step precision
@@ -43,8 +44,8 @@ export function NumberInput({
     };
 
     return (
-        <div className={`number-input-container ${!isValid ? 'invalid' : ''}`}>
-            <div className="input-wrapper">
+        <div className={`number-input-container ${fitToContent ? 'fit-to-content' : ''} ${!isValid ? 'invalid' : ''}`}>
+            <div className="input-wrapper" style={{ width: fitToContent ? 'auto' : '100%' }}>
                 <label className="number-label">
                     <span>{uiLabel}</span>
                     {uiTooltip && <Tooltip tooltip={uiTooltip} />}
@@ -56,6 +57,7 @@ export function NumberInput({
                     max={stop}
                     step={step}
                     onChange={(e) => handleChange(Number(e.target.value))}
+                    style={{ flexGrow: fitToContent ? 0 : 1 }}
                 />
                 <div className="buttons">
                     <button 

@@ -19,7 +19,7 @@ def __(mo):
 
 @app.cell
 def __(aw, wi):
-    number = aw(wi.Number(label="Number", tooltip="This is a number", start=0, stop=10, default=1, step=.1))
+    number = aw(wi.Number(label="Number", tooltip="This is a number", start=0, stop=10, default=1, step=.1, fit_to_content=False))
     number
     return (number,)
 
