@@ -2,6 +2,18 @@
 
 
 
+## v0.0.16 (2024-12-03)
+
+### Fix
+
+* fix(container): enhance container widget with new properties and styles
+
+- Added new `width`, `height`, and `direction` parameters to the `container` function for better layout control.
+- Introduced a `side_by_side_container` function for arranging contents horizontally.
+- Updated CSS styles for the container to support flexible display options.
+- Improved the overall usability and flexibility of the container widget. ([`c520d7c`](https://github.com/numerous-com/numerous-widgets/commit/c520d7cb240929465f45688ac0040da3d0ed0045))
+
+
 ## v0.0.15 (2024-12-03)
 
 ### Fix
