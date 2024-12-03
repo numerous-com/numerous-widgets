@@ -2,6 +2,13 @@
 
 
 
+## v0.0.12 (2024-12-03)
+
+### Fix
+
+* fix(styles): Updated stylesheet ([`535d96d`](https://github.com/numerous-com/numerous-widgets/commit/535d96d9b6ccbc792fca46dbd8215547e50487a5))
+
+
 ## v0.0.11 (2024-12-03)
 
 ### Fix
