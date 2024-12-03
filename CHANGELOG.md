@@ -2,6 +2,13 @@
 
 
 
+## v0.0.11 (2024-12-03)
+
+### Fix
+
+* fix(widgets): Improvements to NumberField ([`de99738`](https://github.com/numerous-com/numerous-widgets/commit/de9973835032dd0f00de7de29ce98e3818c1c1f3))
+
+
 ## v0.0.10 (2024-12-03)
 
 ### Fix
