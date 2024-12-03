@@ -2,6 +2,13 @@
 
 
 
+## v0.0.13 (2024-12-03)
+
+### Fix
+
+* fix(tabs): fixes to tabs ([`20e8d65`](https://github.com/numerous-com/numerous-widgets/commit/20e8d65d7e7227c4e14b24b2a08980e67f694a47))
+
+
 ## v0.0.12 (2024-12-03)
 
 ### Fix
