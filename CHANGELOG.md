@@ -2,6 +2,20 @@
 
 
 
+## v0.0.14 (2024-12-03)
+
+### Fix
+
+* fix(NumberInput): add fitToContent prop for responsive layout
+
+- Introduced a new `fitToContent` prop to the NumberInput component to allow for dynamic sizing based on content.
+- Updated styles to support the new layout mode, enabling the input to adjust its width accordingly.
+- Modified the NumberInputWidget to pass the new prop from the model state.
+- Adjusted the example in app.py to include the `fit_to_content` parameter.
+
+This enhancement improves the usability and flexibility of the NumberInput component. ([`f32a9af`](https://github.com/numerous-com/numerous-widgets/commit/f32a9af13bf38f3d1917c64a4167c200be42dc84))
+
+
 ## v0.0.13 (2024-12-03)
 
 ### Fix
