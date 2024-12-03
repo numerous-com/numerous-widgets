@@ -40,33 +40,47 @@ def __(number):
 @app.cell
 def __(wi):
     drop_down = wi.DropDown(label="Select", tooltip="sdfsd", options=["Option 1", "Option 2"])
-    drop_down
     return (drop_down,)
 
 
 @app.cell
 def __(wi):
     button = wi.Button(label="ok", tooltip="The button")
-    button
     return (button,)
 
 
 @app.cell
-def __(button, drop_down, number):
-    content = [number, drop_down, button]
+def __():
+    return
+
+
+@app.cell
+def __(aw, button, content, drop_down, mo, number):
+    content = [aw(number), aw(drop_down), aw(button), mo.vstack(content)]
     return (content,)
 
 
 @app.cell
-def __(aw, wi):
-    tabs = aw(wi.Tabs(tabs=["Number", "Drop Down", "Button"]))
+def __():
+    return
+
+
+@app.cell
+def __():
+    tabs_options=["Number", "Drop Down", "Button", "Vstack"]
+    return (tabs_options,)
+
+
+@app.cell
+def __(aw, tabs_options, wi):
+    tabs = aw(wi.Tabs(tabs=tabs_options))
     tabs
     return (tabs,)
 
 
 @app.cell
-def __(content, tabs, wi):
-    wi.tabs_active_page_content(tabs, content)
+def __(content, mo, tabs, tabs_options, wi):
+    mo.Html(wi.render_tab_content({k: v for k,v in zip(tabs_options, content)}, tabs.selected_value))
     return
 
 
@@ -120,16 +134,16 @@ def __(progress):
 
 
 @app.cell
-def __(aw, wi):
-    markdown_drawer = aw(wi.MarkdownDrawer("Docs", content="# Hello World"))
-    markdown_drawer
-    return (markdown_drawer,)
+def __():
+    #markdown_drawer = aw(wi.MarkdownDrawer("Docs", content="# Hello World"))
+    #markdown_drawer
+    return
 
 
 @app.cell
-def __(markdown_drawer):
-    markdown_drawer.content = """# Documentation for the System Designer
-
+def __():
+    #markdown_drawer.content = """# Documentation for the System Designer
+    """
     1. Test
     2. Test more
 

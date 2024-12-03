@@ -26,6 +26,14 @@ The widgets are available in the `widgets` module.
     options:
         show_root_heading: true
 
+## ::: numerous.widgets.render_tab_content
+    options:
+        show_root_heading: true
+
+## ::: numerous.widgets.container
+    options:
+        show_root_heading: true
+
 ## ::: numerous.widgets.Timer
     options:
         show_root_heading: true

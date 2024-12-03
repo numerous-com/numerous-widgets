@@ -3,7 +3,7 @@ import traitlets
 from typing import Dict, Union, List, Optional
 import anywidget
 from ._config import get_widget_paths
-
+from numerous.widgets.base.container import container
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("TabsWidget")
 
@@ -64,11 +64,18 @@ class Tabs(anywidget.AnyWidget):
         """Returns the currently selected tab."""
         return self.active_tab
     
-def tabs_active_page_content(tabs: Tabs, content_pages: List[str|anywidget.AnyWidget]) -> str:
+def render_tab_content(widgets, selection: str) -> str:
+    """Renders the content of a tab.
+    Args:
+        widgets: A dictionary of widgets to render.
+        selection: The currently selected tab.
 
-    content = content_pages[tabs.tabs.index(tabs.active_tab)]
-
-
-    return content
+    Returns:
+        A string of HTML representing the content of the selected tab.
+    """
+    html = ""
+    for k, w in widgets.items():
+        html += container(w, hidden=k!=selection)
+    return html
 
     

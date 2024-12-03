@@ -39,11 +39,12 @@ class MapSelector(anywidget.AnyWidget):
         points: Dict[str, Tuple[float, float]] = None,
         center: List[float] = None,
         zoom: int = None,
+        default: str = None,
     ):
         # Initialize with keyword arguments
         super().__init__(
             points=points if points is not None else {},
-            value='',
+            value=default if default is not None else '',
             center=center if center is not None else [0, 0],
             zoom=zoom if zoom is not None else 2,
             location_clicked=[0, 0],
