@@ -2,6 +2,17 @@
 
 
 
+## v0.0.9 (2024-12-03)
+
+### Documentation
+
+* docs(state_model): Add example usage for StateModel in documentation ([`fe12690`](https://github.com/numerous-com/numerous-widgets/commit/fe12690c28cb4244202bf7b0dea1432bd32dbc01))
+
+### Fix
+
+* fix(docs): update example ([`57ea12d`](https://github.com/numerous-com/numerous-widgets/commit/57ea12de85dcb0b992a3d688c5220e7bc7944eda))
+
+
 ## v0.0.8 (2024-12-02)
 
 ### Fix
