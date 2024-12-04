@@ -2,6 +2,21 @@
 
 
 
+## v0.0.17 (2024-12-04)
+
+### Fix
+
+* fix(TaskWidget, ProcessTask): streamline synchronization and enhance task management
+
+- Removed the dependency on `isRunning` in the `TaskWidget` component for sync interval management, simplifying the synchronization logic.
+- Updated import paths in `sim_app.py` and `__init__.py` to reflect the new module structure.
+- Added new properties and methods in `ProcessTask` for better task state management, including `is_stopped`, `_exit_flag`, and improved logging functionality.
+- Enhanced the `sync_with_task` function to include a callback for when the task stops, improving task lifecycle management.
+- Introduced validation methods in `StateModel` to check widget values, enhancing form handling capabilities.
+
+These changes improve the overall usability and maintainability of the task management system. ([`2114246`](https://github.com/numerous-com/numerous-widgets/commit/2114246f916d997c395d0c23662e9abe989cefc6))
+
+
 ## v0.0.16 (2024-12-03)
 
 ### Fix
