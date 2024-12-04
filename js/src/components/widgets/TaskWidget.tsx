@@ -21,14 +21,14 @@ function TaskWidget() {
     const [syncInterval] = useModelState<number>("sync_interval");
 
     React.useEffect(() => {
-        if (syncEnabled && isRunning) {
+        if (syncEnabled) {
             const intervalId = setInterval(() => {
                 setLastSync(Date.now() / 1000);
             }, syncInterval * 1000);
             
             return () => clearInterval(intervalId);
         }
-    }, [syncEnabled, isRunning, setLastSync]);
+    }, [syncEnabled, setLastSync]);
 
     const handleReset = async () => {
         setProgress(0);

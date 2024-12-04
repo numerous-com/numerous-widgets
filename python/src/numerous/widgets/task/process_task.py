@@ -9,6 +9,7 @@ from .. import Task as TaskWidget
 from .. import Timer
 from typing import Callable
 import subprocess
+import signal
 
 class ProcessTask:
     """A base class for running long-running tasks in a separate process with progress tracking.
@@ -35,6 +36,7 @@ class ProcessTask:
         self._process: Optional[multiprocessing.Process] = None
         self._progress = multiprocessing.Value("d", 0.0)
         self._stop_flag = multiprocessing.Value('i', 0)
+        self._exit_flag = multiprocessing.Value('i', 0)
         self._result_queue: multiprocessing.Queue = multiprocessing.Queue()
         self._exception_queue: multiprocessing.Queue = multiprocessing.Queue()
         self._log_queue: multiprocessing.Queue = multiprocessing.Queue()
@@ -45,6 +47,19 @@ class ProcessTask:
         self.run_in_process: bool = run_in_process
         self.exc: Optional[Exception] = None
         self.tb: Optional[str] = None
+        self._started: bool = False
+        self._exit_pending: bool = False
+        self._result_fetched: bool = False
+
+    def _log(self, type_: str, source: str, message: str) -> None:
+        """Internal method to add a log entry to the queue.
+
+        Args:
+            type_ (str): The type of log entry (e.g., "info", "error", "stdout")
+            source (str): The source of the log entry (e.g., "process", "task")
+            message (str): The message to log
+        """
+        self._log_queue.put((datetime.now(), type_, source, message))
 
     def _run_wrapper(self, *args: Any, **kwargs: Any) -> None:
         """Internal wrapper method to handle task execution and exception handling.
@@ -53,6 +68,7 @@ class ProcessTask:
             *args: Variable length argument list to pass to run().
             **kwargs: Arbitrary keyword arguments to pass to run().
         """
+
         try:
             if self.capture_stdout:
                 # Redirect stdout and stderr to capture all output
@@ -74,37 +90,38 @@ class ProcessTask:
                 sys.stderr = StreamToQueue(self._log_queue)
 
             try:
+
                 result = self.run(*args, **kwargs)
+
                 self._result_queue.put(result)
+
             except Exception as e:
-                # Log the exception details
-                self._log_queue.put((datetime.now(), "error", "process", f"Error in run(): {str(e)}"))
-                self._log_queue.put((datetime.now(), "error", "process", f"Traceback:\n{traceback.format_exc()}"))
-                # Put the exception in the queue
+
+                self._log("error", "process", f"Error in run(): {str(e)}")
+                self._log("error", "process", f"Traceback:\n{traceback.format_exc()}")
                 self._exception_queue.put((datetime.now(), e, traceback.format_exc()))
-                raise  # Re-raise to ensure the process exits with error
+                raise
             finally:
+
                 # Always mark as complete, even if there was an error
                 self._progress.value = 1.0
 
         except Exception as e:
-            # Catch any exceptions that might occur in the stdout/stderr redirection
-            self._log_queue.put((datetime.now(), "error", "process", f"Error in wrapper: {str(e)}"))
-            self._log_queue.put((datetime.now(), "error", "process", f"Traceback:\n{traceback.format_exc()}"))
+
+            self._log("error", "process", f"Error in wrapper: {str(e)}")
+            self._log("error", "process", f"Traceback:\n{traceback.format_exc()}")
             self._exception_queue.put((datetime.now(), e, traceback.format_exc()))
             raise
         finally:
+
             # Always restore stdout/stderr
             if self.capture_stdout:
                 sys.stdout = sys.__stdout__
                 sys.stderr = sys.__stderr__
+
             
-            # Ensure queues are flushed
-            try:
-                while not self._log_queue.empty():
-                    time.sleep(0.1)
-            except:
-                pass
+            self._exit_flag.value = 1
+            #signal.raise_signal(signal.SIGTERM)
 
     def log(self, message: str) -> None:
         """Add a log entry to the queue.
@@ -112,7 +129,7 @@ class ProcessTask:
         Args:
             message (str): The message to add to the log queue.
         """
-        self._log_queue.put((datetime.now(), "info", "task", message))
+        self._log("info", "task", message)
 
     @property
     def log_strings(self) -> str:
@@ -146,17 +163,23 @@ class ProcessTask:
             *args: Variable length argument list to pass to run().
             **kwargs: Arbitrary keyword arguments to pass to run().
         """
-        self._progress.value = 0.0
-        self._return_value = None
-        self._exception = None
+        if self.started:
+            raise RuntimeError("Task has already been started")
         
+
+
         if self.run_in_process:
             if self._process is None or not self._process.is_alive():
                 self._process = multiprocessing.Process(
                     target=self._run_wrapper, args=args, kwargs=kwargs
                 )
                 self._process.start()
+                self._started = True
+                self._exit_pending = True
         else:
+            self.started = True
+            self._exit_pending = True
+
             # Run directly in the same thread
             self._run_wrapper(*args, **kwargs)
 
@@ -169,16 +192,58 @@ class ProcessTask:
             try:
                 raise RuntimeError(self.stop_message)
             except Exception as e:
-                self._exception_queue.put((datetime.now(), e, traceback.format_exc()))
+                self._exception_queue.put((datetime.now(), e, traceback.format_exc()))      
 
     def join(self) -> None:
         if self._process:
             self._process.join()
 
+    def _cleanup(self) -> None:
+        if self._exit_flag.value == 2:
+            if self._process is not None:
+                self._process.terminate()
+                self._process.join()
+
     @property
     def alive(self) -> bool:
-        return self._process.is_alive() if self._process else False
+        self._cleanup()
 
+        if not self.run_in_process:
+            return False
+        if self._process is None:
+            return False
+        # A process is only considered alive if it's running (exitcode is None)
+        #return self._process.is_alive() and self._process.exitcode is None
+        return self._exit_flag.value == 0
+    
+    @property
+    def started(self) -> bool:
+        return self._started
+    
+    @property
+    def exited(self) -> bool:
+        if not self.run_in_process:
+            # For non-process tasks, consider exited if started and pending exit
+            return self.started and self._exit_pending
+        
+        if self._process is None:
+            return False
+        
+        # Process has exited if it was started, has an exitcode, and exit is pending
+        has_exited = (not self.alive and 
+                      #self._process.exitcode is not None and 
+                      self.started and 
+                      self._exit_pending)
+        
+        if has_exited:
+            self._exit_pending = False
+
+        return has_exited
+    
+    @property
+    def completed(self) -> bool:
+        return self.exited and self._progress.value >= 1.0
+    
     @property
     def progress(self) -> float:
         """Get the current progress of the task.
@@ -187,6 +252,14 @@ class ProcessTask:
             float: Progress value between 0.0 and 1.0.
         """
         return self._progress.value
+    
+    def set_progress(self, value: float) -> None:
+        """Set the progress of the task.
+
+        Args:
+            value (float): Progress value between 0.0 and 1.0.
+        """
+        self._progress.value = value
     
     @property
     def result(self) -> Any:
@@ -198,18 +271,25 @@ class ProcessTask:
         Raises:
             RuntimeError: If an exception occurred during task execution.
         """
-        if self._process is not None:
-            self._process.join()  # Wait for process to finish
+        self._cleanup()
 
-        if self._exception is not None:
-            raise self._exception
+        while not self._result_fetched:
 
-        if not self._result_queue.empty():
-            self._return_value = self._result_queue.get()
+            if not self.started:
+                raise RuntimeError("Task has not been started")
 
-        if not self._exception_queue.empty():
-            timestamp, exc, tb = self._exception_queue.get()  # Unpack all three values
-            raise RuntimeError(f"Exception in process:\n{tb}") from exc
+            if self._exception is not None:
+                raise self._exception
+
+            if not self._result_queue.empty():
+                self._return_value = self._result_queue.get()
+                self._result_fetched = True
+
+            if not self._exception_queue.empty():
+                timestamp, exc, tb = self._exception_queue.get()  # Unpack all three values
+                raise RuntimeError(f"Exception in process:\n{tb}") from exc
+            
+            time.sleep(.1)
 
         return self._return_value
 
@@ -223,6 +303,8 @@ class ProcessTask:
                 or (exception, traceback) if using cached values,
                 or None if no exception occurred.
         """
+        self._cleanup()
+
         if not self._exception_queue.empty():
             self.exception_timestamp, self.exc, self.tb = self._exception_queue.get()
             return self.exc, self.tb, self.exception_timestamp
@@ -237,7 +319,7 @@ class ProcessTask:
 
     def reset(self) -> None:
         """Reset the task's state to initial conditions."""
-
+        self._cleanup()
         if self._process and self._process.is_alive():
             self.stop()
             
@@ -258,6 +340,126 @@ class ProcessTask:
         self.exc = None
         self.tb = None
         self.exception_timestamp = None
+        self._started = False
+        self._exit_pending = False
+        self._exit_flag.value = 0
+        self._result_fetched = False
+        
+
+    def disable_exit(self) -> None:
+        self._exit_pending = False
+        
+    def on_log_line(self, line: str, source: str) -> None:
+        """Process a line of output from the task.
+        Override this method in subclasses to implement custom log line processing.
+        
+        Args:
+            line (str): A line of output to process
+            source (str): Source of the line (e.g. "stdout", "stderr")
+        """
+        pass
+
+def run_in_subprocess(task: ProcessTask, cmd: Union[str, List[str]], shell: bool = False, cwd: Optional[str] = None) -> Tuple[str, str]:
+    """Run a shell command and capture its output."""
+    process = None
+    try:
+        # Start process
+        process = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            shell=shell,
+            cwd=cwd,
+            text=True,
+            bufsize=1,
+            universal_newlines=True
+        )
+        
+        from queue import Queue
+        from threading import Thread
+        
+        stdout_queue = Queue()
+        stderr_queue = Queue()
+        
+        def pipe_reader(pipe, queue):
+            """Continuously read from pipe and put lines into queue."""
+            try:
+                for line in iter(pipe.readline, ''):
+                    queue.put(line)
+            finally:
+                pipe.close()
+        
+        # Start reader threads
+        stdout_thread = Thread(target=pipe_reader, args=(process.stdout, stdout_queue))
+        stderr_thread = Thread(target=pipe_reader, args=(process.stderr, stderr_queue))
+        stdout_thread.daemon = True
+        stderr_thread.daemon = True
+        stdout_thread.start()
+        stderr_thread.start()
+        
+        stdout_lines = []
+        stderr_lines = []
+        
+        # Handle output while process runs
+        while True:
+            if task._stop_flag.value == 1:
+                process.terminate()
+                break
+            
+            # Process all available stdout
+            while not stdout_queue.empty():
+                stdout_line = stdout_queue.get_nowait()
+                stdout_lines.append(stdout_line)
+                task._log("stdout", "process", stdout_line.strip())
+                task.on_log_line(stdout_line.strip(), "stdout")
+            
+            # Process all available stderr
+            while not stderr_queue.empty():
+                stderr_line = stderr_queue.get_nowait()
+                stderr_lines.append(stderr_line)
+                task._log("stderr", "process", stderr_line.strip())
+                task.on_log_line(stderr_line.strip(), "stderr")
+            
+            # Check if process has finished
+            retcode = process.poll()
+            if retcode is not None:
+                # Process any remaining output
+                time.sleep(0.1)  # Give threads a chance to finish reading
+                
+                while not stdout_queue.empty():
+                    stdout_line = stdout_queue.get_nowait()
+                    stdout_lines.append(stdout_line)
+                    task._log("stdout", "process", stdout_line.strip())
+                    
+                while not stderr_queue.empty():
+                    stderr_line = stderr_queue.get_nowait()
+                    stderr_lines.append(stderr_line)
+                    task._log("stderr", "process", stderr_line.strip())
+                
+                if retcode != 0:
+                    stdout_str = ''.join(stdout_lines)
+                    stderr_str = ''.join(stderr_lines)
+                    error = subprocess.CalledProcessError(
+                        retcode, cmd, 
+                        stdout_str,
+                        stderr_str
+                    )
+                    task._log("error", "process", f"Process failed with exit code {retcode}\n{stderr_str}")
+                    raise error
+                break
+            
+            # Small sleep to prevent CPU hogging
+            time.sleep(0.1)
+
+        return ''.join(stdout_lines), ''.join(stderr_lines)
+        
+    except Exception as e:
+        task._log("error", "process", f"Error: {str(e)}")
+        if process and process.poll() is None:
+            process.kill()
+        raise
+    
+    
 
 class SubprocessTask(ProcessTask):
     """ProcessTask subclass for running shell commands using subprocess.
@@ -265,124 +467,14 @@ class SubprocessTask(ProcessTask):
     Captures stdout and stderr, with progress parsing from stdout.
     """
     
-    def __init__(self, *args, progress_parser: Optional[Callable[[str], Optional[float]]]=None, **kwargs) -> None:
-        """Initialize the subprocess task.
-        
-        Args:
-            progress_parser: Callable that takes a stdout line and returns a float progress value (0-1) 
-                           or None if the line doesn't contain progress info
-            *args: Additional arguments passed to ProcessTask
-            **kwargs: Additional keyword arguments passed to ProcessTask
-        """
+    def __init__(self, *args, **kwargs) -> None:
+        """Initialize the subprocess task."""
         super().__init__(*args, stop_message="Process was terminated.", **kwargs)
-        self._progress_parser = progress_parser
-        
-    def run(self, cmd: Union[str, List[str]], shell: bool = False, cwd: Optional[str] = None) -> Tuple[str, str]:
-        """Run a shell command and capture its output."""
-        process = None
-        try:
-            # Start process
-            process = subprocess.Popen(
-                cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                shell=shell,
-                cwd=cwd,
-                text=True,
-                bufsize=1,
-                universal_newlines=True
-            )
-            
-            from queue import Queue
-            from threading import Thread
-            
-            stdout_queue = Queue()
-            stderr_queue = Queue()
-            
-            def pipe_reader(pipe, queue):
-                """Continuously read from pipe and put lines into queue."""
-                try:
-                    for line in iter(pipe.readline, ''):
-                        queue.put(line)
-                finally:
-                    pipe.close()
-            
-            # Start reader threads
-            stdout_thread = Thread(target=pipe_reader, args=(process.stdout, stdout_queue))
-            stderr_thread = Thread(target=pipe_reader, args=(process.stderr, stderr_queue))
-            stdout_thread.daemon = True
-            stderr_thread.daemon = True
-            stdout_thread.start()
-            stderr_thread.start()
-            
-            stdout_lines = []
-            stderr_lines = []
-            
-            # Handle output while process runs
-            while True:
-                if self._stop_flag.value == 1:
-                    process.terminate()
-                    break
-                
-                # Process all available stdout
-                while not stdout_queue.empty():
-                    stdout_line = stdout_queue.get_nowait()
-                    stdout_lines.append(stdout_line)
-                    self._log_queue.put((datetime.now(), "stdout", "process", stdout_line.strip()))
-                    if self._progress_parser:
-                        progress = self._progress_parser(stdout_line)
-                        if progress is not None:
-                            self._progress.value = progress
-                
-                # Process all available stderr
-                while not stderr_queue.empty():
-                    stderr_line = stderr_queue.get_nowait()
-                    stderr_lines.append(stderr_line)
-                    self._log_queue.put((datetime.now(), "stderr", "process", stderr_line.strip()))
-                
-                # Check if process has finished
-                retcode = process.poll()
-                if retcode is not None:
-                    # Process any remaining output
-                    time.sleep(0.1)  # Give threads a chance to finish reading
-                    
-                    while not stdout_queue.empty():
-                        stdout_line = stdout_queue.get_nowait()
-                        stdout_lines.append(stdout_line)
-                        self._log_queue.put((datetime.now(), "stdout", "process", stdout_line.strip()))
-                        
-                    while not stderr_queue.empty():
-                        stderr_line = stderr_queue.get_nowait()
-                        stderr_lines.append(stderr_line)
-                        self._log_queue.put((datetime.now(), "stderr", "process", stderr_line.strip()))
-                    
-                    if retcode != 0:
-                        stdout_str = ''.join(stdout_lines)
-                        stderr_str = ''.join(stderr_lines)
-                        error = subprocess.CalledProcessError(
-                            retcode, cmd, 
-                            stdout_str,
-                            stderr_str
-                        )
-                        self._log_queue.put((datetime.now(), "error", "process", 
-                                           f"Process failed with exit code {retcode}\n{stderr_str}"))
-                        raise error
-                    break
-                
-                # Small sleep to prevent CPU hogging
-                time.sleep(0.1)
 
-            return ''.join(stdout_lines), ''.join(stderr_lines)
-            
-        except Exception as e:
-            # Ensure we capture and log any exceptions
-            self._log_queue.put((datetime.now(), "error", "process", f"Error: {str(e)}"))
-            if process and process.poll() is None:
-                process.kill()
-            raise
+    def run(self, *args, **kwargs) -> Any:
+        return run_in_subprocess(self, *args, **kwargs)
 
-
-def sync_with_task(task_widget: TaskWidget, process_task: ProcessTask) -> None:
+def sync_with_task(task_widget: TaskWidget, process_task: ProcessTask, on_stopped: Callable=None) -> None:
     """Synchronize the task widget with the process task
     
     This function synchronizes the task widget with the process task by updating the progress, logs, and error state.
@@ -390,7 +482,9 @@ def sync_with_task(task_widget: TaskWidget, process_task: ProcessTask) -> None:
     Args:
         task_widget (TaskWidget): The task widget to synchronize
         process_task (ProcessTask): The process task to synchronize with
+        on_stopped (Callable): Callback function for when the task stops
     """
+    
     task_widget.progress = process_task.progress
     log_entries = process_task.log_entries
 
@@ -401,11 +495,23 @@ def sync_with_task(task_widget: TaskWidget, process_task: ProcessTask) -> None:
         task_widget.clear_error()
         
     task_widget.add_logs(log_entries)
+
     if process_task.completed and process_task.exception is None:
         task_widget.complete()
+        
+    if process_task.exited:
+        if on_stopped:
+            try:    
+                on_stopped(process_task)
+            except Exception as e:
+                print("Error in on_stopped callback", e)
+                traceback.print_exc()
+        return False
+    
+    return True
 
 
-def process_task_control(process_task: ProcessTask, on_start: Callable, on_stop: Callable=None, update_interval: float = 1.0) -> Tuple[TaskWidget, Timer]:
+def process_task_control(process_task: ProcessTask, on_start: Callable, on_stopped: Callable=None, update_interval: float = 1.0) -> Tuple[TaskWidget, Timer]:
     """Control a process task with a task widget
     
     This function creates a task widget to synchronize the task widget with the process task.
@@ -421,12 +527,10 @@ def process_task_control(process_task: ProcessTask, on_start: Callable, on_stop:
     """
     def _sync_with_task(task_widget: TaskWidget):
 
-        sync_with_task(task_widget, process_task)
+        return sync_with_task(task_widget, process_task, on_stopped)
 
     def _on_stop():
         process_task.stop()
-        if on_stop is not None:
-            on_stop()
         
 
     task_widget = TaskWidget(on_start=on_start, on_stop=_on_stop, on_reset=process_task.reset, on_sync=_sync_with_task, sync_interval=update_interval)

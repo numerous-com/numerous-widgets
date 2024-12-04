@@ -12,8 +12,9 @@ def number_field(label, tooltip, start, stop, default, multiple_of):
         default: The default value of the field.
         multiple_of: The increment of the field.
     """
+    widget =  wi.Number(label=label, tooltip=tooltip, default=default, start=start, stop=stop, step=multiple_of)
     def generate_widget():
-        return wi.Number(label=label, default=default)
+        return widget
     return Field(ge = start, default=default, le =stop, multiple_of=multiple_of, widget_factory=generate_widget)
 
 class StateModel(BaseModel):
@@ -79,6 +80,26 @@ class StateModel(BaseModel):
                 raise e
             return False
         return True
+    
+    def widget_value_valid(self, field: str) -> bool:
+        """Check if the value of a widget is valid.
+        Args:
+            field: The field to check the value for.
+        Returns:
+            bool: True if the value is valid, False otherwise.
+        """
+        val = self.get_widget(field).value
+        #print("Field", field, " Value", val)
+        valid = self.validate(field, val)
+        #print("Valid", valid)
+        return valid
+
+    def all_valid(self) -> bool:
+        """Check if all fields are valid.
+        Returns:
+            bool: True if all fields widgets values are valid, False otherwise.
+        """
+        return all(self.widget_value_valid(field) for field in self.model_fields.keys())
 
     def apply_values(self, values: dict|BaseModel, to_widgets=True, to_model=True) -> None:
         """Apply values to the model or widgets.

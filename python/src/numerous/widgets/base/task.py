@@ -20,6 +20,7 @@ class Task(anywidget.AnyWidget):
     is_completed = traitlets.Bool(default_value=False).tag(sync=True)
     is_failed = traitlets.Bool(default_value=False).tag(sync=True)
     is_disabled = traitlets.Bool(default_value=False).tag(sync=True)
+    is_stopped = traitlets.Bool(default_value=False).tag(sync=True)
     started = traitlets.Bool(default_value=False).tag(sync=True)
     progress = traitlets.Float(default_value=0.0).tag(sync=True)
     logs = traitlets.List(default_value=[]).tag(sync=True)  # Will store tuples as lists for JSON serialization
@@ -47,24 +48,30 @@ class Task(anywidget.AnyWidget):
         self._on_sync = on_sync
         self.is_disabled = disabled
         self.error = None
-        self.sync_enabled = on_sync is not None
+        self.sync_enabled = False
         self.sync_interval = sync_interval
         
         # Observe changes to is_running and started to trigger callbacks
         self.observe(self._handle_running_change, names=['is_running'])
         self.observe(self._handle_started_change, names=['started'])
         self.observe(self._handle_sync, names=['last_sync'])
+
+    def _handle_stopped_change(self, change):
+        """Internal handler for stopped state changes"""
+        if change['new']:
+            if self._on_stop:
+                self._on_stop()
     
     def _handle_running_change(self, change):
         """Internal handler for running state changes"""
         if change['new']:  # Started running
             self.is_completed = False
             self.is_failed = False
+            self.enable_sync()
+
             if self._on_start:
                 self._on_start()
-        else:  # Stopped running
-            if self._on_stop:
-                self._on_stop()
+        
     
     def _handle_started_change(self, change):
         """Internal handler for started state changes"""
@@ -76,7 +83,13 @@ class Task(anywidget.AnyWidget):
     def _handle_sync(self, change):
         """Internal handler for sync events"""
         if self._on_sync and self.sync_enabled:
-            self._on_sync(self)
+            _sync = self._on_sync(self)
+            print("Sync", _sync)
+            if _sync is None:
+                _sync = False
+            self.sync_enabled = _sync
+        else:
+            self.sync_enabled = False
     
     def set_progress(self, value: float):
         """Sets the progress value (0.0 to 1.0)"""

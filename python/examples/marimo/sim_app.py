@@ -6,14 +6,14 @@ app = marimo.App(width="medium")
 
 @app.cell
 def __():
-    from widgets.process_task import Simulation, process_task_control, SubprocessTask
+    from numerous.widgets.task.process_task import Simulation, process_task_control, SubprocessTask
     return Simulation, SubprocessTask, process_task_control
 
 
 @app.cell
 def __():
     import marimo as mo
-    import widgets as wi
+    import numerous.widgets as wi
     return mo, wi
 
 
