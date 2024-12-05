@@ -15,7 +15,7 @@ def number_field(label, tooltip, start, stop, default, multiple_of):
     widget =  wi.Number(label=label, tooltip=tooltip, default=default, start=start, stop=stop, step=multiple_of)
     def generate_widget():
         return widget
-    return Field(ge = start, default=default, le =stop, multiple_of=multiple_of, widget_factory=generate_widget)
+    return Field(ge = start, default=default, le =stop, multiple_of=multiple_of, widget_factory=generate_widget, tooltip=tooltip)
 
 class StateModel(BaseModel):
     """A model that can be used to generate a ui from a pydantic model and sync the ui with the model.
