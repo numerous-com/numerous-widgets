@@ -2,6 +2,13 @@
 
 
 
+## v0.0.21 (2024-12-06)
+
+### Fix
+
+* fix(widgets): build path and related css ([`270e463`](https://github.com/numerous-com/numerous-widgets/commit/270e463e9c6903fe4ba4eae96ba17b60186852b9))
+
+
 ## v0.0.20 (2024-12-06)
 
 ### Fix
