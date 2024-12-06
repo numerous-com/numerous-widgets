@@ -2,6 +2,13 @@
 
 
 
+## v0.0.20 (2024-12-06)
+
+### Fix
+
+* fix(widgets): Remove unfinished FileLoaderWidget ([`5e8e965`](https://github.com/numerous-com/numerous-widgets/commit/5e8e965411e5cfa84024ebd8275b68530c184971))
+
+
 ## v0.0.19 (2024-12-06)
 
 ### Fix
