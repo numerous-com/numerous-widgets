@@ -2,6 +2,18 @@
 
 
 
+## v0.0.18 (2024-12-06)
+
+### Fix
+
+* fix(widgets): Added templating features ([`4281ae7`](https://github.com/numerous-com/numerous-widgets/commit/4281ae74872fbe5a2bb3a9f5b4b42f67b9d7f372))
+
+* fix(NumberField): add tooltip parameter to Field return
+
+- Updated the number_field function to include a tooltip parameter in the Field return statement, enhancing the widget&#39;s usability by providing additional context for users.
+- This change improves the overall user experience by allowing tooltips to be displayed alongside number input fields. ([`0eb3d1a`](https://github.com/numerous-com/numerous-widgets/commit/0eb3d1aba4b17a38b7c5153b1580bdad4cfa1810))
+
+
 ## v0.0.17 (2024-12-04)
 
 ### Fix
