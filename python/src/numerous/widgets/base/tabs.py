@@ -74,8 +74,15 @@ def render_tab_content(widgets, selection: str) -> str:
         A string of HTML representing the content of the selected tab.
     """
     html = ""
+    found = False
     for k, w in widgets.items():
         html += container(w, hidden=k!=selection)
+        if k == selection:
+            print("selected")
+            print(container(w, hidden=k!=selection))
+            found = True
+    if not found:
+        raise ValueError(f"Tab {selection} not found")
     return html
 
     

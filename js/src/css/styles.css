@@ -1328,14 +1328,43 @@ select::-ms-expand {
   color: #ef4444;
 }
 
-.container {
-  display: block;
+.widget-container {
+  display: flex;
   width: 100%;
-  box-sizing: border-box;
+  margin: 0;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  margin-right: 0px;
+  padding: 0px;
 }
 
-.container.hidden {
+.widget-container.hidden {
   display: none;
+}
+
+.file-loader-container {
+    display: inline-block;
+}
+
+.file-loader-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #f8f8f8;
+    cursor: pointer;
+}
+
+.file-loader-button:hover {
+    background: #eee;
+}
+
+.widget-container-bordered {
+  border: 1px solid #3d3d3d;
+  border-radius: 4px;
 }
 
 

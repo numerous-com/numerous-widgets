@@ -5,9 +5,6 @@ def container(content: Union[str, anywidget.AnyWidget, list] = None,
               hidden: bool = False,
               classes: str = "",
               styles: str = "",
-              width: str = None,
-              height: str = None,
-              direction: str|None = None
               ):
     """
     Create a container widget for organizing content.
@@ -17,9 +14,6 @@ def container(content: Union[str, anywidget.AnyWidget, list] = None,
         hidden: Whether the container is hidden (defaults to False)
         classes: List of CSS classes to add to the container
         styles: Additional CSS styles to apply to the container
-        width: CSS width value (e.g. "100px", "50%", "20vw")
-        height: CSS height value (e.g. "100px", "50%", "20vh", "auto")
-        direction: CSS direction value (e.g. "row", "column")
     """
     
     # Handle content list or single element
@@ -38,22 +32,15 @@ def container(content: Union[str, anywidget.AnyWidget, list] = None,
     if hidden:
         style_parts.append("display: none")
     else:
-        if direction:
-            style_parts.append("display: flex")
-            style_parts.append(f"flex-direction: {direction}")
-        else:
-            style_parts.append("display: block")
-    if width:
-        style_parts.append(f"width: {width}")
-    if height:
-        style_parts.append(f"height: {height}")
-    if styles:
+        if len(style_parts) == 0:
+            style_parts.append("display: flex; flex-direction: column")
         style_parts.append(styles)
+
           
     style_str = "; ".join(style_parts)
 
     return f"""
-        <div class="container {classes}" style="{style_str}">
+        <div class="widget-container{" "+classes}" style="{style_str}">
             {content_html}
         </div>
     """

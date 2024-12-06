@@ -132,5 +132,60 @@ def __():
     return
 
 
+@app.cell
+def __(wi):
+    loader = wi.FileLoader(
+        label="Load CSV",
+        tooltip="Click to load a CSV file",
+        accept=".csv"
+    )
+    return (loader,)
+
+
+@app.cell
+def __(aw, loader):
+    loader_widget = aw(loader)
+    loader_widget
+    return (loader_widget,)
+
+
+@app.cell
+def __():
+    #with loader_widget.open("r") as f:
+    #    print(f.read())
+    return
+
+
+@app.cell
+def __(loader, loader_widget):
+    if loader_widget.file_content:
+       print(loader.as_buffer.read())
+    return
+
+
+@app.cell
+def __(loader, loader_widget):
+    if loader_widget.file_content:
+        _str = loader.as_string.read()
+        print(_str)
+    return
+
+
+@app.cell
+def __(aw, loader_widget):
+    from numerous.widgets.files.load_save_from_local import FileSaver
+
+    # Create a saver widget
+    saver = FileSaver(label="Save File", tooltip="Click to save file")
+
+    if loader_widget.file_content:
+        # Update content when needed
+        saver.update_content(loader_widget.file_content, "hello.txt")
+
+    saver_widget = aw(saver)
+    saver_widget
+    return FileSaver, saver, saver_widget
+
+
 if __name__ == "__main__":
     app.run()

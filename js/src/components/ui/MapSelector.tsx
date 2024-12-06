@@ -128,6 +128,6 @@ export function MapSelector({ points = {}, value, center = [0, 0], zoom, onChang
     }, []);
 
     return (
-        <div ref={mapRef} style={{ width: '100%', height: '300px' }} />
+        <div ref={mapRef} style={{ width: '100%', height: '50vh' }} />
     );
 }
