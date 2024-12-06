@@ -26880,7 +26880,7 @@ function oS({ points: t = {}, value: e, center: n = [0, 0], zoom: i, onChange: r
     return f.on("click", y), f.on("touchend", y), f.on("pointermove", m), a(f), c(d), () => {
       f.dispose(), f.un("click", y), f.un("touchend", y), f.un("pointermove", m);
     };
-  }, []), /* @__PURE__ */ Me.createElement("div", { ref: o, style: { width: "100%", height: "300px" } });
+  }, []), /* @__PURE__ */ Me.createElement("div", { ref: o, style: { width: "100%", height: "50vh" } });
 }
 function lS() {
   const [t, e] = ls("points"), [n, i] = ls("value"), [r, s] = ls("center"), [o, l] = ls("zoom"), [a, u] = ls("location_clicked");

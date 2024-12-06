@@ -26,8 +26,6 @@ if IS_DEV:
 
     print(f"RUNNING NUMEROUS WIDGETS IN DEVELOPMENT MODE\n\nPlease ensure dev server running on {DEV_SERVER} using 'npx vite'\n")
 
-else:
-    CSS = STATIC_DIR / "style.css"
 
 def get_widget_paths(component_name: str) -> tuple[Union[str, pathlib.Path], pathlib.Path]:
     """
@@ -46,6 +44,6 @@ def get_widget_paths(component_name: str) -> tuple[Union[str, pathlib.Path], pat
 
     else:
         esm = STATIC_DIR / f"{component_name}.mjs"
-        css = STATIC_DIR / f"{component_name}.css"
+        css = STATIC_DIR / f"styles.css"
     
     return esm, css

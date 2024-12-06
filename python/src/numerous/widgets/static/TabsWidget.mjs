@@ -5753,9 +5753,7 @@ function _d({
   )))));
 }
 function Nd({ model: e }) {
-  const [n] = yt("tabs"), [t] = yt("ui_label"), [r] = yt("ui_tooltip"), [l, u] = yt("content_updated"), [o, i] = yt("active_tab");
-  e != null && e.model_id;
-  const s = (c) => {
+  const [n] = yt("tabs"), [t] = yt("ui_label"), [r] = yt("ui_tooltip"), [l, u] = yt("content_updated"), [o, i] = yt("active_tab"), s = (c) => {
     i(c);
   };
   return /* @__PURE__ */ U.createElement(

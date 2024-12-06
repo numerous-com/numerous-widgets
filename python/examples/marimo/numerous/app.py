@@ -15,22 +15,23 @@ def __():
 
 
 @app.cell
-def __(counter, ht, increment_counter, page, selection_widget, tabs):
+def __(counter, ht, increment_counter, map, page, selection_widget, tabs):
     ht(page(**{
         "tabs": tabs,
-        "show_components": tabs.active_tab == "Components",
-        "show_advanced": tabs.active_tab == "Advanced",
+        "show_basic": tabs.active_tab == "Basic",
+        "show_map": tabs.active_tab == "Map",
         "counter": counter,
         "increment_counter": increment_counter,
         "selection_widget": selection_widget,
-        
+        "map_widget": map
+
     }))
     return
 
 
 @app.cell
 def __(aw, wi):
-    tabs = aw(wi.Tabs(["Components", "Advanced"]))
+    tabs = aw(wi.Tabs(["Basic", "Map"]))
     return (tabs,)
 
 
@@ -59,6 +60,16 @@ def __(aw, set_value, value, wi):
 def __(aw, wi):
     selection_widget = aw(wi.DropDown(["1", "2", "3"], label="Select Value", fit_to_content=True))
     return (selection_widget,)
+
+
+@app.cell
+def __(aw, wi):
+    map = aw(wi.MapSelector(points={
+            'New York': [-73.985428, 40.748817],    # New York
+            'Paris': [2.294481, 48.858370],     # Paris
+            'Tokyo': [139.839478, 35.652832]    # Tokyo
+        }, center= [2.294481, 48.858370], zoom=0))
+    return (map,)
 
 
 if __name__ == "__main__":

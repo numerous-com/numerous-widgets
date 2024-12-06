@@ -5908,13 +5908,13 @@ function zd({
 function Pd() {
   const [e, t] = Pe("is_running"), [n, r] = Pe("is_completed"), [l, o] = Pe("is_failed"), [u] = Pe("is_disabled"), [i, s] = Pe("started"), [c, v] = Pe("progress"), [m, p] = Pe("logs"), [g] = Pe("error"), [w, S] = Pe("last_sync"), [O] = Pe("sync_enabled"), [f] = Pe("sync_interval");
   k.useEffect(() => {
-    if (O && e) {
+    if (O) {
       const h = setInterval(() => {
         S(Date.now() / 1e3);
       }, f * 1e3);
       return () => clearInterval(h);
     }
-  }, [O, e, S]);
+  }, [O, S]);
   const a = async () => {
     v(0), t(!1), r(!1), o(!1), s(!1), p([]);
   }, d = () => {

@@ -1,2 +1,2 @@
 marimo
-numerous-widgets
+numerous-widgets==0.0.20

@@ -14,14 +14,14 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 export default defineConfig({
 	plugins: [anywidget()],
 	build: {
-		outDir: "../python/src/widgets/static",
+		outDir: "../python/src/numerous/widgets/static",
 			lib: {
 				entry: [`src/components/widgets/${widgetName}.tsx`],
 				formats: ["es"],
 			},
 			rollupOptions: {
 				output: {
-					assetFileNames: `${widgetName}.css`,
+					assetFileNames: `styles.css`,
 					entryFileNames: "[name].mjs",
 					chunkFileNames: "[name]-[hash].mjs",
 				},

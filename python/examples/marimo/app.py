@@ -1,7 +1,7 @@
 import marimo
 
 __generated_with = "0.9.24"
-app = marimo.App(width="medium")
+app = marimo.App(width="medium", css_file="styles.css")
 
 
 @app.cell
@@ -77,6 +77,12 @@ def __(aw, mo, wi):
 
     mo.Html(wi.card(map))
     return (map,)
+
+
+@app.cell
+def __(map):
+    map
+    return
 
 
 @app.cell
