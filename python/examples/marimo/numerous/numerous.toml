@@ -1,0 +1,11 @@
+name = "Numerous Widgets Marimo Demo"
+description = "This app is to demo the Numerous widgets toolbox on Numerous"
+cover_image = "app_cover.jpg"
+exclude = ["*venv", "venv*", ".git", ".env"]
+port = 8000
+
+[python]
+  library = "marimo"
+  version = "3.12"
+  app_file = "app.py"
+  requirements_file = "requirements.txt"

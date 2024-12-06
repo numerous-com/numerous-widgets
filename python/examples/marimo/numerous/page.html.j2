@@ -1,0 +1,66 @@
+<style>
+    {{css}}
+
+
+    .title {
+        text-align: left;
+        font-size: 3em;
+        background-color: black;
+        color: black;
+        padding-left: .5em;
+    }
+
+    .column_with_spacing {
+        display: flex;
+        flex-direction: column;
+        gap: 2em;
+        margin-top: 2em;
+    }
+
+    .bordered_container {
+        border-right: 1px solid var(--ui-widget-border-color);
+        border-bottom: 1px solid var(--ui-widget-border-color);
+        border-left: 1px solid var(--ui-widget-border-color);
+        border-radius: 4px;
+        box-shadow: var(--ui-widget-dropdown-shadow);
+        padding: 1em;
+    }
+    .header-container {
+        display: flex;
+        background-color: black;
+        padding: 1em;
+        height: fit-content;
+        overflow: hidden;
+        border-radius: 4px;
+    }
+    .logo {
+        transform: scale(0.2);
+        transform-origin: top left;
+        background-color: black;
+        padding-left: 1em;
+        height: 50px;
+        width: 20%;
+    }
+
+    
+</style>
+
+
+<div class="header-container">
+    <div class="logo">{{ logo }}</div>
+</div>
+
+
+<div style="margin-top: 1em;">
+    {{tabs}}
+</div>
+<div class="bordered_container">
+    <div class="column_with_spacing" style="display: {{'flex' if show_components else 'none'}}">
+        {{ counter }}
+        {{ increment_counter }}
+        {{ selection_widget}}
+    </div>
+    <div class="column_with_spacing" style="display: {{'flex' if show_advanced else 'none'}}">
+        <h2>More to come soon...</h2>
+    </div>
+</div>
