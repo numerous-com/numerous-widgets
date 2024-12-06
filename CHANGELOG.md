@@ -2,6 +2,13 @@
 
 
 
+## v0.0.19 (2024-12-06)
+
+### Fix
+
+* fix(widgets): Example app in marimo ([`943f8df`](https://github.com/numerous-com/numerous-widgets/commit/943f8dfe5c784d9b372f2f060fc2fda1b1c2959d))
+
+
 ## v0.0.18 (2024-12-06)
 
 ### Fix
