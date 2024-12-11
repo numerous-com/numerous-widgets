@@ -2,7 +2,7 @@
 
 Welcome to the widgets project.
 
-The project consists of widgets in Python apps, as well as python libraries for app state management and running tasks.
+The project consists of widgets for use in Python apps, as well as python libraries for app state management and long running tasks.
 
 To install the python package, run:
 
@@ -112,6 +112,32 @@ On Linux/Mac, run:
 build-widgets.sh
 ```
 
+The build scripts will generate mjs files in the python/numerous/widgets/static directory from where Python will load them if in "production" mode.
+
 To use the built JavaScript code, change the `WIDGET_ENV` in the `.env` file to `production`.
 
 Now you are all setup to develop the widgets. Happy coding!
+
+## CI/CD
+
+The project is configured to use GitHub Actions for CI/CD.
+
+The pipeline will build the widgets and generate the mjs files. Create a new version using semantic versioning and push to the repository. Finally the Python package will be built and pushed to the pypi repository.
+
+## Docs
+
+The docs are generated using mkdocs.
+
+To run the docs, from the `docs` directory, run:
+
+```sh
+mkdocs serve
+```
+
+This will start a development server and open a browser window with the docs.
+
+## ToDo
+
+- [ ] Setup pre-commit hooks for ruff, mypy and pytest
+- [ ] Add tests for the widgets
+- [ ] Finalize a basic widget set
