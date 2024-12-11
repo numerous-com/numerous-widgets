@@ -136,7 +136,7 @@ mkdocs serve
 
 This will start a development server and open a browser window with the docs.
 
-## ToDo
+## To Do
 
 - [ ] Setup pre-commit hooks for ruff, mypy and pytest
 - [ ] Add tests for the widgets
