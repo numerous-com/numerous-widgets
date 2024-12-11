@@ -63,7 +63,7 @@ pip install marimo
 
 You can start developing the widgets by editing the `app.py` file in the `python/examples/marimo` directory.
 
-Go to the `python/examples/marimo` directory and run:
+Go to the `python/examples/marimo/numerous` directory and run:
 
 ```sh
 marimo edit app.py

@@ -1,5 +1,5 @@
 import panel as pn
-import widgets as wi
+import numerous.widgets as wi
 
 # Enable the Panel extension for the notebook/browser
 pn.extension("ipywidgets")
