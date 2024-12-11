@@ -2,6 +2,25 @@
 
 
 
+## v0.0.22 (2024-12-11)
+
+### Documentation
+
+* docs: Update README and enhance CI/CD documentation; refactor widget imports and adjust PlotWidget margins
+
+- Revised project description in README to clarify the purpose of the widgets and libraries.
+- Added CI/CD section detailing GitHub Actions integration for building widgets and generating mjs files.
+- Updated import path for ProjectMenuWidget to reflect new directory structure.
+- Adjusted margin settings in PlotWidget for improved layout.
+- Minor CSS adjustments to maintain consistency across styles.
+
+These changes improve documentation clarity and streamline the widget integration process. ([`fdbd9b3`](https://github.com/numerous-com/numerous-widgets/commit/fdbd9b3c1ec73af11c62e4331c1ce25254199142))
+
+### Fix
+
+* fix(widgets): Bump version ([`5a83d35`](https://github.com/numerous-com/numerous-widgets/commit/5a83d3556c75aae5bb8fddd508a25e3fd18d518c))
+
+
 ## v0.0.21 (2024-12-06)
 
 ### Fix
