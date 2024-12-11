@@ -34,6 +34,7 @@ class Button(anywidget.AnyWidget):
         )
         
         self.on_click = on_click
+        
 
     @traitlets.observe('clicked')
     def _handle_click(self, change):

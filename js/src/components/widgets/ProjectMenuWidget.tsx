@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
-import { ProjectMenu } from "../ProjectMenu";
+import { ProjectMenu } from "../ui/projectsProjectMenu";
 
 import '../../css/styles.css';
 

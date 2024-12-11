@@ -13,11 +13,13 @@ if ($currentPolicy -eq "Restricted") {
 # List of widget names (without the .tsx extension)
 $widgets = @(
     "ButtonWidget",
+    "ChartWidget",
     "CheckBoxWidget",
     "DropDownWidget",
     "MapSelectorWidget",
     "MarkdownDrawerWidget",
     "NumberInputWidget",
+    "PlotWidget",
     "ProgressBarWidget",
     "ProjectMenuWidget",
     "TabsWidget",

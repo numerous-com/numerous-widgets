@@ -6,6 +6,8 @@ try:
 except importlib.metadata.PackageNotFoundError:
     __version__ = "unknown"
 
+from .base._config import CSS as css
+
 from .base.button import Button
 from .base.drop_down import DropDown
 from .base.number import Number
@@ -19,9 +21,12 @@ from .base.markdown_drawer import MarkdownDrawer
 from .base.task import Task
 from .base.timer import Timer
 
+from .base.chartjs import Chart
+
 from .task.process_task import process_task_control, ProcessTask, SubprocessTask, run_in_subprocess, sync_with_task
 
 from .templating import render_template
+
 try:
     import numerous
     from .numerous.project import ProjectsMenu

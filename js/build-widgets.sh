@@ -9,6 +9,8 @@ fi
 # List of widget names (without the .tsx extension)
 widgets=(
     "ButtonWidget"
+    "ChartWidget"
+    "PlotWidget"
     "CheckBoxWidget"
     "DropDownWidget"
     "MapSelectorWidget"

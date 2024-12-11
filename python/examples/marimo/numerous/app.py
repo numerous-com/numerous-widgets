@@ -72,5 +72,50 @@ def __(aw, wi):
     return (map,)
 
 
+@app.cell
+def __():
+    import numpy as np
+    from numerous.widgets.base.plotly import Plot
+
+    # Generate some sample data
+    x = np.linspace(0, 10, 100)
+    y = np.sin(x)
+
+    # Create the scatter plot data
+    data = [{
+        'type': 'scatter',
+        'x': x,
+        'y': y,
+        'mode': 'markers',
+        'name': 'Sin Wave'
+    }]
+
+    # Configure the layout
+    layout = {
+        'title': 'Simple Scatter Plot',
+        'xaxis': {'title': 'X'},
+        'yaxis': {'title': 'sin(x)'}
+    }
+
+    # Optional configuration (e.g., disable the modebar)
+    config = {
+        'displayModeBar': False
+    }
+
+    # Create and display the plot
+    plot = Plot(
+        data=data,
+        layout=layout,
+        config=config
+    )
+    plot
+    return Plot, config, data, layout, np, plot, x, y
+
+
+@app.cell
+def __():
+    return
+
+
 if __name__ == "__main__":
     app.run()
