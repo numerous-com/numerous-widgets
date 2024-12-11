@@ -2,6 +2,17 @@
 
 
 
+## v0.0.23 (2024-12-11)
+
+### Fix
+
+* fix(widgets): Clean up examples ([`4cfc969`](https://github.com/numerous-com/numerous-widgets/commit/4cfc9697f281887cc7ce66cee4ba27fdfe1c2b52))
+
+### Unknown
+
+* chore(widgets) : Remove build folder ([`5ef7900`](https://github.com/numerous-com/numerous-widgets/commit/5ef79001066d42820dea2225367e1282d726b99d))
+
+
 ## v0.0.22 (2024-12-11)
 
 ### Documentation
