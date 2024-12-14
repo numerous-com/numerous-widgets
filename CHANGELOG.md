@@ -2,6 +2,13 @@
 
 
 
+## v0.0.24 (2024-12-14)
+
+### Fix
+
+* fix(widgets): remove file saver ([`a3d6782`](https://github.com/numerous-com/numerous-widgets/commit/a3d67829d1c5224c1b032eb9997236cf3f692baa))
+
+
 ## v0.0.23 (2024-12-11)
 
 ### Fix
