@@ -1,7 +1,6 @@
 from numerous.widgets import render_template, css
 from numerous.widgets.base._config import IS_DEV
 from pathlib import Path
-from typing import Dict, Any
 
 
 with open(Path(__file__).parent.joinpath("page.html.j2"), "r") as f:
