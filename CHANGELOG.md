@@ -2,6 +2,23 @@
 
 
 
+## v0.0.25 (2024-12-16)
+
+### Documentation
+
+* docs: Update README for development server instructions and build process; enhance index.html and main.tsx with new UI components
+
+- Clarified instructions in README for running the development server from the `js/src` directory.
+- Added details on building JavaScript code for production and CI pipeline requirements.
+- Updated index.html to include a stylesheet link and corrected the script source path.
+- Refactored main.tsx to implement new UI components: NumberInput, Button, Tabs, and MapSelector, improving the app&#39;s functionality and user experience.
+- Introduced state management for counter and selected values, enhancing interactivity within the application. ([`4f42560`](https://github.com/numerous-com/numerous-widgets/commit/4f425604ce18a106468f9206bc7b53a599c13b04))
+
+### Fix
+
+* fix(widgets): Build a demo in main.tsx ([`cc187ac`](https://github.com/numerous-com/numerous-widgets/commit/cc187ac3052aa96e93f3b7962659c3703cecbe03))
+
+
 ## v0.0.24 (2024-12-14)
 
 ### Fix
