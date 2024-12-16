@@ -2,6 +2,13 @@
 
 
 
+## v0.0.26 (2024-12-16)
+
+### Fix
+
+* fix(widgets): Updated main with chart and Numerous banner ([`58e5cc4`](https://github.com/numerous-com/numerous-widgets/commit/58e5cc457d0b8aaad1df6d509aaab7072f5e9e9a))
+
+
 ## v0.0.25 (2024-12-16)
 
 ### Documentation
