@@ -88,7 +88,7 @@ Prerequisites:
 - Node.js
 - npm
 
-To run the development server, from the `js` directory, run:
+To run the development server, from the `js/src` directory, run:
 
 ```sh
 npx vite
@@ -98,6 +98,10 @@ Now, to use the development version of the widgets in Python and Marimo, change 
 The widgets js folder are structured as React components, which are then imported in Widget.tsx files which wraps the AnyWidget React interface. This means you can use the Widgets in a standalone React app for testing and development as well.
 
 ### Build
+
+The Python package will use built JavaScript code from the `static` directory in production mode. When you have created a new widget you need to add it to the build scripts in the `build-widgets.ps1` and `build-widgets.sh` files.
+
+When you have changed the widget code, you need to build the JavaScript code again. The CI pipeline will build the JavaScript code when you push to the repository, but only if you have added the widget to the build scripts.
 
 To build the JavaScript code, from the `js` directory, run:
 

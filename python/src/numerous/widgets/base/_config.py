@@ -22,7 +22,7 @@ if IS_DEV:
 
     # Development server configuration
     DEV_SERVER = os.getenv("VITE_DEV_SERVER", "http://localhost:5173")
-    DEV_COMPONENT_PATH = f"{DEV_SERVER}/src/components/widgets"
+    DEV_COMPONENT_PATH = f"{DEV_SERVER}/components/widgets"
 
     print(f"RUNNING NUMEROUS WIDGETS IN DEVELOPMENT MODE\n\nPlease ensure dev server running on {DEV_SERVER} using 'npx vite'\n")
 else:
