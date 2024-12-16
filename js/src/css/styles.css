@@ -1367,5 +1367,21 @@ select::-ms-expand {
   border-radius: 4px;
 }
 
+.column_with_spacing {
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+  margin-top: 2em;
+}
 
+.bordered_container {
+  border-right: 1px solid var(--ui-widget-border-color);
+  border-bottom: 1px solid var(--ui-widget-border-color);
+  border-left: 1px solid var(--ui-widget-border-color);
+  border-radius: 4px;
+  box-shadow: var(--ui-widget-dropdown-shadow);
+  padding: 1em;
+  flex: 1;
+  min-height: 0;
+}
 

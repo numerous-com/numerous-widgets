@@ -1,58 +1,86 @@
 import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { ProjectMenu } from './components/ProjectMenu';
+import { NumberInput } from './components/ui/NumberInput';
+import { Button } from './components/ui/Button';
+import { Tabs } from './components/ui/Tabs';
+import { DropDown } from './components/ui/Dropdown';
+import { MapSelector } from './components/ui/MapSelector';
 import './css/styles.css';
 
 const App = () => {
-  const [projects, setProjects] = useState([
-    { id: '1', name: 'Sample Project', description: 'A sample project description' },
-    { id: '2', name: 'Another Project', description: 'Another project to show' },
-  ]);
+  // State management
+  const [counter, setCounter] = useState(0);
+  const [activeTab, setActiveTab] = useState('Basic');
+  const [selectedValue, setSelectedValue] = useState('1');
+  const [selectedLocation, setSelectedLocation] = useState<string>('');
 
-  const [scenarios] = useState([
-    { id: '1', name: 'Scenario 1', projectId: '1' },
-    { id: '2', name: 'Scenario 2', projectId: '1' },
-    { id: '3', name: 'Scenario 1', projectId: '2' },
-  ]);
 
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
-  const [selectedScenarioId, setSelectedScenarioId] = useState<string | null>(null);
-  const [changed, setChanged] = useState(false);
-
-  const selectedProject = projects.find(p => p.id === selectedProjectId);
-  const selectedScenario = scenarios.find(s => s.id === selectedScenarioId);
-
-  const handleUpdateProject = (projectId: string, name: string, description: string) => {
-    setProjects(projects.map(project => 
-      project.id === projectId 
-        ? { ...project, name, description }
-        : project
-    ));
-    setChanged(true);
+  // Map configuration
+  const points = {
+    'New York': [-73.985428, 40.748817],
+    'Paris': [2.294481, 48.858370],
+    'Tokyo': [139.839478, 35.652832]
   };
 
-  const handleSave = () => {
-    // Implement save logic here
-    setChanged(false);
+  const handleIncrementCounter = () => {
+    setCounter(prev => prev + 1);
+  };
+
+  const handleLocationClick = (coords: [number, number]) => {
+    console.log('Clicked coordinates:', coords);
   };
 
   return (
-    <div className="app">
-      <ProjectMenu
-        selectedProjectName={selectedProject?.name}
-        selectedScenarioName={selectedScenario?.name}
-        projects={projects}
-        scenarios={scenarios}
-        onUpdateProject={handleUpdateProject}
-        onSelectProject={setSelectedProjectId}
-        onSelectScenario={setSelectedScenarioId}
-        onOpenModal={() => setIsModalOpen(true)}
-        onSave={handleSave}
-        changed={changed}
-        hasSelection={!!selectedProjectId}
-        isModalOpen={isModalOpen}
-        onCloseModal={() => setIsModalOpen(false)}
+    <div className="app marimo">
+      <Tabs
+        value={activeTab}
+        tabs={['Basic', 'Map']}
+        contentUpdated={false}
+        onChange={setActiveTab}
       />
+
+      {activeTab === 'Basic' && (
+        <div className="bordered_container">
+          <div className="column_with_spacing">
+            <NumberInput
+              value={counter}
+              start={0}
+              stop={100}
+              step={1}
+              uiLabel="Counter:"
+            uiTooltip="Current count value"
+            onChange={setCounter}
+              fitToContent={true}
+            />
+
+            <Button
+              label="Increment Counter"
+              onClick={handleIncrementCounter}
+            />
+
+              <DropDown
+              options={['1', '2', '3']}
+              uiLabel="Dropdown:"
+              uiTooltip="Select a value"
+              fitToContent={true}
+              selected_key={selectedValue}
+              onChange={setSelectedValue}
+            />
+            
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'Map' && (
+        <MapSelector
+          points={points}
+          value={selectedLocation}
+          center={[2.294481, 48.858370]}
+          zoom={0}
+          onChange={setSelectedLocation}
+          onLocationClick={handleLocationClick}
+        />
+      )}
     </div>
   );
 };
