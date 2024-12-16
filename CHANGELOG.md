@@ -2,6 +2,13 @@
 
 
 
+## v0.0.27 (2024-12-16)
+
+### Fix
+
+* fix(widgets): styles for check box and task button updated ([`60eecef`](https://github.com/numerous-com/numerous-widgets/commit/60eecefd5d11e13a6189b78c1f1f57ccbb7fd503))
+
+
 ## v0.0.26 (2024-12-16)
 
 ### Fix
