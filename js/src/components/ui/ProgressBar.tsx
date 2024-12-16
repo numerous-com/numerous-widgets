@@ -19,17 +19,21 @@ export function ProgressBar({ value, uiLabel, uiTooltip }: ProgressBarProps) {
                     {uiTooltip && <Tooltip tooltip={uiTooltip} />}
                 </div>
             )}
-            <div className="progress-track">
+            <div className="progress-track-container">
                 <div 
-                    className="progress-fill"
-                    style={{ width: `${clampedValue}%` }}
+                    className="progress-track"
                     role="progressbar"
                     aria-valuenow={clampedValue}
                     aria-valuemin={0}
                     aria-valuemax={100}
-                />
+                >
+                    <div 
+                        className="progress-fill"
+                        style={{ width: `${clampedValue}%` }}
+                    />
+                </div>
+                <div className="progress-value">{Math.round(clampedValue)}%</div>
             </div>
-            <div className="progress-value">{Math.round(clampedValue)}%</div>
         </div>
     );
 }

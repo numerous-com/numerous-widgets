@@ -113,7 +113,8 @@ def __():
 
 
 @app.cell
-def __():
+def __(aw, wi):
+    aw(wi.Task())
     return
 
 

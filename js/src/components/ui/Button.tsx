@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Tooltip } from './Tooltip';
 
 interface ButtonProps {
     label: string;
@@ -18,17 +17,12 @@ export function Button({
 }: ButtonProps) {
     return (
         <div className="button-container">
-            {label && (
-                <label className="button-label">
-                    <span>{label}</span>
-                    {tooltip && <Tooltip tooltip={tooltip} />}
-                </label>
-            )}
             <button 
                 className="widget-button"
                 onClick={onClick}
                 disabled={disabled}
                 aria-pressed={value}
+                title={tooltip}
             >
                 {label}
             </button>
