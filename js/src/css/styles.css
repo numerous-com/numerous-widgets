@@ -1385,3 +1385,26 @@ select::-ms-expand {
   min-height: 0;
 }
 
+.logo {
+  transform: scale(0.2);
+  transform-origin: top left;
+  background-color: black;
+  padding-left: 1em;
+  height: 40px;
+}
+
+.header-container {
+  display: flex;
+  background-color: black;
+  padding: 1em;
+  height: 4vh;
+  overflow: hidden;
+}
+
+footer {
+  margin-top: auto;
+  padding: 1em;
+  text-align: center;
+  background-color: #f8f8f8;
+}
+
