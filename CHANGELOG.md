@@ -2,6 +2,13 @@
 
 
 
+## v0.0.28 (2024-12-17)
+
+### Fix
+
+* fix(widgets): Change icon on Task button details to (i) to signify a detailed view ([`e142f04`](https://github.com/numerous-com/numerous-widgets/commit/e142f04e9623d74ed2d861becc4ae8063eb19481))
+
+
 ## v0.0.27 (2024-12-16)
 
 ### Fix
