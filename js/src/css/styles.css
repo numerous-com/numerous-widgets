@@ -1374,3 +1374,25 @@ select::-ms-expand {
   background-color: var(--ui-widget-hover-background);
 }
 
+.modal-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  z-index: 9998 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  position: relative;
+  background-color: var(--ui-widget-primary-background);
+  border-radius: 8px;
+  box-shadow: var(--ui-widget-dropdown-shadow);
+  min-width: 32rem;
+  max-width: 90vw;
+  max-height: 85vh;
+  overflow: auto;
+  z-index: 9999 !important;
+}
+

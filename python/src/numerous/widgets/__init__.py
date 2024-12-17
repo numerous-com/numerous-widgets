@@ -27,9 +27,7 @@ from .task.process_task import process_task_control, ProcessTask, SubprocessTask
 
 from .templating import render_template
 
-try:
-    import numerous
-    from .numerous.project import ProjectsMenu
-except ImportError:
-    pass
+
+from .numerous.project import ProjectsMenu
+
 

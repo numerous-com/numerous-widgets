@@ -1,6 +1,11 @@
-from numerous.collections import collection
 from uuid import uuid4
 from dataclasses import dataclass, field
+
+try:
+    from numerous.collections import collection
+except ImportError:
+    def collection(path: str):
+        raise ImportError("numerous sdk is not installed. Please install it with `pip install numerous`")    
 
 @dataclass
 class Scenario:

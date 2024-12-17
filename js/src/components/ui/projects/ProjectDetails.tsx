@@ -64,60 +64,64 @@ export const ProjectDetails: React.FC<ProjectDetailsProps> = ({
   };
 
   return (
-    <div className="flex gap-4">
-      <div className="flex-1 flex flex-col gap-4">
-        <ItemDetails
-          name={projectName}
-          description={projectDescription}
-          onNameChange={setProjectName}
-          onDescriptionChange={setProjectDescription}
-          title="Project Details"
-        />
-        
-        <ScenarioList
-          scenarios={scenarios}
-          projectId={project.id}
-          onSelectScenario={onSelectScenario}
-          selectedScenarioId={selectedScenarioId}
-        />
+    <div className="h-full flex flex-col">
+      <div className="flex-1 flex gap-6">
+        <div className="flex-1">
+          <ItemDetails
+            name={projectName}
+            description={projectDescription}
+            onNameChange={setProjectName}
+            onDescriptionChange={setProjectDescription}
+            title="Project Details"
+          />
+          
+          <div className="mt-6">
+            <ScenarioList
+              scenarios={scenarios}
+              projectId={project.id}
+              onSelectScenario={onSelectScenario}
+              selectedScenarioId={selectedScenarioId}
+            />
+          </div>
+        </div>
+
+        <div className="flex-1">
+          {selectedScenario ? (
+            <ItemDetails
+              name={scenarioName}
+              description={scenarioDescription}
+              onNameChange={setScenarioName}
+              onDescriptionChange={setScenarioDescription}
+              title="Scenario Details"
+            />
+          ) : (
+            <div className="h-full flex items-center justify-center text-gray-500">
+              Select a scenario to view details
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="flex-1 flex flex-col gap-4">
-        {selectedScenario ? (
-          <ItemDetails
-            name={scenarioName}
-            description={scenarioDescription}
-            onNameChange={setScenarioName}
-            onDescriptionChange={setScenarioDescription}
-            title="Scenario Details"
-          />
-        ) : (
-          <div className="h-full flex items-center justify-center text-gray-500">
-            Select a scenario to view details
-          </div>
-        )}
-
-        <div className="flex justify-end gap-2">
-          <button
-            type="button"
-            onClick={handleCancel}
-            className="px-4 py-2 border rounded hover:bg-gray-50"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={!projectName || !selectedScenario}
-            className={`px-4 py-2 rounded text-white ${
-              !projectName || !selectedScenario
-                ? 'bg-blue-300'
-                : 'bg-blue-500 hover:bg-blue-600'
-            }`}
-          >
-            OK
-          </button>
-        </div>
+      <div className="border-t mt-6 pt-4 flex justify-end gap-2">
+        <button
+          type="button"
+          onClick={handleCancel}
+          className="px-4 py-2 border rounded hover:bg-gray-50"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={!projectName || !selectedScenario}
+          className={`px-4 py-2 rounded text-white ${
+            !projectName || !selectedScenario
+              ? 'bg-blue-300'
+              : 'bg-blue-500 hover:bg-blue-600'
+          }`}
+        >
+          OK
+        </button>
       </div>
     </div>
   );
