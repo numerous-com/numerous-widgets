@@ -2,6 +2,13 @@
 
 
 
+## v0.0.29 (2024-12-17)
+
+### Fix
+
+* fix(widgets): Updates to project menu ([`3c71cab`](https://github.com/numerous-com/numerous-widgets/commit/3c71cab14e4cfd705cca6a134bdcb831500fd622))
+
+
 ## v0.0.28 (2024-12-17)
 
 ### Fix
