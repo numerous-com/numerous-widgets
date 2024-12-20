@@ -2,6 +2,23 @@
 
 
 
+## v0.1.0 (2024-12-20)
+
+### Feature
+
+* feat(widgets): Add new widgets and update dependencies
+
+- Introduced new widgets: TableWidget, ChatWidget, MarkdownDisplayWidget, StringInputWidget, AccordionWidget, RadioButtonsWidget, SliderWidget, DateTimePickerWidget, and DateTimeRangePickerWidget.
+- Updated package dependencies to include @tanstack/react-table and react-table for enhanced table functionalities.
+- Enhanced styles for new widgets and improved overall UI consistency.
+
+This commit expands the widget library and improves the user interface with additional components. ([`1a6c855`](https://github.com/numerous-com/numerous-widgets/commit/1a6c855f98e4890ac25d99258a1691fc49fb0c91))
+
+### Fix
+
+* fix(widgets): Remove commas from widget lines ([`2761375`](https://github.com/numerous-com/numerous-widgets/commit/276137590cfa31bc87f1418f11c7062cc425657d))
+
+
 ## v0.0.29 (2024-12-17)
 
 ### Fix
