@@ -58,8 +58,15 @@
         {{ counter }}
         {{ increment_counter }}
         {{ selection_widget}}
+        {{ string_input }}
     </div>
     <div class="column_with_spacing" style="display: {{'flex' if show_map else 'none'}}">
         {{ map_widget }}
+    </div>
+</div>
+<div class="bordered_container">
+{{ accordion }}
+    <div class="column_with_spacing" style="display: {{'flex' if show_accordion else 'none'}}">
+        "Hello from accordion"
     </div>
 </div>

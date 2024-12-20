@@ -19,10 +19,12 @@
 		"react-dom": "^18.3.1",
 		"react-markdown": "^9.0.1",
 		"react-plotly.js": "^2.6.0",
+		"react-table": "^7.8.0",
 		"rehype-highlight": "^7.0.1",
 		"rehype-katex": "^7.0.1",
 		"remark-gfm": "^4.0.0",
-		"remark-math": "^6.0.0"
+		"remark-math": "^6.0.0",
+		"@tanstack/react-table": "^8.11.7"
 	},
 	"devDependencies": {
 		"@anywidget/vite": "^0.2.0",

@@ -24,7 +24,16 @@ $widgets = @(
     "ProjectMenuWidget",
     "TabsWidget",
     "TaskWidget",
-    "TimerWidget"
+    "TimerWidget",
+    "TableWidget",
+    "ChatWidget",
+    "MarkdownDisplayWidget",
+    "StringInputWidget",
+    "AccordionWidget",
+    "RadioButtonsWidget",
+    "SliderWidget",
+    "DateTimePickerWidget",
+    "DateTimeRangePickerWidget"
 )
 
 # Create output directory if it doesn't exist

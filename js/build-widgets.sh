@@ -8,19 +8,28 @@ fi
 
 # List of widget names (without the .tsx extension)
 widgets=(
-    "ButtonWidget"
-    "ChartWidget"
-    "PlotWidget"
-    "CheckBoxWidget"
-    "DropDownWidget"
-    "MapSelectorWidget"
-    "MarkdownDrawerWidget"
-    "NumberInputWidget"
-    "ProgressBarWidget"
-    "ProjectMenuWidget"
-    "TabsWidget"
-    "TaskWidget"
-    "TimerWidget"
+    "ButtonWidget",
+    "ChartWidget",
+    "CheckBoxWidget",
+    "DropDownWidget",
+    "MapSelectorWidget",
+    "MarkdownDrawerWidget",
+    "NumberInputWidget",
+    "PlotWidget",
+    "ProgressBarWidget",
+    "ProjectMenuWidget",
+    "TabsWidget",
+    "TaskWidget",
+    "TimerWidget",
+    "TableWidget",
+    "ChatWidget",
+    "MarkdownDisplayWidget",
+    "StringInputWidget",
+    "AccordionWidget",
+    "RadioButtonsWidget",
+    "SliderWidget",
+    "DateTimePickerWidget",
+    "DateTimeRangePickerWidget"
 )
 
 # Create output directory if it doesn't exist

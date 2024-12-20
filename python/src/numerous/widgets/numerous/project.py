@@ -14,6 +14,8 @@ class ProjectBrowserBase(anywidget.AnyWidget):
     selected_project_id = traitlets.Unicode(allow_none=True).tag(sync=True)
     selected_scenario_id = traitlets.Unicode(allow_none=True).tag(sync=True)
 
+    changed = traitlets.Bool(default_value=False).tag(sync=True)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
