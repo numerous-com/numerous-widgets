@@ -59,14 +59,39 @@
         {{ increment_counter }}
         {{ selection_widget}}
         {{ string_input }}
+        {{ radio }}
+        {{ slider }}
+        {{ picker }}
+        {{ picker_range }}
     </div>
     <div class="column_with_spacing" style="display: {{'flex' if show_map else 'none'}}">
         {{ map_widget }}
     </div>
-</div>
-<div class="bordered_container">
-{{ accordion }}
-    <div class="column_with_spacing" style="display: {{'flex' if show_accordion else 'none'}}">
-        "Hello from accordion"
+    <div class="column_with_spacing" style="display: {{'flex' if show_markdown else 'none'}}">
+        {{ markdown }}
+    </div>
+    <div class="column_with_spacing" style="display: {{'flex' if show_accordion_tab else 'none'}}">
+        <div class="bordered_container">
+            {{ accordion }}
+            <div class="column_with_spacing" style="display: {{'flex' if show_accordion else 'none'}}">
+            "Hello from accordion"
+            </div>
+        </div>
+    </div>
+    <div class="column_with_spacing" style="display: {{'flex' if show_table else 'none'}}">
+        {{ table }}
+    </div>
+    <div class="column_with_spacing" style="display: {{'flex' if show_chat else 'none'}}">
+        {{ chat }}
+    </div>
+    <div class="column_with_spacing" style="display: {{'flex' if show_projects else 'none'}}">
+        {{ project_widget }}
+        {{ make_a_change }}
+    </div>
+    <div class="column_with_spacing" style="display: {{'flex' if show_task else 'none'}}">
+        {{ task }}
     </div>
 </div>
+   
+  
+

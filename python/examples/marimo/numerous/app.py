@@ -17,34 +17,59 @@ def _():
 @app.cell
 def _(
     accordion,
+    chat,
     counter,
     ht,
     increment_counter,
+    make_a_change,
     map,
+    md,
     page,
+    picker,
+    picker_range,
+    project_widget,
+    radio,
     selection_widget,
+    slider,
     string_input,
+    table,
     tabs,
+    task_button,
 ):
     ht(page(**{
         "tabs": tabs,
         "show_basic": tabs.active_tab == "Basic",
         "show_map": tabs.active_tab == "Map",
+        "show_accordion_tab": tabs.active_tab == "Accordion",
+        "show_projects": tabs.active_tab == "Projects",
+        "show_task": tabs.active_tab == "Task",
+        "show_table": tabs.active_tab == "Table",
+        "show_markdown": tabs.active_tab == "Markdown",
+        "show_chat": tabs.active_tab == "Chat",
         "counter": counter,
         "increment_counter": increment_counter,
         "selection_widget": selection_widget,
         "map_widget": map,
         "string_input": string_input,
         "accordion": accordion,
-        "show_accordion": accordion.expanded
-
+        "show_accordion": accordion.expanded,
+        "project_widget": project_widget,
+        "radio": radio,
+        "slider": slider,
+        "picker": picker,
+        "picker_range": picker_range,
+        "table": table,
+        "markdown": md,
+        "chat": chat,
+        "task": task_button,
+        "make_a_change": make_a_change
     }))
     return
 
 
 @app.cell
 def _(aw, wi):
-    tabs = aw(wi.Tabs(["Basic", "Map"]))
+    tabs = aw(wi.Tabs(["Basic", "Map", "Accordion", "Projects", "Task", "Table", "Markdown", "Chat"]))
     return (tabs,)
 
 
@@ -103,7 +128,6 @@ def _(aw, wi):
 @app.cell
 def _(aw, wi):
     task_button = aw(wi.Task())
-    task_button
     return (task_button,)
 
 
@@ -116,7 +140,6 @@ def _(task_button):
 @app.cell
 def _(aw, wi):
     project_widget = aw(wi.ProjectsMenu())
-    project_widget
     return (project_widget,)
 
 
@@ -125,8 +148,8 @@ def _(aw, project_widget, wi):
     def on_change_something(event):
         project_widget.changed = True
 
-    aw(wi.Button(label="Make a change!", on_click=on_change_something))
-    return (on_change_something,)
+    make_a_change = aw(wi.Button(label="Make a change!", on_click=on_change_something))
+    return make_a_change, on_change_something
 
 
 @app.cell
@@ -148,15 +171,7 @@ def _(aw, wi):
         tooltip="Choose one of the available options",
         default="Option 1"
     ))
-
-    radio
     return (radio,)
-
-
-@app.cell
-def _(radio):
-    radio.value
-    return
 
 
 @app.cell
@@ -169,7 +184,6 @@ def _(aw, wi):
         default=50,
         tooltip="Drag to adjust the value"
     ))
-    slider
     return (slider,)
 
 
@@ -186,7 +200,6 @@ def _(aw, wi):
         min_date=now - timedelta(days=7),  # Last week
         max_date=now + timedelta(days=7)   # Next week
     ))
-    picker
     return datetime, now, picker, timedelta
 
 
@@ -202,7 +215,6 @@ def _(aw, datetime, timedelta, wi):
         min_date=_now - timedelta(days=7),  # Last week
         max_date=_now + timedelta(days=7)   # Next week
     ))
-    picker_range
     return (picker_range,)
 
 
@@ -221,7 +233,6 @@ def _(aw, wi):
     - Math equations: $E = mc^2$
     - Tables
     - And more!"""))
-    md
     return (md,)
 
 
@@ -254,14 +265,7 @@ def _(aw, wi):
     # Update data
     new_data = [{"name": "Alice", "age": 28, "city": "Tokyo"}]
     table.update_data(new_data)
-    table
     return columns, data, new_data, selected_data, table
-
-
-@app.cell
-def _(table):
-    table.value
-    return
 
 
 @app.cell
@@ -294,8 +298,6 @@ def _(aw, wi):
 
     # Get message history
     history = chat.message_history
-
-    chat
     return chat, history, on_new_message
 
 
