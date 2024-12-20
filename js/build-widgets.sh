@@ -8,27 +8,27 @@ fi
 
 # List of widget names (without the .tsx extension)
 widgets=(
-    "ButtonWidget",
-    "ChartWidget",
-    "CheckBoxWidget",
-    "DropDownWidget",
-    "MapSelectorWidget",
-    "MarkdownDrawerWidget",
-    "NumberInputWidget",
-    "PlotWidget",
-    "ProgressBarWidget",
-    "ProjectMenuWidget",
-    "TabsWidget",
-    "TaskWidget",
-    "TimerWidget",
-    "TableWidget",
-    "ChatWidget",
-    "MarkdownDisplayWidget",
-    "StringInputWidget",
-    "AccordionWidget",
-    "RadioButtonsWidget",
-    "SliderWidget",
-    "DateTimePickerWidget",
+    "ButtonWidget"
+    "ChartWidget"
+    "CheckBoxWidget"
+    "DropDownWidget"
+    "MapSelectorWidget"
+    "MarkdownDrawerWidget"
+    "NumberInputWidget"
+    "PlotWidget"
+    "ProgressBarWidget"
+    "ProjectMenuWidget"
+    "TabsWidget"
+    "TaskWidget"
+    "TimerWidget"
+    "TableWidget"
+    "ChatWidget"
+    "MarkdownDisplayWidget"
+    "StringInputWidget"
+    "AccordionWidget"
+    "RadioButtonsWidget"
+    "SliderWidget"
+    "DateTimePickerWidget"
     "DateTimeRangePickerWidget"
 )
 
