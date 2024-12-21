@@ -2,6 +2,13 @@
 
 
 
+## v0.1.1 (2024-12-20)
+
+### Fix
+
+* fix(widgets): Update example app ([`0551c6f`](https://github.com/numerous-com/numerous-widgets/commit/0551c6ff9afc4c6945f1a8f4c9886b8acc13aae8))
+
+
 ## v0.1.0 (2024-12-20)
 
 ### Feature
