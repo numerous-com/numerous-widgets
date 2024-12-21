@@ -1,6 +1,6 @@
 import anywidget
 import traitlets
-from typing import Dict, Union, Optional
+from typing import Dict, Union
 from ._config import get_widget_paths
 
 # Get environment-appropriate paths
@@ -33,7 +33,7 @@ class Accordion(anywidget.AnyWidget):
         )
 
     @staticmethod
-    def from_dict(config: Dict[str, Union[str, bool]]) -> "AccordionWidget":
+    def from_dict(config: Dict[str, Union[str, bool]]) -> "Accordion":
         """Creates an AccordionWidget instance from a configuration dictionary."""
         return Accordion(
             title=config["title"],

@@ -3,13 +3,11 @@ import multiprocessing
 import time
 import traceback
 import sys
-import io
 from datetime import datetime
 from .. import Task as TaskWidget
 from .. import Timer
 from typing import Callable
 import subprocess
-import signal
 
 class ProcessTask:
     """A base class for running long-running tasks in a separate process with progress tracking.
@@ -312,10 +310,6 @@ class ProcessTask:
         if self.exc is not None:
             return self.exc, self.tb, self.exception_timestamp
         return None
-    
-    @property
-    def completed(self) -> bool:
-        return self._progress.value >= 1.0
 
     def reset(self) -> None:
         """Reset the task's state to initial conditions."""

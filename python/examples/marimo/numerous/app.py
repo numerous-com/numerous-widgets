@@ -301,5 +301,46 @@ def _(aw, wi):
     return chat, history, on_new_message
 
 
+@app.cell
+def _(aw, wi):
+    # Create modal dialog
+    dialog = aw(wi.ModalDialog(
+        title="Confirm Action",
+        message="Are you sure you want to proceed?",
+        show_cancel=True,
+        ok_label="Yes, proceed",
+        cancel_label="No, go back"
+    ))
+
+    # Handle dialog result
+    def on_result(change):
+        if change.new == 'ok':
+            print("User clicked OK")
+        elif change.new == 'cancel':
+            print("User clicked Cancel")
+
+    dialog.observe_result(on_result)
+
+
+
+    # Show with different message
+    dialog.show(
+        title="Success",
+        message="Operation completed successfully!"
+    )
+
+    # Hide the dialog programmatically
+    dialog.hide()
+    dialog
+    return dialog, on_result
+
+
+@app.cell
+def _(dialog):
+    # Show the dialog
+    dialog.show()
+    return
+
+
 if __name__ == "__main__":
     app.run()

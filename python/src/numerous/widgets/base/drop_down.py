@@ -1,4 +1,4 @@
-from typing import Dict, Union, List, Optional
+from typing import List
 import traitlets
 from ._config import get_widget_paths
 import anywidget
@@ -48,11 +48,6 @@ class DropDown(anywidget.AnyWidget):
             options=options,
             fit_to_content=fit_to_content,
         )
-
-    @property
-    def selected_value(self) -> str:
-        """Returns the currently selected option."""
-        return self.selected_key
     
     @property
     def val(self) -> str:

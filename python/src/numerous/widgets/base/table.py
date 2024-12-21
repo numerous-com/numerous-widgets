@@ -1,6 +1,6 @@
 import anywidget
 import traitlets
-from typing import List, Dict, Optional, Union
+from typing import List, Dict
 from ._config import get_widget_paths
 
 # Get environment-appropriate paths

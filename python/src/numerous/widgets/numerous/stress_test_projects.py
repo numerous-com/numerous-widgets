@@ -1,6 +1,5 @@
 import random
 from datetime import datetime
-from typing import List
 import time
 from projects import Project, Scenario, save_project, save_scenario, save_document
 
@@ -32,7 +31,7 @@ def main():
     start_time = time.time()
     total_documents = 0
     
-    print(f"Starting stress test with:")
+    print("Starting stress test with:")
     print(f"- {NUM_PROJECTS} projects")
     print(f"- {SCENARIOS_PER_PROJECT} scenarios per project")
     print(f"- {DOCUMENTS_PER_SCENARIO} documents per scenario")

@@ -1,6 +1,6 @@
 import anywidget
 import traitlets
-from typing import Callable, Optional, List, Tuple, Dict
+from typing import Callable, Optional, List, Tuple
 from datetime import datetime
 from ._config import get_widget_paths
 
@@ -75,7 +75,7 @@ class Task(anywidget.AnyWidget):
     
     def _handle_started_change(self, change):
         """Internal handler for started state changes"""
-        if change['new'] == False and change['old'] == True:  # Changed from True to False
+        if not change['new'] and change['old']:
             # This indicates a reset from the UI
             if self._on_reset:
                 self._on_reset()

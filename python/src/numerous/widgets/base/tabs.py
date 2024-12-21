@@ -1,7 +1,6 @@
 import anywidget
 import traitlets
-from typing import Dict, Union, List, Optional
-import anywidget
+from typing import Dict, Union, List
 from ._config import get_widget_paths
 from numerous.widgets.base.container import container
 # Get environment-appropriate paths
@@ -50,8 +49,8 @@ class Tabs(anywidget.AnyWidget):
         )
 
     @staticmethod
-    def from_dict(config: Dict[str, Union[str, List[str]]]) -> "TabsWidget":
-        """Creates a TabsWidget instance from a configuration dictionary."""
+    def from_dict(config: Dict[str, Union[str, List[str]]]) -> "Tabs":
+        """Creates a Tabs instance from a configuration dictionary."""
         return Tabs(
             label=config["ui_label"],
             tooltip=config["ui_tooltip"],

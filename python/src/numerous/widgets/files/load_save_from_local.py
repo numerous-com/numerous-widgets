@@ -1,6 +1,6 @@
 import anywidget
 import traitlets
-from typing import Optional, List
+from typing import Optional
 from numerous.widgets.base._config import get_widget_paths
 from io import BytesIO, StringIO
 

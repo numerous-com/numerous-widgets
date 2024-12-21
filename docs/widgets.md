@@ -46,3 +46,34 @@ The widgets are available in the `widgets` module.
     options:
         show_root_heading: true
 
+## ::: numerous.widgets.Slider
+    options:
+        show_root_heading: true
+
+## ::: numerous.widgets.RadioButtons
+    options:
+        show_root_heading: true
+
+## ::: numerous.widgets.StringInput
+    options:
+        show_root_heading: true
+
+## ::: numerous.widgets.MarkdownDisplay
+    options:
+        show_root_heading: true
+
+## ::: numerous.widgets.Accordion
+    options:
+        show_root_heading: true
+
+## ::: numerous.widgets.Chat
+    options:
+        show_root_heading: true
+
+## ::: numerous.widgets.Table
+    options:
+        show_root_heading: true
+
+## ::: numerous.widgets.Task
+    options:
+        show_root_heading: true
