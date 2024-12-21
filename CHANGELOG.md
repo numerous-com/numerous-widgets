@@ -2,6 +2,13 @@
 
 
 
+## v0.1.2 (2024-12-21)
+
+### Fix
+
+* fix(widgets): ruff linting ([`e771527`](https://github.com/numerous-com/numerous-widgets/commit/e7715271b2df6e4aa1b04935d19c231d2f22cc2b))
+
+
 ## v0.1.1 (2024-12-20)
 
 ### Fix
