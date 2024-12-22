@@ -7,12 +7,12 @@ app = marimo.App(width="medium")
 @app.cell
 def _():
     import marimo as mo
+
     import numerous.widgets as wi
 
     aw = mo.ui.anywidget
     ht = mo.Html
     from page import page
-
     return aw, ht, mo, page, wi
 
 
@@ -40,34 +40,32 @@ def _(
 ):
     ht(
         page(
-            **{
-                "tabs": tabs,
-                "show_basic": tabs.active_tab == "Basic",
-                "show_map": tabs.active_tab == "Map",
-                "show_accordion_tab": tabs.active_tab == "Accordion",
-                "show_projects": tabs.active_tab == "Projects",
-                "show_task": tabs.active_tab == "Task",
-                "show_table": tabs.active_tab == "Table",
-                "show_markdown": tabs.active_tab == "Markdown",
-                "show_chat": tabs.active_tab == "Chat",
-                "counter": counter,
-                "increment_counter": increment_counter,
-                "selection_widget": selection_widget,
-                "map_widget": map,
-                "string_input": string_input,
-                "accordion": accordion,
-                "show_accordion": accordion.expanded,
-                "project_widget": project_widget,
-                "radio": radio,
-                "slider": slider,
-                "picker": picker,
-                "picker_range": picker_range,
-                "table": table,
-                "markdown": md,
-                "chat": chat,
-                "task": task_button,
-                "make_a_change": make_a_change,
-            }
+            tabs=tabs,
+            show_basic=tabs.active_tab == "Basic",
+            show_map=tabs.active_tab == "Map",
+            show_accordion_tab=tabs.active_tab == "Accordion",
+            show_projects=tabs.active_tab == "Projects",
+            show_task=tabs.active_tab == "Task",
+            show_table=tabs.active_tab == "Table",
+            show_markdown=tabs.active_tab == "Markdown",
+            show_chat=tabs.active_tab == "Chat",
+            counter=counter,
+            increment_counter=increment_counter,
+            selection_widget=selection_widget,
+            map_widget=map,
+            string_input=string_input,
+            accordion=accordion,
+            show_accordion=accordion.expanded,
+            project_widget=project_widget,
+            radio=radio,
+            slider=slider,
+            picker=picker,
+            picker_range=picker_range,
+            table=table,
+            markdown=md,
+            chat=chat,
+            task=task_button,
+            make_a_change=make_a_change,
         )
     )
     return
@@ -185,7 +183,8 @@ def _(aw, wi):
     # Create a single accordion button
     accordion = aw(
         wi.Accordion(
-            title="Click to expand", expanded=False  # Optional: specify initial state
+            title="Click to expand",
+            expanded=False,  # Optional: specify initial state
         )
     )
     return (accordion,)
@@ -326,7 +325,7 @@ def _(aw, wi):
     chat.observe_new_messages(on_new_message)
 
     # Add a new system message
-    chat.add_message("This is a system message", type="system")
+    chat.add_message("This is a system message", msg_type="system")
 
     # Get message history
     history = chat.message_history

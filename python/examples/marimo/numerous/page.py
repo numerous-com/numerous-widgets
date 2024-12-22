@@ -1,12 +1,13 @@
-from numerous.widgets import render_template, CSS
-from numerous.widgets.base.config import IS_DEV
 from pathlib import Path
 
+from numerous.widgets import CSS, render_template
+from numerous.widgets.base.config import IS_DEV
 
-with open(Path(__file__).parent.joinpath("page.html.j2"), "r") as f:
+
+with open(Path(__file__).parent.joinpath("page.html.j2")) as f:
     page_html_template = f.read()
 
-logo = open(Path(__file__).parent.joinpath("logo.svg"), "r").read()
+logo = open(Path(__file__).parent.joinpath("logo.svg")).read()
 
 
 def page(**page_variables) -> str:
@@ -14,7 +15,7 @@ def page(**page_variables) -> str:
     page_variables["logo"] = logo
 
     if IS_DEV:
-        with open(Path(__file__).parent.joinpath("page.html.j2"), "r") as f:
+        with open(Path(__file__).parent.joinpath("page.html.j2")) as f:
             page_html_template_dev = f.read()
 
     return render_template(

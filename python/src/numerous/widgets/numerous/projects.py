@@ -1,23 +1,30 @@
-from uuid import uuid4
+"""Module providing functions for interacting with Numerous projects."""
+
 from dataclasses import dataclass, field
-from typing import Any, Dict
+from pathlib import Path
+from typing import Any
+from uuid import uuid4
+
 
 try:
     from numerous.collections import collection
 except ImportError:
 
-    def collection(path: str) -> Any:  # type: ignore[misc]
+    def collection(path: str) -> Any:  # type: ignore[misc, unused-ignore]  # noqa: ANN401, ARG001
         raise ImportError(
-            "numerous sdk is not installed. Please install it with `pip install numerous`"
+            "numerous sdk is not installed. Please install it with\
+                  `pip install numerous`"
         )
 
 
 @dataclass
 class Scenario:
+    """A scenario is a collection of documents and files."""
+
     name: str
     description: str
-    documents: Dict[str, Dict[str, Any] | None]
-    files: Dict[str, str] | None
+    documents: dict[str, dict[str, Any] | None]
+    files: dict[str, str] | None
     id: str = field(default_factory=lambda: str(uuid4()))
 
 
@@ -31,7 +38,8 @@ class ScenarioMetadata:
     interface: str
     interface_version: str
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
+        """Return a dictionary representation of the scenario metadata."""
         return {
             "id": self.id,
             "name": self.name,
@@ -47,12 +55,12 @@ class ScenarioMetadata:
 class Project:
     name: str
     description: str
-    scenarios: Dict[str, Scenario] | None
+    scenarios: dict[str, Scenario] | None
     id: str = field(default_factory=lambda: str(uuid4()))
 
 
-def list_projects() -> Dict[str, Project]:
-    """Returns a dictionary of project names and their descriptions"""
+def list_projects() -> dict[str, Project]:
+    """Return a dictionary of project names and their descriptions."""
     projects_dict = {}
     projects = collection("projects")
 
@@ -71,7 +79,7 @@ def list_projects() -> Dict[str, Project]:
 
 
 def get_project(project_name: str) -> Project:
-    """Returns project details including all scenario names and descriptions"""
+    """Return project details including all scenario names and descriptions."""
     project = collection("projects").collection(project_name)
     project_metadata = project.document(".project_metadata").get()
 
@@ -80,7 +88,8 @@ def get_project(project_name: str) -> Project:
         scenario_metadata = scenario.document(".scenario_metadata").get()
         if scenario_metadata is None:
             raise ValueError(
-                f"Scenario metadata not found for scenario {scenario.key} in project {project_name}"
+                f"Scenario metadata not found for scenario {scenario.key}\
+                      in project {project_name}"
             )
         scenarios_dict[scenario_metadata["id"]] = Scenario(
             id=scenario_metadata["id"],
@@ -100,7 +109,7 @@ def get_project(project_name: str) -> Project:
 
 
 def get_scenario(project_name: str, scenario_name: str) -> Scenario:
-    """Returns full scenario details including all documents"""
+    """Return full scenario details including all documents."""
     project = collection("projects").collection(project_name)
     scenario = project.collection("scenarios").collection(scenario_name)
     scenario_metadata = scenario.document(".scenario_metadata").get()
@@ -115,7 +124,8 @@ def get_scenario(project_name: str, scenario_name: str) -> Scenario:
 
     if scenario_metadata is None:
         raise ValueError(
-            f"Scenario metadata not found for scenario {scenario_name} in project {project_name}"
+            f"Scenario metadata not found for scenario {scenario_name}\
+                  in project {project_name}"
         )
 
     return Scenario(
@@ -129,41 +139,31 @@ def get_scenario(project_name: str, scenario_name: str) -> Scenario:
 
 def get_document(
     project_name: str, scenario_name: str, document_key: str
-) -> Dict[str, Any] | None:
-    """Returns a specific document from a scenario
-
-    Args:
-        project_name: The project ID
-        scenario_name: The scenario ID
-        document_key: The document key to retrieve
-
-    Returns:
-        The document dictionary
-    """
+) -> dict[str, Any] | None:
+    """Return a specific document from a scenario."""
     project = collection("projects").collection(project_name)
     scenario = project.collection("scenarios").collection(scenario_name)
-    document = scenario.collection("documents").document(document_key).get()
-    return document
+    return scenario.collection("documents").document(document_key).get()  # type: ignore[no-any-return]
 
 
-def get_file(project_name: str, scenario_name: str, file_key: str) -> Any | None:
-    """Returns a specific file from a scenario"""
+def get_file(project_name: str, scenario_name: str, file_key: str) -> str | None:
+    """Return a specific file from a scenario."""
     project = collection("projects").collection(project_name)
     scenario = project.collection("scenarios").collection(scenario_name)
-    file = scenario.collection("files").file(file_key).read_text()
-    return file
+    return scenario.collection("files").file(file_key).read_text()  # type: ignore[no-any-return]
 
 
 def save_file(
     project: Project, scenario: Scenario, file_key: str, file_path: str
 ) -> None:
+    """Save a file to a scenario."""
     _scenario = (
         collection("projects")
         .collection(project.id)
         .collection("scenarios")
         .collection(scenario.id)
     )
-    with open(file_path, "rb") as file:
+    with Path(file_path).open("rb") as file:
         _scenario.collection("files").file(file_key).save(file.read())
 
 
@@ -189,7 +189,7 @@ def save_scenario(project: Project, scenario: Scenario) -> None:
 
 
 def save_document(
-    project: Project, scenario: Scenario, name: str, document: Dict[str, Any]
+    project: Project, scenario: Scenario, name: str, document: dict[str, Any]
 ) -> None:
     document_collection = (
         collection("projects")
@@ -263,11 +263,3 @@ if __name__ == "__main__":
         scenarios={},
     )
     save_project(project2)
-
-    # Print results
-    print("\nAll projects:")
-    print(list_projects())
-    print("\nProject 1 details:")
-    print(get_project("project-1"))
-    print("\nScenario 1 details (with documents):")
-    print(get_scenario("project-1", "scenario-1"))

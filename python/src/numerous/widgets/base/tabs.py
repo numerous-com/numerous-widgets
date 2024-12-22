@@ -1,7 +1,10 @@
+"""Module providing a tabs widget for the numerous library."""
+
 import anywidget
 import traitlets
-from typing import List
+
 from .config import get_widget_paths
+
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("TabsWidget")
@@ -10,11 +13,11 @@ ESM, CSS = get_widget_paths("TabsWidget")
 class TabContainer:
     """A container widget for a single tab."""
 
-    def __init__(self, element_id: str):
+    def __init__(self, element_id: str) -> None:
         self.element_id = element_id
 
 
-class Tabs(anywidget.AnyWidget):
+class Tabs(anywidget.AnyWidget):  # type: ignore[misc]
     # Define traitlets for the widget properties
     ui_label = traitlets.Unicode().tag(sync=True)
     ui_tooltip = traitlets.Unicode().tag(sync=True)
@@ -30,11 +33,11 @@ class Tabs(anywidget.AnyWidget):
 
     def __init__(
         self,
-        tabs: List[str],
+        tabs: list[str],
         label: str = "",
         tooltip: str | None = None,
         default: str | None = None,
-    ):
+    ) -> None:
         # Get the initial active tab
         if not self.initial_tab:
             self.initial_tab = default or tabs[0]
@@ -52,4 +55,4 @@ class Tabs(anywidget.AnyWidget):
     @property
     def selected_value(self) -> str:
         """Returns the currently selected tab."""
-        return self.active_tab
+        return str(self.active_tab)

@@ -1,27 +1,34 @@
+"""Module providing a map selector widget for the numerous library."""
+
 import anywidget
 import traitlets
-from typing import Dict, List, Tuple
+
 from .config import get_widget_paths
+
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("MapSelectorWidget")
 
 
-class MapSelector(anywidget.AnyWidget):
+class MapSelector(anywidget.AnyWidget):  # type: ignore[misc]
     """
     A widget for selecting a point on a map.
 
-    The widget is initialized with a dictionary of points, where each point is a tuple of longitude and latitude.
-    The widget also has a center and zoom level, which can be specified at initialization.
+    The widget is initialized with a dictionary of points, where each point is a \
+        tuple of longitude and latitude.
+    The widget also has a center and zoom level, which can be specified at \
+        initialization.
 
     The selected point can be accessed via the `selected_value` property.
 
     The last location clicked can be accessed via the `location_clicked` property.
 
     Args:
-        points: A dictionary of points, where each point is a tuple of longitude and latitude.
+        points: A dictionary of points, where each point is a tuple of longitude \
+            and latitude.
         center: The center of the map, as a tuple of longitude and latitude.
         zoom: The zoom level of the map.
+
     """
 
     # Define traitlets for the widget properties
@@ -37,11 +44,11 @@ class MapSelector(anywidget.AnyWidget):
 
     def __init__(
         self,
-        points: Dict[str, Tuple[float, float]] | None = None,
-        center: List[float] | None = None,
+        points: dict[str, tuple[float, float]] | None = None,
+        center: list[float] | None = None,
         zoom: int | None = None,
         default: str | None = None,
-    ):
+    ) -> None:
         # Initialize with keyword arguments
         super().__init__(
             points=points if points is not None else {},
@@ -53,9 +60,11 @@ class MapSelector(anywidget.AnyWidget):
 
     @property
     def selected_value(self) -> str:
-        """Returns the currently selected point ID.
+        """
+        Returns the currently selected point ID.
 
         Returns:
             str: The ID of the currently selected point.
+
         """
-        return self.value
+        return str(self.value)

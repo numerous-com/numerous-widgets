@@ -1,15 +1,21 @@
+"""Chat is for creating chat widgets."""
+
+from collections.abc import Callable
+from datetime import datetime
+from typing import Any
+
 import anywidget
 import traitlets
-from typing import List, Dict, Optional, Any, Callable
-from datetime import datetime
-from .config import get_widget_paths
 from anywidget import AnyWidget
+
+from .config import get_widget_paths
+
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("ChatWidget")
 
 
-class Chat(anywidget.AnyWidget):
+class Chat(anywidget.AnyWidget):  # type: ignore[misc]
     """
     A chat widget that displays messages and handles user input.
 
@@ -18,6 +24,7 @@ class Chat(anywidget.AnyWidget):
         placeholder: Placeholder text for the input field
         max_height: Maximum height of the chat container (default: "400px")
         className: Optional CSS class name for styling
+
     """
 
     # Define traitlets for the widget properties
@@ -33,11 +40,11 @@ class Chat(anywidget.AnyWidget):
 
     def __init__(
         self,
-        messages: Optional[List[Dict[str, Any]]] = None,
+        messages: list[dict[str, Any]] | None = None,
         placeholder: str = "Type a message...",
         max_height: str = "400px",
-        className: str = "",
-    ):
+        class_name: str = "",
+    ) -> None:
         """
         Initialize the chat widget.
 
@@ -45,7 +52,7 @@ class Chat(anywidget.AnyWidget):
         {
             "id": str,
             "content": str,
-            "type": "user" | "system",
+            "msg_type": "user" | "system",
             "timestamp": str (ISO format)
         }
         """
@@ -55,11 +62,11 @@ class Chat(anywidget.AnyWidget):
         # Validate message format
         for msg in messages:
             if not isinstance(msg, dict):
-                raise ValueError("Each message must be a dictionary")
+                raise TypeError("Each message must be a dictionary.")
             if "content" not in msg:
-                raise ValueError("Each message must have 'content'")
-            if "type" not in msg:
-                msg["type"] = "user"
+                raise TypeError("Each message must have 'content'.")
+            if "msg_type" not in msg:
+                msg["msg_type"] = "user"
             if "timestamp" not in msg:
                 msg["timestamp"] = datetime.now().isoformat()
             if "id" not in msg:
@@ -71,28 +78,28 @@ class Chat(anywidget.AnyWidget):
             messages=messages,
             placeholder=placeholder,
             max_height=max_height,
-            class_name=className,
+            class_name=class_name,
             new_message=None,
         )
 
-    def add_message(self, content: str, type: str = "system") -> None:
+    def add_message(self, content: str, msg_type: str = "system") -> None:
         """Add a new message to the chat."""
         message = {
             "id": str(len(self.messages)),
             "content": content,
-            "type": type,
+            "msg_type": msg_type,
             "timestamp": datetime.now().isoformat(),
         }
-        self.messages = self.messages + [message]
+        self.messages = [*self.messages, message]
 
     def clear_messages(self) -> None:
         """Clear all messages from the chat."""
         self.messages = []
 
     @property
-    def message_history(self) -> List[Dict[str, Any]]:
+    def message_history(self) -> list[dict[str, Any]]:
         """Get the current message history."""
-        return self.messages
+        return self.messages  # type: ignore[no-any-return]
 
     def observe_new_messages(self, handler: Callable[[AnyWidget], None]) -> None:
         """Observe new messages from the user."""

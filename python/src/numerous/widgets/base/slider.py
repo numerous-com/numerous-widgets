@@ -1,13 +1,16 @@
+"""Module providing a slider widget for the numerous library."""
+
 import anywidget
 import traitlets
-from typing import Optional
+
 from .config import get_widget_paths
+
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("SliderWidget")
 
 
-class Slider(anywidget.AnyWidget):
+class Slider(anywidget.AnyWidget):  # type: ignore[misc]
     """
     A widget for selecting a numeric value within a range using a slider.
 
@@ -20,6 +23,7 @@ class Slider(anywidget.AnyWidget):
         step: The step size between values.
         default: The default value of the slider.
         tooltip: The tooltip of the slider.
+
     """
 
     # Define traitlets for the widget properties
@@ -40,9 +44,9 @@ class Slider(anywidget.AnyWidget):
         min_value: float,
         max_value: float,
         step: float = 1.0,
-        default: Optional[float] = None,
-        tooltip: Optional[str] = None,
-    ):
+        default: float | None = None,
+        tooltip: str | None = None,
+    ) -> None:
         if min_value >= max_value:
             raise ValueError("min_value must be less than max_value")
         if step <= 0:
@@ -67,11 +71,12 @@ class Slider(anywidget.AnyWidget):
     @property
     def selected_value(self) -> float:
         """Returns the current slider value."""
-        return self.value
+        return float(self.value)
 
     @property
     def val(self) -> float:
-        return self.value
+        """Return the current slider value."""
+        return float(self.value)
 
     @val.setter
     def val(self, value: float) -> None:

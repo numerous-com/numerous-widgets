@@ -1,13 +1,18 @@
+"""Module providing a modal dialog widget for the numerous library."""
+
+from collections.abc import Callable
+
 import anywidget
 import traitlets
-from typing import Callable
+
 from .config import get_widget_paths
+
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("ModalDialogWidget")
 
 
-class ModalDialog(anywidget.AnyWidget):
+class ModalDialog(anywidget.AnyWidget):  # type: ignore[misc]
     """
     A modal dialog widget that displays a message with OK and optional Cancel buttons.
 
@@ -18,6 +23,7 @@ class ModalDialog(anywidget.AnyWidget):
         ok_label: Custom label for the OK button (default: "OK")
         cancel_label: Custom label for the Cancel button (default: "Cancel")
         className: Optional CSS class name for styling
+
     """
 
     # Define traitlets for the widget properties
@@ -41,8 +47,8 @@ class ModalDialog(anywidget.AnyWidget):
         show_cancel: bool = False,
         ok_label: str = "OK",
         cancel_label: str = "Cancel",
-        className: str = "",
-    ):
+        class_name: str = "",
+    ) -> None:
         super().__init__(
             is_open=False,
             title=title,
@@ -50,7 +56,7 @@ class ModalDialog(anywidget.AnyWidget):
             show_cancel=show_cancel,
             ok_label=ok_label,
             cancel_label=cancel_label,
-            class_name=className,
+            class_name=class_name,
             result=None,
         )
 

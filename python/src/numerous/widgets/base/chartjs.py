@@ -1,13 +1,18 @@
+"""Module providing a chartjs widget for the numerous library."""
+
+from typing import Any
+
 import anywidget
 import traitlets
-from typing import Dict, Any
+
 from .config import get_widget_paths
+
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("ChartWidget")
 
 
-class Chart(anywidget.AnyWidget):
+class Chart(anywidget.AnyWidget):  # type: ignore[misc]
     """
     A widget for displaying Chart.js charts.
 
@@ -15,6 +20,7 @@ class Chart(anywidget.AnyWidget):
         type: The type of chart ('line', 'bar', 'pie', etc.)
         data: The data configuration for the chart
         options: Optional chart configuration options
+
     """
 
     # Define traitlets for the widget properties
@@ -28,9 +34,9 @@ class Chart(anywidget.AnyWidget):
 
     def __init__(
         self,
-        type: str = "line",
-        data: Dict[str, Any] | None = None,
-        options: Dict[str, Any] | None = None,
+        chart_type: str = "line",
+        data: dict[str, Any] | None = None,
+        options: dict[str, Any] | None = None,
     ) -> None:
         if data is None:
             data = {"labels": [], "datasets": []}
@@ -39,23 +45,27 @@ class Chart(anywidget.AnyWidget):
             options = {}
 
         super().__init__(
-            chart_type=type,
+            chart_type=chart_type,
             chart_data=data,
             chart_options=options,
         )
 
-    def update_data(self, data: Dict[str, Any]) -> None:
-        """Updates the chart data.
+    def update_data(self, data: dict[str, Any]) -> None:
+        """
+        Update the chart data.
 
         Args:
             data: The new chart data configuration
+
         """
         self.chart_data = data
 
-    def update_options(self, options: Dict[str, Any]) -> None:
-        """Updates the chart options.
+    def update_options(self, options: dict[str, Any]) -> None:
+        """
+        Update the chart options.
 
         Args:
             options: The new chart options configuration
+
         """
         self.chart_options = options

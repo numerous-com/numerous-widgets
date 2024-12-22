@@ -1,8 +1,13 @@
-from pydantic import BaseModel, Field
-import numerous.widgets as wi
+"""Module providing a model that can be used to generate a ui from a pydantic model."""
+
+from typing import Any, TypeVar
+
 from anywidget import AnyWidget
-from typing import Any, Dict, Tuple, Union, TypeVar
+from pydantic import BaseModel
 from pydantic.fields import FieldInfo
+
+import numerous.widgets as wi
+
 
 T = TypeVar("T")
 
@@ -14,8 +19,10 @@ def number_field(
     stop: float,
     default: float,
     multiple_of: float,
-) -> Any:
-    """Create a number field.
+) -> FieldInfo:
+    """
+    Create a number field.
+
     Args:
         label: The label of the field.
         tooltip: The tooltip of the field.
@@ -23,6 +30,7 @@ def number_field(
         stop: The maximum value of the field.
         default: The default value of the field.
         multiple_of: The increment of the field.
+
     """
     widget = wi.Number(
         label=label,
@@ -36,9 +44,9 @@ def number_field(
     def generate_widget() -> AnyWidget:
         return widget
 
-    extra: Dict[str, Any] = {"widget_factory": generate_widget}
+    extra: dict[str, Any] = {"widget_factory": generate_widget}
 
-    return Field(
+    return FieldInfo(
         default=default,
         ge=start,
         le=stop,
@@ -49,14 +57,16 @@ def number_field(
 
 
 class StateModel(BaseModel):
-    """A model that can be used to generate a ui from a pydantic model and sync the ui with the model.
+    """
+    A model that can be used to generate a ui from a pydantic model.
 
     Args:
         *args: The arguments to pass to the pydantic model.
         **kwargs: The keyword arguments to pass to the pydantic model.
+
     """
 
-    def __init__(self, *args: Tuple[Any, ...], **kwargs: Dict[str, Any]) -> None:
+    def __init__(self, *args: tuple[Any, ...], **kwargs: dict[str, Any]) -> None:
         super().__init__(*args, **kwargs)
 
         for v in self.model_fields.values():
@@ -71,9 +81,12 @@ class StateModel(BaseModel):
 
     @property
     def changed(self) -> bool:
-        """Check if the model has changed.
+        """
+        Check if the model has changed.
+
         Returns:
             bool: True if the model has changed, False otherwise.
+
         """
         _changed = []
         for k, v in self.model_fields.items():
@@ -121,28 +134,35 @@ class StateModel(BaseModel):
         widget = self.get_widget(field)
         try:
             self.model_validate({field: widget.value})
-            return True
-        except Exception:
+        except Exception:  # noqa: BLE001
             return False
+        else:
+            return True
 
     def all_valid(self) -> bool:
-        """Check if all fields are valid.
+        """
+        Check if all fields are valid.
+
         Returns:
             bool: True if all fields widgets values are valid, False otherwise.
+
         """
-        return all(self.widget_value_valid(field) for field in self.model_fields.keys())
+        return all(self.widget_value_valid(field) for field in self.model_fields)
 
     def apply_values(
         self,
-        values: Union[dict[str, Any], BaseModel],
+        values: dict[str, Any] | BaseModel,
         to_widgets: bool = True,
         to_model: bool = True,
     ) -> None:
-        """Apply values to the model or widgets.
+        """
+        Apply values to the model or widgets.
+
         Args:
             values: The values to apply.
             to_widgets: Whether to apply the values to the widgets.
             to_model: Whether to apply the values to the model.
+
         """
         if isinstance(values, BaseModel):
             values = values.model_dump()

@@ -1,14 +1,18 @@
+"""Module providing a datetime picker widget for the numerous library."""
+
+from datetime import datetime
+
 import anywidget
 import traitlets
-from typing import Optional
-from datetime import datetime
+
 from .config import get_widget_paths
+
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("DateTimePickerWidget")
 
 
-class DateTimePicker(anywidget.AnyWidget):
+class DateTimePicker(anywidget.AnyWidget):  # type: ignore[misc]
     """
     A widget for selecting a date and time.
 
@@ -20,6 +24,7 @@ class DateTimePicker(anywidget.AnyWidget):
         default: The default datetime value.
         min_date: The minimum allowed date (optional).
         max_date: The maximum allowed date (optional).
+
     """
 
     # Define traitlets for the widget properties
@@ -36,11 +41,11 @@ class DateTimePicker(anywidget.AnyWidget):
     def __init__(
         self,
         label: str,
-        tooltip: Optional[str] = None,
-        default: Optional[datetime] = None,
-        min_date: Optional[datetime] = None,
-        max_date: Optional[datetime] = None,
-    ):
+        tooltip: str | None = None,
+        default: datetime | None = None,
+        min_date: datetime | None = None,
+        max_date: datetime | None = None,
+    ) -> None:
         # Use current datetime as default if none provided
         if default is None:
             default = datetime.now()
@@ -71,25 +76,11 @@ class DateTimePicker(anywidget.AnyWidget):
 
     @property
     def val(self) -> datetime:
+        """Returns the current datetime value."""
         return datetime.fromisoformat(self.value)
 
     @val.setter
     def val(self, value: datetime) -> None:
-        if isinstance(value, str):
-            value = datetime.fromisoformat(value)
-
-        # Validate against min/max dates
-        if self.min_date and value < datetime.fromisoformat(self.min_date):
-            raise ValueError("Value must be greater than or equal to min_date")
-        if self.max_date and value > datetime.fromisoformat(self.max_date):
-            raise ValueError("Value must be less than or equal to max_date")
-
-        self.value = value.isoformat()
-
-    def get_value(self) -> datetime:
-        return datetime.fromisoformat(self.value)
-
-    def set_value(self, value: datetime) -> None:
         if isinstance(value, str):
             value = datetime.fromisoformat(value)
 

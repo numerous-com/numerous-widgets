@@ -1,12 +1,16 @@
+"""Module providing a string input widget for the numerous library."""
+
 import anywidget
 import traitlets
+
 from numerous.widgets.base.config import get_widget_paths
+
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("StringInputWidget")
 
 
-class String(anywidget.AnyWidget):
+class String(anywidget.AnyWidget):  # type: ignore[misc]
     """
     A widget for text input.
 
@@ -17,6 +21,7 @@ class String(anywidget.AnyWidget):
         tooltip: The tooltip of the string input.
         default: The default value of the string input.
         placeholder: Placeholder text to show when input is empty.
+
     """
 
     # Define traitlets for the widget properties
@@ -41,7 +46,7 @@ class String(anywidget.AnyWidget):
         fit_to_content: bool = False,
         validation_regex: str = "",
         is_password: bool = False,
-    ):
+    ) -> None:
         super().__init__(
             ui_label=label,
             ui_tooltip=tooltip if tooltip is not None else "",
@@ -54,18 +59,22 @@ class String(anywidget.AnyWidget):
 
     @property
     def val(self) -> str:
-        """Returns the current input value.
+        """
+        Return the current input value.
 
         Returns:
             str: The current input value.
+
         """
-        return self.value
+        return str(self.value)
 
     @val.setter
     def val(self, value: str) -> None:
-        """Sets the current input value.
+        """
+        Set the current input value.
 
         Args:
             value: The new value to set.
+
         """
         self.value = value

@@ -1,12 +1,16 @@
+"""Module providing a progress bar widget for the numerous library."""
+
 import anywidget
 import traitlets
+
 from .config import get_widget_paths
+
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("ProgressBarWidget")
 
 
-class ProgressBar(anywidget.AnyWidget):
+class ProgressBar(anywidget.AnyWidget):  # type: ignore[misc]
     """
     A widget for displaying progress.
 
@@ -16,6 +20,7 @@ class ProgressBar(anywidget.AnyWidget):
         value: The initial progress value (0-100).
         label: Optional label to display above the progress bar.
         tooltip: Optional tooltip text.
+
     """
 
     # Define traitlets for the widget properties
@@ -41,10 +46,10 @@ class ProgressBar(anywidget.AnyWidget):
 
     @property
     def val(self) -> float:
-        """Returns the current progress value (0-100)."""
-        return self.value
+        """Return the current progress value (0-100)."""
+        return float(self.value)
 
     @val.setter
     def val(self, value: float) -> None:
-        """Sets the progress value, clamped between 0 and 100."""
+        """Set the progress value, clamped between 0 and 100."""
         self.value = min(max(value, 0.0), 100.0)

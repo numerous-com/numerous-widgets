@@ -1,13 +1,19 @@
+"""Module providing a timer widget for the numerous library."""
+
+from collections.abc import Callable
+from typing import Any
+
 import anywidget
 import traitlets
-from typing import Callable, Optional, Dict, Any
+
 from .config import get_widget_paths
+
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("TimerWidget")
 
 
-class Timer(anywidget.AnyWidget):
+class Timer(anywidget.AnyWidget):  # type: ignore[misc]
     """
     A widget that triggers a callback at regular intervals.
 
@@ -16,6 +22,7 @@ class Timer(anywidget.AnyWidget):
         callback: The function to call at each interval
         active: Whether the timer starts active
         label: The label for the timer button
+
     """
 
     # Define traitlets for the widget properties
@@ -31,7 +38,7 @@ class Timer(anywidget.AnyWidget):
     def __init__(
         self,
         interval: float = 1.0,
-        callback: Optional[Callable[[], None]] = None,
+        callback: Callable[[], None] | None = None,
         active: bool = False,
         label: str = "Timer",
     ) -> None:
@@ -44,17 +51,17 @@ class Timer(anywidget.AnyWidget):
         self._callback = callback
         self.observe(self._handle_tick, names=["last_tick"])
 
-    def _handle_tick(self, change: Dict[str, Any]) -> None:
-        """Called when a tick occurs in the frontend"""
+    def _handle_tick(self, change: dict[str, Any]) -> None:  # noqa: ARG002
+        """Call when a tick occurs in the frontend."""
         if self._callback is not None:
             self._callback()
 
     @property
     def active(self) -> bool:
-        """Returns whether the timer is currently active"""
-        return self.is_active
+        """Return whether the timer is currently active."""
+        return bool(self.is_active)
 
     @active.setter
     def active(self, value: bool) -> None:
-        """Sets whether the timer is active"""
+        """Set whether the timer is active."""
         self.is_active = value

@@ -1,12 +1,16 @@
+"""Module providing a checkbox widget for the numerous library."""
+
 import anywidget
 import traitlets
+
 from .config import get_widget_paths
+
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("CheckBoxWidget")
 
 
-class CheckBox(anywidget.AnyWidget):
+class CheckBox(anywidget.AnyWidget):  # type: ignore[misc]
     """
     A widget for selecting a boolean value.
 
@@ -16,6 +20,7 @@ class CheckBox(anywidget.AnyWidget):
         label: The label of the checkbox.
         tooltip: The tooltip of the checkbox.
         default: The default value of the checkbox.
+
     """
 
     # Define traitlets for the widget properties
@@ -43,18 +48,13 @@ class CheckBox(anywidget.AnyWidget):
     @property
     def selected_value(self) -> bool:
         """Returns the current checkbox state."""
-        return self.value
+        return bool(self.value)
 
     @property
     def val(self) -> bool:
-        return self.value
+        """Return the current checkbox state."""
+        return bool(self.value)
 
     @val.setter
     def val(self, value: bool) -> None:
-        self.value = value
-
-    def get_value(self) -> bool:
-        return self.value
-
-    def set_value(self, value: bool) -> None:
         self.value = value

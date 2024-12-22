@@ -1,12 +1,16 @@
+"""Module providing an accordion widget for the numerous library."""
+
 import anywidget
 import traitlets
+
 from .config import get_widget_paths
+
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("AccordionWidget")
 
 
-class Accordion(anywidget.AnyWidget):
+class Accordion(anywidget.AnyWidget):  # type: ignore[misc]
     """
     A widget for creating an accordion.
 
@@ -15,6 +19,7 @@ class Accordion(anywidget.AnyWidget):
         label: The label of the accordion.
         tooltip: The tooltip of the accordion.
         expanded: Whether the accordion is expanded.
+
     """
 
     # Define traitlets for the widget properties
@@ -33,7 +38,7 @@ class Accordion(anywidget.AnyWidget):
         label: str = "",
         tooltip: str | None = None,
         expanded: bool = False,
-    ):
+    ) -> None:
         # Initialize with keyword arguments
         super().__init__(
             title=title,
@@ -45,4 +50,4 @@ class Accordion(anywidget.AnyWidget):
     @property
     def expanded(self) -> bool:
         """Returns whether the accordion is expanded."""
-        return self.is_expanded
+        return bool(self.is_expanded)

@@ -1,14 +1,18 @@
+"""Module providing a datetime range picker widget for the numerous library."""
+
+from datetime import datetime
+
 import anywidget
 import traitlets
-from typing import Optional, Tuple
-from datetime import datetime
+
 from .config import get_widget_paths
+
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("DateTimeRangePickerWidget")
 
 
-class DateTimeRangePicker(anywidget.AnyWidget):
+class DateTimeRangePicker(anywidget.AnyWidget):  # type: ignore[misc]
     """
     A widget for selecting a date and time range.
 
@@ -21,6 +25,7 @@ class DateTimeRangePicker(anywidget.AnyWidget):
         default_end: The default end datetime value.
         min_date: The minimum allowed date (optional).
         max_date: The maximum allowed date (optional).
+
     """
 
     # Define traitlets for the widget properties
@@ -38,12 +43,12 @@ class DateTimeRangePicker(anywidget.AnyWidget):
     def __init__(
         self,
         label: str,
-        tooltip: Optional[str] = None,
-        default_start: Optional[datetime] = None,
-        default_end: Optional[datetime] = None,
-        min_date: Optional[datetime] = None,
-        max_date: Optional[datetime] = None,
-    ):
+        tooltip: str | None = None,
+        default_start: datetime | None = None,
+        default_end: datetime | None = None,
+        min_date: datetime | None = None,
+        max_date: datetime | None = None,
+    ) -> None:
         # Use current datetime as default start if none provided
         if default_start is None:
             default_start = datetime.now()
@@ -61,15 +66,11 @@ class DateTimeRangePicker(anywidget.AnyWidget):
         if min_date and max_date and min_date > max_date:
             raise ValueError("min_date must be less than or equal to max_date")
 
-        if min_date:
-            if default_start < min_date or default_end < min_date:
-                raise ValueError(
-                    "default dates must be greater than or equal to min_date"
-                )
+        if min_date and (default_start < min_date or default_end < min_date):
+            raise ValueError("default dates must be greater than or equal to min_date")
 
-        if max_date:
-            if default_start > max_date or default_end > max_date:
-                raise ValueError("default dates must be less than or equal to max_date")
+        if max_date and (default_start > max_date or default_end > max_date):
+            raise ValueError("default dates must be less than or equal to max_date")
 
         # Initialize with keyword arguments
         super().__init__(
@@ -82,7 +83,7 @@ class DateTimeRangePicker(anywidget.AnyWidget):
         )
 
     @property
-    def selected_value(self) -> Tuple[datetime, datetime]:
+    def selected_value(self) -> tuple[datetime, datetime]:
         """Returns the current datetime range as a tuple (start, end)."""
         return (
             datetime.fromisoformat(self.start_value),
@@ -90,11 +91,12 @@ class DateTimeRangePicker(anywidget.AnyWidget):
         )
 
     @property
-    def val(self) -> Tuple[datetime, datetime]:
+    def val(self) -> tuple[datetime, datetime]:
+        """Returns the current datetime range as a tuple (start, end)."""
         return self.selected_value
 
     @val.setter
-    def val(self, value: Tuple[datetime, datetime]) -> None:
+    def val(self, value: tuple[datetime, datetime]) -> None:
         start, end = value
         if isinstance(start, str):
             start = datetime.fromisoformat(start)
@@ -117,9 +119,3 @@ class DateTimeRangePicker(anywidget.AnyWidget):
 
         self.start_value = start.isoformat()
         self.end_value = end.isoformat()
-
-    def get_value(self) -> Tuple[datetime, datetime]:
-        return self.selected_value
-
-    def set_value(self, value: Tuple[datetime, datetime]) -> None:
-        self.val = value

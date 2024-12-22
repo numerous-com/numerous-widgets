@@ -1,10 +1,13 @@
+"""Templating is for rendering Jinja2 templates."""
+
+from typing import IO, Any
+
 from jinja2 import Template
-from typing import Union, IO, Dict, Any
 
 
-def render_template(template: Union[str, IO[str]], **kwargs: Dict[str, Any]) -> str:
+def render_template(template: str | IO[str], **kwargs: dict[str, Any]) -> str:
     """
-    Renders a Jinja2 template with processed keyword arguments.
+    Render a Jinja2 template with processed keyword arguments.
 
     Args:
         template: Either a template string or a file-like object containing the template
@@ -13,6 +16,7 @@ def render_template(template: Union[str, IO[str]], **kwargs: Dict[str, Any]) -> 
 
     Returns:
         str: The rendered template
+
     """
     # Convert template string or file to Jinja2 Template object
     if hasattr(template, "read"):  # File-like object
@@ -34,5 +38,5 @@ def render_template(template: Union[str, IO[str]], **kwargs: Dict[str, Any]) -> 
 
     content = _template.render(**processed_kwargs)
     if not isinstance(content, str):
-        raise ValueError("Template rendering returned a non-string value")
+        raise TypeError("Template rendering returned a non-string value")
     return content

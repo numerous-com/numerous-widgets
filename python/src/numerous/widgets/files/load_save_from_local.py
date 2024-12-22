@@ -1,14 +1,19 @@
+"""Module providing a file loader widget for the numerous library."""
+
+from io import BytesIO, StringIO
+from typing import Any
+
 import anywidget
 import traitlets
-from typing import Optional, Dict, Any
+
 from numerous.widgets.base.config import get_widget_paths
-from io import BytesIO, StringIO
+
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("FileLoaderWidget")
 
 
-class FileLoader(anywidget.AnyWidget):
+class FileLoader(anywidget.AnyWidget):  # type: ignore[misc]
     """
     A widget for loading file contents.
 
@@ -16,6 +21,7 @@ class FileLoader(anywidget.AnyWidget):
         label: The label of the load button
         tooltip: The tooltip text
         accept: File types to accept (e.g., '.txt,.csv')
+
     """
 
     # Define traitlets for the widget properties
@@ -36,7 +42,7 @@ class FileLoader(anywidget.AnyWidget):
         tooltip: str | None = None,
         accept: str = "*",
         encoding: str = "utf-8",
-    ):
+    ) -> None:
         super().__init__(
             ui_label=label,
             ui_tooltip=tooltip if tooltip is not None else "",
@@ -45,21 +51,20 @@ class FileLoader(anywidget.AnyWidget):
             filename=None,
             encoding=encoding,
         )
-        self._bytes: Optional[bytes] = None
+        self._bytes: bytes | None = None
 
     @property
-    def content(self) -> Dict[str, Any]:
+    def content(self) -> dict[str, Any]:
         """Returns the loaded file content as bytes."""
-        return self.file_content
+        return self.file_content  # type: ignore[no-any-return]
 
     @property
-    def selected_filename(self) -> Optional[str]:
+    def selected_filename(self) -> str | None:
         """Returns the name of the loaded file."""
-        return self.filename
+        return self.filename  # type: ignore[no-any-return]
 
-    @traitlets.observe("file_content")
-    def _observe_file_content(self, change: Dict[str, Any]) -> None:
-        print("file_content changed")
+    @traitlets.observe("file_content")  # type: ignore[misc]
+    def _observe_file_content(self, change: dict[str, Any]) -> None:
         # Convert from dict where values are integers to bytes
         if isinstance(change["new"], dict):
             self._bytes = bytes(change["new"].values())
@@ -67,22 +72,24 @@ class FileLoader(anywidget.AnyWidget):
             self._bytes = change["new"]
 
     @property
-    def as_buffer(self) -> Optional[BytesIO]:
-        """Returns a file-like object (BytesIO) containing the loaded file content.
+    def as_buffer(self) -> BytesIO | None:
+        """
+        Returns a file-like object (BytesIO) containing the loaded file content.
 
         Example:
             with open(loader_widget.as_buffer, "r") as f:
                 print(f)
+
         """
         if self._bytes is None:
             return None
         return BytesIO(self._bytes)
 
     @property
-    def as_string(self, encoding: Optional[str] = None) -> Optional[StringIO]:
-        """Returns the loaded file content as a string."""
+    def as_string(self) -> StringIO | None:
+        """Return the loaded file content as a string."""
         if self._bytes is None:
             return None
         return StringIO(
-            self._bytes.decode(self.encoding if encoding is None else encoding)
+            self._bytes.decode(self.encoding if self.encoding is not None else "utf-8")
         )

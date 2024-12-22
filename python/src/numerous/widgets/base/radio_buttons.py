@@ -1,13 +1,16 @@
+"""Module providing a radio buttons widget for the numerous library."""
+
 import anywidget
 import traitlets
-from typing import List, Optional
+
 from .config import get_widget_paths
+
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("RadioButtonsWidget")
 
 
-class RadioButtons(anywidget.AnyWidget):
+class RadioButtons(anywidget.AnyWidget):  # type: ignore[misc]
     """
     A widget for selecting a single option from multiple choices.
 
@@ -18,6 +21,7 @@ class RadioButtons(anywidget.AnyWidget):
         label: The label of the radio button group.
         tooltip: The tooltip of the radio button group.
         default: The default selected option.
+
     """
 
     # Define traitlets for the widget properties
@@ -32,11 +36,11 @@ class RadioButtons(anywidget.AnyWidget):
 
     def __init__(
         self,
-        options: List[str],
+        options: list[str],
         label: str,
-        tooltip: Optional[str] = None,
-        default: Optional[str] = None,
-    ):
+        tooltip: str | None = None,
+        default: str | None = None,
+    ) -> None:
         if not options:
             raise ValueError("Options list cannot be empty")
 
@@ -56,23 +60,16 @@ class RadioButtons(anywidget.AnyWidget):
 
     @property
     def selected_value(self) -> str:
-        """Returns the currently selected option."""
-        return self.value
+        """Return the currently selected option."""
+        return str(self.value)
 
     @property
     def val(self) -> str:
-        return self.value
+        """Return the currently selected option."""
+        return str(self.value)
 
     @val.setter
     def val(self, value: str) -> None:
-        if value not in self.options:
-            raise ValueError("Value must be one of the options")
-        self.value = value
-
-    def get_value(self) -> str:
-        return self.value
-
-    def set_value(self, value: str) -> None:
         if value not in self.options:
             raise ValueError("Value must be one of the options")
         self.value = value

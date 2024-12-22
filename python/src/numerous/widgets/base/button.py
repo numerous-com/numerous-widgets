@@ -1,13 +1,18 @@
+"""Module providing a button widget for the numerous library."""
+
+from collections.abc import Callable
+
 import anywidget
 import traitlets
-from typing import Callable
+
 from .config import get_widget_paths
+
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("ButtonWidget")
 
 
-class Button(anywidget.AnyWidget):
+class Button(anywidget.AnyWidget):  # type: ignore[misc]
     # Define traitlets for the widget properties
     ui_label = traitlets.Unicode().tag(sync=True)
     ui_tooltip = traitlets.Unicode().tag(sync=True)
@@ -37,12 +42,12 @@ class Button(anywidget.AnyWidget):
 
         self.on_click = on_click
 
-    @traitlets.observe("clicked")
+    @traitlets.observe("clicked")  # type: ignore[misc]
     def _handle_click(self, change: traitlets.BaseDescriptor) -> None:
-
         if self.on_click is not None:
             self.on_click(change)
 
     @property
     def val(self) -> bool:
-        return self.value
+        """Return the value of the button."""
+        return bool(self.value)

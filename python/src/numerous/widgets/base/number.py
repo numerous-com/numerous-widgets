@@ -1,13 +1,18 @@
+"""Module providing a numeric input widget for the numerous library."""
+
+from typing import Any
+
 import anywidget
 import traitlets
-from typing import Any, Dict
+
 from .config import get_widget_paths
+
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("NumberInputWidget")
 
 
-class Number(anywidget.AnyWidget):
+class Number(anywidget.AnyWidget):  # type: ignore[misc]
     """
     A widget for selecting a numeric value.
 
@@ -17,6 +22,7 @@ class Number(anywidget.AnyWidget):
         label: The label of the number input.
         tooltip: The tooltip of the number input.
         default: The default value of the number input.
+
     """
 
     # Define traitlets for the widget properties
@@ -44,7 +50,7 @@ class Number(anywidget.AnyWidget):
         stop: float = 100.0,
         step: float = 1.0,
         fit_to_content: bool = False,
-    ):
+    ) -> None:
         # Initialize with keyword arguments
         super().__init__(
             ui_label=label,
@@ -58,31 +64,37 @@ class Number(anywidget.AnyWidget):
 
     @property
     def selected_value(self) -> float:
-        """Returns the currently selected numeric value.
+        """
+        Return the currently selected numeric value.
 
         Returns:
             float: The currently selected numeric value.
+
         """
-        return self.value
+        return float(self.value)
 
     @property
     def val(self) -> float:
-        """Returns the currently selected numeric value.
+        """
+        Return the currently selected numeric value.
 
         Returns:
             float: The currently selected numeric value.
+
         """
-        return self.value
+        return float(self.value)
 
     @val.setter
     def val(self, value: float) -> None:
-        """Sets the currently selected numeric value.
+        """
+        Set the currently selected numeric value.
 
         Args:
             value: The new value to set.
+
         """
         self.value = value
 
-    @traitlets.observe("value")
-    def _validate_value(self, change: Dict[str, Any]) -> None:
+    @traitlets.observe("value")  # type: ignore[misc]
+    def _validate_value(self, change: dict[str, Any]) -> None:
         self.valid = self.start <= change["new"] <= self.stop

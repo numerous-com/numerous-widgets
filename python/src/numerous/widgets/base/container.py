@@ -1,11 +1,10 @@
-from typing import Union, List
+"""Module providing a container widget for the numerous library."""
+
 import anywidget
 
 
 def container(
-    content: (
-        Union[str, anywidget.AnyWidget, List[Union[str, anywidget.AnyWidget]]] | None
-    ) = None,
+    content: str | anywidget.AnyWidget | list[str | anywidget.AnyWidget] | None = None,
     hidden: bool = False,
     classes: str = "",
     styles: str = "",
@@ -18,8 +17,8 @@ def container(
         hidden: Whether the container is hidden (defaults to False)
         classes: List of CSS classes to add to the container
         styles: Additional CSS styles to apply to the container
-    """
 
+    """
     # Handle content list or single element
     if content is None:
         content_html = ""
@@ -49,7 +48,7 @@ def container(
 
 
 def side_by_side_container(
-    contents: List[tuple[Union[str, anywidget.AnyWidget], float]],
+    contents: list[tuple[str | anywidget.AnyWidget, float]],
     hidden: bool = False,
     classes: str = "",
     styles: str = "",
@@ -62,8 +61,8 @@ def side_by_side_container(
         hidden: Whether the container is hidden (defaults to False)
         classes: List of CSS classes to add to the container
         styles: Additional CSS styles to apply to the container
-    """
 
+    """
     # Build style string for the container
     style_parts = []
     if hidden:

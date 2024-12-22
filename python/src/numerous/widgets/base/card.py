@@ -1,9 +1,10 @@
-from typing import Union, List
+"""Module providing a card widget for the numerous library."""
+
 import anywidget
 
 
 def card(
-    content: Union[str, anywidget.AnyWidget, List[Union[str, anywidget.AnyWidget]]],
+    content: str | anywidget.AnyWidget | list[str | anywidget.AnyWidget],
     title: str | None = None,
     direction: str = "column",
     hidden: bool = False,
@@ -16,6 +17,7 @@ def card(
         title: Optional card title
         direction: Flow direction of elements ("row" or "column", defaults to "column")
         hidden: Whether the card is hidden (defaults to False)
+
     """
     title_html = f"<h5 class='card-title'>{title}</h5>" if title else ""
 

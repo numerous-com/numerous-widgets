@@ -1,12 +1,16 @@
+"""Module providing a markdown drawer widget for the numerous library."""
+
 import anywidget
 import traitlets
+
 from .config import get_widget_paths
+
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("MarkdownDrawerWidget")
 
 
-class MarkdownDrawer(anywidget.AnyWidget):
+class MarkdownDrawer(anywidget.AnyWidget):  # type: ignore[misc]
     """
     A collapsible drawer widget that displays markdown content.
 
@@ -14,6 +18,7 @@ class MarkdownDrawer(anywidget.AnyWidget):
         title: The title shown in the drawer header
         content: The markdown content to display
         open: Whether the drawer starts open (default: False)
+
     """
 
     # Define traitlets for the widget properties
@@ -29,10 +34,10 @@ class MarkdownDrawer(anywidget.AnyWidget):
         self,
         title: str,
         content: str,
-        open: bool = False,
-    ):
+        is_open: bool = False,
+    ) -> None:
         super().__init__(
             title=title,
             content=content,
-            is_open=open,
+            is_open=is_open,
         )
