@@ -5,6 +5,7 @@ from .config import get_widget_paths
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("MarkdownDrawerWidget")
 
+
 class MarkdownDrawer(anywidget.AnyWidget):
     """
     A collapsible drawer widget that displays markdown content.
@@ -14,6 +15,7 @@ class MarkdownDrawer(anywidget.AnyWidget):
         content: The markdown content to display
         open: Whether the drawer starts open (default: False)
     """
+
     # Define traitlets for the widget properties
     title = traitlets.Unicode().tag(sync=True)
     content = traitlets.Unicode().tag(sync=True)

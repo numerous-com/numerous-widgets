@@ -5,6 +5,7 @@ from numerous.widgets.base.config import get_widget_paths
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("StringInputWidget")
 
+
 class String(anywidget.AnyWidget):
     """
     A widget for text input.
@@ -17,6 +18,7 @@ class String(anywidget.AnyWidget):
         default: The default value of the string input.
         placeholder: Placeholder text to show when input is empty.
     """
+
     # Define traitlets for the widget properties
     ui_label = traitlets.Unicode().tag(sync=True)
     ui_tooltip = traitlets.Unicode().tag(sync=True)
@@ -33,7 +35,7 @@ class String(anywidget.AnyWidget):
     def __init__(
         self,
         label: str,
-        tooltip: str|None = None,
+        tooltip: str | None = None,
         default: str = "",
         placeholder: str = "",
         fit_to_content: bool = False,
@@ -53,17 +55,17 @@ class String(anywidget.AnyWidget):
     @property
     def val(self) -> str:
         """Returns the current input value.
-        
+
         Returns:
             str: The current input value.
         """
         return self.value
-    
+
     @val.setter
     def val(self, value: str) -> None:
         """Sets the current input value.
-        
+
         Args:
             value: The new value to set.
         """
-        self.value = value 
+        self.value = value

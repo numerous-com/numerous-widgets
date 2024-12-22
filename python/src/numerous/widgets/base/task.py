@@ -8,14 +8,16 @@ from anywidget import AnyWidget
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("TaskWidget")
 
+
 class Task(anywidget.AnyWidget):
     """
     A widget for controlling and displaying task progress.
-    
+
     The widget shows a play button that transforms into a stop button with
     circular progress indicator when running, and either a checkmark (success)
     or X (failure) when finished.
     """
+
     # Define traitlets for the widget properties
     is_running = traitlets.Bool(default_value=False).tag(sync=True)
     is_completed = traitlets.Bool(default_value=False).tag(sync=True)
@@ -24,7 +26,7 @@ class Task(anywidget.AnyWidget):
     is_stopped = traitlets.Bool(default_value=False).tag(sync=True)
     started = traitlets.Bool(default_value=False).tag(sync=True)
     progress = traitlets.Float(default_value=0.0).tag(sync=True)
-    logs: List[Tuple[str, str, str, str]] = traitlets.List(default_value=[]).tag(sync=True) # type: ignore[assignment]
+    logs: List[Tuple[str, str, str, str]] = traitlets.List(default_value=[]).tag(sync=True)  # type: ignore[assignment]
     error: Dict[str, Any] | None = traitlets.Dict(allow_none=True, default_value=None).tag(sync=True)  # type: ignore[assignment]
     last_sync = traitlets.Float(default_value=0.0).tag(sync=True)
     sync_enabled = traitlets.Bool(default_value=False).tag(sync=True)
@@ -40,7 +42,7 @@ class Task(anywidget.AnyWidget):
         on_reset: Optional[Callable[[], None]] = None,
         on_sync: Optional[Callable[[AnyWidget], None]] = None,
         sync_interval: float = 1.0,
-        disabled: bool = False
+        disabled: bool = False,
     ):
         super().__init__()
         self._on_start = on_start
@@ -51,36 +53,35 @@ class Task(anywidget.AnyWidget):
         self.error = None
         self.sync_enabled = False
         self.sync_interval = sync_interval
-        
+
         # Observe changes to is_running and started to trigger callbacks
-        self.observe(self._handle_running_change, names=['is_running'])
-        self.observe(self._handle_started_change, names=['started'])
-        self.observe(self._handle_sync, names=['last_sync'])
+        self.observe(self._handle_running_change, names=["is_running"])
+        self.observe(self._handle_started_change, names=["started"])
+        self.observe(self._handle_sync, names=["last_sync"])
 
     def _handle_stopped_change(self, change: Dict[str, Any]) -> None:
         """Internal handler for stopped state changes"""
-        if change['new']:
+        if change["new"]:
             if self._on_stop:
                 self._on_stop()
-    
+
     def _handle_running_change(self, change: Dict[str, Any]) -> None:
         """Internal handler for running state changes"""
-        if change['new']:  # Started running
+        if change["new"]:  # Started running
             self.is_completed = False
             self.is_failed = False
             self.enable_sync()
 
             if self._on_start:
                 self._on_start()
-        
-    
+
     def _handle_started_change(self, change: Dict[str, Any]) -> None:
         """Internal handler for started state changes"""
-        if not change['new'] and change['old']:
+        if not change["new"] and change["old"]:
             # This indicates a reset from the UI
             if self._on_reset:
                 self._on_reset()
-    
+
     def _handle_sync(self, change: Dict[str, Any]) -> None:
         """Internal handler for sync events"""
         if self._on_sync and self.sync_enabled:
@@ -91,13 +92,13 @@ class Task(anywidget.AnyWidget):
             self.sync_enabled = _sync
         else:
             self.sync_enabled = False
-    
+
     def set_progress(self, value: float) -> None:
         """Sets the progress value (0.0 to 1.0)"""
         self.progress = max(0.0, min(1.0, value))
         if self.progress >= 1.0:
             self.complete()
-    
+
     def start(self) -> None:
         """Starts the task"""
         if not self.is_disabled:
@@ -105,13 +106,13 @@ class Task(anywidget.AnyWidget):
             self.started = True
             self.is_completed = False
             self.is_failed = False
-    
+
     def stop(self) -> None:
         """Stops the task"""
         if not self.is_disabled:
             self.is_running = False
             self.progress = 0.0
-    
+
     def complete(self) -> None:
         """Marks the task as completed successfully"""
         if not self.is_disabled:
@@ -119,14 +120,14 @@ class Task(anywidget.AnyWidget):
             self.is_completed = True
             self.is_failed = False
             self.progress = 1.0
-    
+
     def fail(self) -> None:
         """Marks the task as failed"""
         if not self.is_disabled:
             self.is_running = False
             self.is_completed = False
             self.is_failed = True
-    
+
     def reset(self) -> None:
         """Resets the widget to its initial state"""
         if not self.is_disabled:
@@ -141,19 +142,21 @@ class Task(anywidget.AnyWidget):
             # Call the reset callback if provided
             if self._on_reset:
                 self._on_reset()
-    
+
     def enable(self) -> None:
         """Enables the task widget"""
         self.is_disabled = False
-    
+
     def disable(self) -> None:
         """Disables the task widget"""
         self.is_disabled = True
-    
-    def add_log(self, message: str, log_type: str = "info", source: str = "system") -> None:
+
+    def add_log(
+        self, message: str, log_type: str = "info", source: str = "system"
+    ) -> None:
         """
         Add a log entry with timestamp, type, source, and message.
-        
+
         Args:
             message: The log message text
             log_type: Type of log ('info', 'error', 'warning', etc.)
@@ -175,40 +178,54 @@ class Task(anywidget.AnyWidget):
                 # Convert datetime to ISO string if necessary
                 if isinstance(timestamp, datetime):
                     timestamp = timestamp.isoformat()
-                processed_logs.append((timestamp, log[1], log[2], log[3],))
+                processed_logs.append(
+                    (
+                        timestamp,
+                        log[1],
+                        log[2],
+                        log[3],
+                    )
+                )
             self.logs += processed_logs
 
     def set_logs(self, logs: List[Tuple[str, str, str, str]]) -> None:
         """Set the logs to a new list"""
         self.logs = logs
-    
+
     def clear_logs(self) -> None:
         """Clear all logs"""
         self.logs = []
-    
-    def set_error(self, message: str, traceback: Optional[str] = None, timestamp: Optional[datetime] = None) -> None:
+
+    def set_error(
+        self,
+        message: str,
+        traceback: Optional[str] = None,
+        timestamp: Optional[datetime] = None,
+    ) -> None:
         """Set an error message and optional traceback"""
         if timestamp is None:
             timestamp = datetime.now()
-        
+
         # Ensure timestamp is converted to ISO format string
-        timestamp_str = timestamp.isoformat() if isinstance(timestamp, datetime) else str(timestamp)
-        
+        timestamp_str = (
+            timestamp.isoformat() if isinstance(timestamp, datetime) else str(timestamp)
+        )
+
         self.error = {
-            'message': str(message),
-            'traceback': str(traceback) if traceback else None,
-            'timestamp': timestamp_str
+            "message": str(message),
+            "traceback": str(traceback) if traceback else None,
+            "timestamp": timestamp_str,
         }
         self.fail()
-    
+
     def clear_error(self) -> None:
         """Clear the current error"""
         self.error = None  # Set to None instead of empty dict
-    
+
     def enable_sync(self) -> None:
         """Enable synchronization"""
         self.sync_enabled = True
-        
+
     def disable_sync(self) -> None:
         """Disable synchronization"""
         self.sync_enabled = False

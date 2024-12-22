@@ -1,6 +1,7 @@
 import importlib.metadata
-#from .project_widget import ProjectsMenuWidget
-#from .scenario_input_widget import ScenarioInputWidget
+
+# from .project_widget import ProjectsMenuWidget
+# from .scenario_input_widget import ScenarioInputWidget
 try:
     __version__ = importlib.metadata.version("widget")
 except importlib.metadata.PackageNotFoundError:
@@ -15,7 +16,10 @@ from .base.tabs import Tabs as Tabs
 from .base.checkbox import CheckBox as CheckBox
 from .base.map_selector import MapSelector as MapSelector
 from .base.card import card as card
-from .base.container import container as container, side_by_side_container as side_by_side_container
+from .base.container import (
+    container as container,
+    side_by_side_container as side_by_side_container,
+)
 from .base.progress_bar import ProgressBar as ProgressBar
 from .base.markdown_drawer import MarkdownDrawer as MarkdownDrawer
 from .base.task import Task as Task
@@ -27,7 +31,13 @@ from .base.radio_buttons import RadioButtons as RadioButtons
 from .base.slider import Slider as Slider
 from .base.datetime_picker import DateTimePicker as DateTimePicker
 from .base.datetime_range_picker import DateTimeRangePicker as DateTimeRangePicker
-from .task.process_task import process_task_control as process_task_control, ProcessTask as ProcessTask, SubprocessTask as SubprocessTask, run_in_subprocess as run_in_subprocess, sync_with_task as sync_with_task
+from .task.process_task import (
+    process_task_control as process_task_control,
+    ProcessTask as ProcessTask,
+    SubprocessTask as SubprocessTask,
+    run_in_subprocess as run_in_subprocess,
+    sync_with_task as sync_with_task,
+)
 from .base.markdown_display import MarkdownDisplay as MarkdownDisplay
 from .base.table import Table as Table
 from .base.chat import Chat as Chat
@@ -37,4 +47,3 @@ from .templating import render_template as render_template
 
 
 from .numerous.project import ProjectsMenu as ProjectsMenu
-

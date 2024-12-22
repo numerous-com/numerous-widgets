@@ -6,6 +6,7 @@ import anywidget
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("DropDownWidget")
 
+
 class DropDown(anywidget.AnyWidget):
     """
     A widget for selecting an option from a list of options.
@@ -17,13 +18,14 @@ class DropDown(anywidget.AnyWidget):
         label: The label of the dropdown.
         tooltip: The tooltip of the dropdown.
     """
+
     # Define traitlets for the widget properties
-    ui_label: str|None = traitlets.Unicode(allow_none=True).tag(sync=True) # type: ignore[assignment]
-    ui_tooltip: str|None = traitlets.Unicode(allow_none=True).tag(sync=True) # type: ignore[assignment]
-    selected_key: str|None = traitlets.Unicode(allow_none=True).tag(sync=True) # type: ignore[assignment]
-    selected_value: str|None = traitlets.Unicode(allow_none=True).tag(sync=True) # type: ignore[assignment]
-    options: List[str] = traitlets.List().tag(sync=True) # type: ignore[assignment]
-    fit_to_content: bool = traitlets.Bool(default_value=False).tag(sync=True) # type: ignore[assignment]
+    ui_label: str | None = traitlets.Unicode(allow_none=True).tag(sync=True)  # type: ignore[assignment]
+    ui_tooltip: str | None = traitlets.Unicode(allow_none=True).tag(sync=True)  # type: ignore[assignment]
+    selected_key: str | None = traitlets.Unicode(allow_none=True).tag(sync=True)  # type: ignore[assignment]
+    selected_value: str | None = traitlets.Unicode(allow_none=True).tag(sync=True)  # type: ignore[assignment]
+    options: List[str] = traitlets.List().tag(sync=True)  # type: ignore[assignment]
+    fit_to_content: bool = traitlets.Bool(default_value=False).tag(sync=True)  # type: ignore[assignment]
 
     # Load the JavaScript and CSS from external files
     _esm = ESM
@@ -32,9 +34,9 @@ class DropDown(anywidget.AnyWidget):
     def __init__(
         self,
         options: List[str],
-        label: str|None = None,
-        tooltip: str|None = None,
-        default: str|None = None,
+        label: str | None = None,
+        tooltip: str | None = None,
+        default: str | None = None,
         fit_to_content: bool = False,
     ):
         # Initialize with keyword arguments
@@ -47,19 +49,19 @@ class DropDown(anywidget.AnyWidget):
             options=options,
             fit_to_content=fit_to_content,
         )
-    
+
     @property
-    def val(self) -> str|None:
+    def val(self) -> str | None:
         """Returns the currently selected option."""
         return self.selected_value
-    
-    def get_value(self) -> str|None:
+
+    def get_value(self) -> str | None:
         return self.selected_value
-    
+
     def set_value(self, value: str) -> None:
         self.selected_key = value
         self.selected_value = value
 
     @property
-    def name(self) -> str|None:
+    def name(self) -> str | None:
         return self.ui_label

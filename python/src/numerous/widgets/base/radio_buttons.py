@@ -6,18 +6,20 @@ from .config import get_widget_paths
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("RadioButtonsWidget")
 
+
 class RadioButtons(anywidget.AnyWidget):
     """
     A widget for selecting a single option from multiple choices.
-    
+
     The selected value can be accessed via the `selected_value` property.
-    
+
     Args:
         options: List of options to choose from.
         label: The label of the radio button group.
         tooltip: The tooltip of the radio button group.
         default: The default selected option.
     """
+
     # Define traitlets for the widget properties
     ui_label = traitlets.Unicode().tag(sync=True)
     ui_tooltip = traitlets.Unicode().tag(sync=True)
@@ -37,7 +39,7 @@ class RadioButtons(anywidget.AnyWidget):
     ):
         if not options:
             raise ValueError("Options list cannot be empty")
-        
+
         # Use first option as default if none provided
         if default is None:
             default = options[0]
@@ -56,11 +58,11 @@ class RadioButtons(anywidget.AnyWidget):
     def selected_value(self) -> str:
         """Returns the currently selected option."""
         return self.value
-    
+
     @property
     def val(self) -> str:
         return self.value
-    
+
     @val.setter
     def val(self, value: str) -> None:
         if value not in self.options:
@@ -69,8 +71,8 @@ class RadioButtons(anywidget.AnyWidget):
 
     def get_value(self) -> str:
         return self.value
-    
+
     def set_value(self, value: str) -> None:
         if value not in self.options:
             raise ValueError("Value must be one of the options")
-        self.value = value 
+        self.value = value

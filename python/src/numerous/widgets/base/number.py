@@ -6,6 +6,7 @@ from .config import get_widget_paths
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("NumberInputWidget")
 
+
 class Number(anywidget.AnyWidget):
     """
     A widget for selecting a numeric value.
@@ -17,6 +18,7 @@ class Number(anywidget.AnyWidget):
         tooltip: The tooltip of the number input.
         default: The default value of the number input.
     """
+
     # Define traitlets for the widget properties
     ui_label = traitlets.Unicode().tag(sync=True)
     ui_tooltip = traitlets.Unicode().tag(sync=True)
@@ -36,7 +38,7 @@ class Number(anywidget.AnyWidget):
     def __init__(
         self,
         label: str,
-        tooltip: str|None = None,
+        tooltip: str | None = None,
         default: float = 0.0,
         start: float = 0.0,
         stop: float = 100.0,
@@ -57,32 +59,30 @@ class Number(anywidget.AnyWidget):
     @property
     def selected_value(self) -> float:
         """Returns the currently selected numeric value.
-        
+
         Returns:
             float: The currently selected numeric value.
         """
         return self.value
-    
+
     @property
     def val(self) -> float:
         """Returns the currently selected numeric value.
-        
+
         Returns:
             float: The currently selected numeric value.
         """
         return self.value
-    
+
     @val.setter
     def val(self, value: float) -> None:
         """Sets the currently selected numeric value.
-        
+
         Args:
             value: The new value to set.
         """
         self.value = value
 
-    @traitlets.observe('value')
+    @traitlets.observe("value")
     def _validate_value(self, change: Dict[str, Any]) -> None:
-        self.valid = self.start <= change['new'] <= self.stop
-
-  
+        self.valid = self.start <= change["new"] <= self.stop

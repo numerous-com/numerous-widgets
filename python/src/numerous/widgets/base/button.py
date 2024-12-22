@@ -6,6 +6,7 @@ from .config import get_widget_paths
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("ButtonWidget")
 
+
 class Button(anywidget.AnyWidget):
     # Define traitlets for the widget properties
     ui_label = traitlets.Unicode().tag(sync=True)
@@ -19,11 +20,12 @@ class Button(anywidget.AnyWidget):
     # Load the JavaScript and CSS from external files
     _esm = ESM
     _css = CSS
+
     def __init__(
         self,
         label: str,
-        tooltip: str|None = None,
-        on_click: Callable[[traitlets.BaseDescriptor], None]|None = None,
+        tooltip: str | None = None,
+        on_click: Callable[[traitlets.BaseDescriptor], None] | None = None,
         disabled: bool = False,
     ) -> None:
         super().__init__(
@@ -32,17 +34,15 @@ class Button(anywidget.AnyWidget):
             clicked=0,
             disabled=disabled,
         )
-        
-        self.on_click = on_click
-        
 
-    @traitlets.observe('clicked')
+        self.on_click = on_click
+
+    @traitlets.observe("clicked")
     def _handle_click(self, change: traitlets.BaseDescriptor) -> None:
 
         if self.on_click is not None:
             self.on_click(change)
-    
+
     @property
     def val(self) -> bool:
         return self.value
-    

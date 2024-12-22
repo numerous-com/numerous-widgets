@@ -1,15 +1,18 @@
 import anywidget
 import traitlets
-from typing import Dict, Union, List
+from typing import List
 from .config import get_widget_paths
-from numerous.widgets.base.container import container
+
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("TabsWidget")
 
+
 class TabContainer:
     """A container widget for a single tab."""
+
     def __init__(self, element_id: str):
         self.element_id = element_id
+
 
 class Tabs(anywidget.AnyWidget):
     # Define traitlets for the widget properties
@@ -29,15 +32,13 @@ class Tabs(anywidget.AnyWidget):
         self,
         tabs: List[str],
         label: str = "",
-        tooltip: str|None = None,
-        default: str|None = None,
+        tooltip: str | None = None,
+        default: str | None = None,
     ):
         # Get the initial active tab
         if not self.initial_tab:
             self.initial_tab = default or tabs[0]
-        
-       
-        
+
         # Initialize with keyword arguments
         super().__init__(
             ui_label=label,
@@ -52,5 +53,3 @@ class Tabs(anywidget.AnyWidget):
     def selected_value(self) -> str:
         """Returns the currently selected tab."""
         return self.active_tab
-
-    

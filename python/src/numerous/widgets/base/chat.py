@@ -8,16 +8,18 @@ from anywidget import AnyWidget
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("ChatWidget")
 
+
 class Chat(anywidget.AnyWidget):
     """
     A chat widget that displays messages and handles user input.
-    
+
     Args:
         messages: Initial list of messages
         placeholder: Placeholder text for the input field
         max_height: Maximum height of the chat container (default: "400px")
         className: Optional CSS class name for styling
     """
+
     # Define traitlets for the widget properties
     messages = traitlets.List(trait=traitlets.Dict()).tag(sync=True)
     placeholder = traitlets.Unicode().tag(sync=True)
@@ -38,7 +40,7 @@ class Chat(anywidget.AnyWidget):
     ):
         """
         Initialize the chat widget.
-        
+
         Message format:
         {
             "id": str,
@@ -62,6 +64,7 @@ class Chat(anywidget.AnyWidget):
                 msg["timestamp"] = datetime.now().isoformat()
             if "id" not in msg:
                 from uuid import uuid4
+
                 msg["id"] = str(uuid4())
 
         super().__init__(
@@ -78,7 +81,7 @@ class Chat(anywidget.AnyWidget):
             "id": str(len(self.messages)),
             "content": content,
             "type": type,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
         self.messages = self.messages + [message]
 
@@ -93,4 +96,4 @@ class Chat(anywidget.AnyWidget):
 
     def observe_new_messages(self, handler: Callable[[AnyWidget], None]) -> None:
         """Observe new messages from the user."""
-        self.observe(handler, names=['new_message']) 
+        self.observe(handler, names=["new_message"])

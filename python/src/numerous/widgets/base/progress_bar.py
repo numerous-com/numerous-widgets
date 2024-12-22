@@ -5,6 +5,7 @@ from .config import get_widget_paths
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("ProgressBarWidget")
 
+
 class ProgressBar(anywidget.AnyWidget):
     """
     A widget for displaying progress.
@@ -16,6 +17,7 @@ class ProgressBar(anywidget.AnyWidget):
         label: Optional label to display above the progress bar.
         tooltip: Optional tooltip text.
     """
+
     # Define traitlets for the widget properties
     value = traitlets.Float(min=0.0, max=100.0).tag(sync=True)
     ui_label = traitlets.Unicode().tag(sync=True)
@@ -28,8 +30,8 @@ class ProgressBar(anywidget.AnyWidget):
     def __init__(
         self,
         value: float = 0.0,
-        label: str|None = None,
-        tooltip: str|None = None,
+        label: str | None = None,
+        tooltip: str | None = None,
     ) -> None:
         super().__init__(
             value=min(max(value, 0.0), 100.0),
@@ -41,7 +43,7 @@ class ProgressBar(anywidget.AnyWidget):
     def val(self) -> float:
         """Returns the current progress value (0-100)."""
         return self.value
-    
+
     @val.setter
     def val(self, value: float) -> None:
         """Sets the progress value, clamped between 0 and 100."""

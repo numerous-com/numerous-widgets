@@ -7,12 +7,13 @@ from .config import get_widget_paths
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("DateTimeRangePickerWidget")
 
+
 class DateTimeRangePicker(anywidget.AnyWidget):
     """
     A widget for selecting a date and time range.
-    
+
     The selected values can be accessed via the `selected_value` property.
-    
+
     Args:
         label: The label of the datetime range picker.
         tooltip: The tooltip of the datetime range picker.
@@ -21,13 +22,14 @@ class DateTimeRangePicker(anywidget.AnyWidget):
         min_date: The minimum allowed date (optional).
         max_date: The maximum allowed date (optional).
     """
+
     # Define traitlets for the widget properties
     ui_label = traitlets.Unicode().tag(sync=True)
     ui_tooltip = traitlets.Unicode().tag(sync=True)
     start_value = traitlets.Unicode().tag(sync=True)  # ISO format string
-    end_value = traitlets.Unicode().tag(sync=True)    # ISO format string
-    min_date = traitlets.Unicode().tag(sync=True)     # ISO format string
-    max_date = traitlets.Unicode().tag(sync=True)     # ISO format string
+    end_value = traitlets.Unicode().tag(sync=True)  # ISO format string
+    min_date = traitlets.Unicode().tag(sync=True)  # ISO format string
+    max_date = traitlets.Unicode().tag(sync=True)  # ISO format string
 
     # Load the JavaScript and CSS from external files
     _esm = ESM
@@ -45,10 +47,11 @@ class DateTimeRangePicker(anywidget.AnyWidget):
         # Use current datetime as default start if none provided
         if default_start is None:
             default_start = datetime.now()
-        
+
         # Use start + 1 hour as default end if none provided
         if default_end is None:
             from datetime import timedelta
+
             default_end = default_start + timedelta(hours=1)
 
         if default_start >= default_end:
@@ -57,11 +60,13 @@ class DateTimeRangePicker(anywidget.AnyWidget):
         # Validate min/max dates if provided
         if min_date and max_date and min_date > max_date:
             raise ValueError("min_date must be less than or equal to max_date")
-        
+
         if min_date:
             if default_start < min_date or default_end < min_date:
-                raise ValueError("default dates must be greater than or equal to min_date")
-        
+                raise ValueError(
+                    "default dates must be greater than or equal to min_date"
+                )
+
         if max_date:
             if default_start > max_date or default_end > max_date:
                 raise ValueError("default dates must be less than or equal to max_date")
@@ -81,13 +86,13 @@ class DateTimeRangePicker(anywidget.AnyWidget):
         """Returns the current datetime range as a tuple (start, end)."""
         return (
             datetime.fromisoformat(self.start_value),
-            datetime.fromisoformat(self.end_value)
+            datetime.fromisoformat(self.end_value),
         )
-    
+
     @property
     def val(self) -> Tuple[datetime, datetime]:
         return self.selected_value
-    
+
     @val.setter
     def val(self, value: Tuple[datetime, datetime]) -> None:
         start, end = value
@@ -95,26 +100,26 @@ class DateTimeRangePicker(anywidget.AnyWidget):
             start = datetime.fromisoformat(start)
         if isinstance(end, str):
             end = datetime.fromisoformat(end)
-            
+
         if start >= end:
             raise ValueError("start datetime must be less than end datetime")
-            
+
         # Validate against min/max dates
         if self.min_date:
             min_date = datetime.fromisoformat(self.min_date)
             if start < min_date or end < min_date:
                 raise ValueError("Values must be greater than or equal to min_date")
-                
+
         if self.max_date:
             max_date = datetime.fromisoformat(self.max_date)
             if start > max_date or end > max_date:
                 raise ValueError("Values must be less than or equal to max_date")
-                
+
         self.start_value = start.isoformat()
         self.end_value = end.isoformat()
 
     def get_value(self) -> Tuple[datetime, datetime]:
         return self.selected_value
-    
+
     def set_value(self, value: Tuple[datetime, datetime]) -> None:
-        self.val = value 
+        self.val = value

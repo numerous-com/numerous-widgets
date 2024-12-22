@@ -5,6 +5,7 @@ from .config import get_widget_paths
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("MarkdownDisplayWidget")
 
+
 class MarkdownDisplay(anywidget.AnyWidget):
     """
     A widget that displays markdown content.
@@ -13,6 +14,7 @@ class MarkdownDisplay(anywidget.AnyWidget):
         content: The markdown content to display
         className: Optional CSS class name for styling (default: "")
     """
+
     # Define traitlets for the widget properties
     content = traitlets.Unicode().tag(sync=True)
     class_name = traitlets.Unicode().tag(sync=True)
@@ -33,4 +35,4 @@ class MarkdownDisplay(anywidget.AnyWidget):
 
     def update_content(self, content: str) -> None:
         """Update the markdown content."""
-        self.content = content 
+        self.content = content

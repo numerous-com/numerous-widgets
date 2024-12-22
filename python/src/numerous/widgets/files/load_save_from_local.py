@@ -7,6 +7,7 @@ from io import BytesIO, StringIO
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("FileLoaderWidget")
 
+
 class FileLoader(anywidget.AnyWidget):
     """
     A widget for loading file contents.
@@ -16,6 +17,7 @@ class FileLoader(anywidget.AnyWidget):
         tooltip: The tooltip text
         accept: File types to accept (e.g., '.txt,.csv')
     """
+
     # Define traitlets for the widget properties
     ui_label = traitlets.Unicode("Load File").tag(sync=True)
     ui_tooltip = traitlets.Unicode("").tag(sync=True)
@@ -49,25 +51,25 @@ class FileLoader(anywidget.AnyWidget):
     def content(self) -> Dict[str, Any]:
         """Returns the loaded file content as bytes."""
         return self.file_content
-    
+
     @property
     def selected_filename(self) -> Optional[str]:
         """Returns the name of the loaded file."""
         return self.filename
-    
-    @traitlets.observe('file_content')
+
+    @traitlets.observe("file_content")
     def _observe_file_content(self, change: Dict[str, Any]) -> None:
         print("file_content changed")
         # Convert from dict where values are integers to bytes
-        if isinstance(change['new'], dict):
-            self._bytes = bytes(change['new'].values())
-        else:   
-            self._bytes = change['new']
-    
+        if isinstance(change["new"], dict):
+            self._bytes = bytes(change["new"].values())
+        else:
+            self._bytes = change["new"]
+
     @property
     def as_buffer(self) -> Optional[BytesIO]:
         """Returns a file-like object (BytesIO) containing the loaded file content.
-        
+
         Example:
             with open(loader_widget.as_buffer, "r") as f:
                 print(f)
@@ -75,11 +77,12 @@ class FileLoader(anywidget.AnyWidget):
         if self._bytes is None:
             return None
         return BytesIO(self._bytes)
-    
+
     @property
     def as_string(self, encoding: Optional[str] = None) -> Optional[StringIO]:
         """Returns the loaded file content as a string."""
         if self._bytes is None:
             return None
-        return StringIO(self._bytes.decode(self.encoding if encoding is None else encoding))
-    
+        return StringIO(
+            self._bytes.decode(self.encoding if encoding is None else encoding)
+        )

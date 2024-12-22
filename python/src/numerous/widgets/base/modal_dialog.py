@@ -1,15 +1,16 @@
 import anywidget
 import traitlets
-from typing import Optional, Callable
+from typing import Callable
 from .config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("ModalDialogWidget")
 
+
 class ModalDialog(anywidget.AnyWidget):
     """
     A modal dialog widget that displays a message with OK and optional Cancel buttons.
-    
+
     Args:
         title: The title of the modal
         message: The message to display
@@ -18,6 +19,7 @@ class ModalDialog(anywidget.AnyWidget):
         cancel_label: Custom label for the Cancel button (default: "Cancel")
         className: Optional CSS class name for styling
     """
+
     # Define traitlets for the widget properties
     is_open = traitlets.Bool(default_value=False).tag(sync=True)
     title = traitlets.Unicode().tag(sync=True)
@@ -52,7 +54,7 @@ class ModalDialog(anywidget.AnyWidget):
             result=None,
         )
 
-    def show(self, title: str|None = None, message: str|None = None) -> None:
+    def show(self, title: str | None = None, message: str | None = None) -> None:
         """Show the modal dialog with optional new title and message."""
         if title is not None:
             self.title = title
@@ -67,4 +69,4 @@ class ModalDialog(anywidget.AnyWidget):
 
     def observe_result(self, handler: Callable[[str], None]) -> None:
         """Observe the result of the modal dialog."""
-        self.observe(handler, names=['result']) 
+        self.observe(handler, names=["result"])

@@ -5,17 +5,19 @@ from .config import get_widget_paths
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("CheckBoxWidget")
 
+
 class CheckBox(anywidget.AnyWidget):
     """
     A widget for selecting a boolean value.
-    
+
     The selected value can be accessed via the `selected_value` property.
-    
+
     Args:
         label: The label of the checkbox.
         tooltip: The tooltip of the checkbox.
         default: The default value of the checkbox.
     """
+
     # Define traitlets for the widget properties
     ui_label = traitlets.Unicode().tag(sync=True)
     ui_tooltip = traitlets.Unicode().tag(sync=True)
@@ -42,17 +44,17 @@ class CheckBox(anywidget.AnyWidget):
     def selected_value(self) -> bool:
         """Returns the current checkbox state."""
         return self.value
-    
+
     @property
     def val(self) -> bool:
         return self.value
-    
+
     @val.setter
     def val(self, value: bool) -> None:
         self.value = value
 
     def get_value(self) -> bool:
         return self.value
-    
+
     def set_value(self, value: bool) -> None:
         self.value = value

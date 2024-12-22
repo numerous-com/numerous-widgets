@@ -1,10 +1,16 @@
 from typing import Union, List
 import anywidget
 
-def card(content: Union[str, anywidget.AnyWidget, List[Union[str, anywidget.AnyWidget]]], title: str|None = None, direction: str = "column", hidden: bool = False) -> str:
+
+def card(
+    content: Union[str, anywidget.AnyWidget, List[Union[str, anywidget.AnyWidget]]],
+    title: str | None = None,
+    direction: str = "column",
+    hidden: bool = False,
+) -> str:
     """
     Create a card widget with optional title and flow direction.
-    
+
     Args:
         content: Single content element or list of elements to display in the card
         title: Optional card title
@@ -12,7 +18,7 @@ def card(content: Union[str, anywidget.AnyWidget, List[Union[str, anywidget.AnyW
         hidden: Whether the card is hidden (defaults to False)
     """
     title_html = f"<h5 class='card-title'>{title}</h5>" if title else ""
-    
+
     # Handle content list or single element
     if isinstance(content, list):
         content_html = "\n".join(
@@ -21,10 +27,10 @@ def card(content: Union[str, anywidget.AnyWidget, List[Union[str, anywidget.AnyW
         )
     else:
         content_html = content.text if hasattr(content, "text") else str(content)
-    
+
     # Add flexbox styling based on direction
     flex_direction = "row" if direction.lower() == "row" else "column"
-    
+
     return f"""
     <div class="card" style="display: {'none' if hidden else 'block'};">
         <div class="card-body" style="display: flex; flex-direction: {flex_direction};">
@@ -32,4 +38,4 @@ def card(content: Union[str, anywidget.AnyWidget, List[Union[str, anywidget.AnyW
             {content_html}
         </div>
     </div>
-    """ 
+    """

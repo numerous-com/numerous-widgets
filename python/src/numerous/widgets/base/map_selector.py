@@ -6,8 +6,8 @@ from .config import get_widget_paths
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("MapSelectorWidget")
 
-class MapSelector(anywidget.AnyWidget):
 
+class MapSelector(anywidget.AnyWidget):
     """
     A widget for selecting a point on a map.
 
@@ -23,9 +23,10 @@ class MapSelector(anywidget.AnyWidget):
         center: The center of the map, as a tuple of longitude and latitude.
         zoom: The zoom level of the map.
     """
+
     # Define traitlets for the widget properties
     points = traitlets.Dict({}).tag(sync=True)
-    value = traitlets.Unicode('').tag(sync=True)
+    value = traitlets.Unicode("").tag(sync=True)
     center = traitlets.List([0, 0]).tag(sync=True)  # [lon, lat]
     zoom = traitlets.Int(2).tag(sync=True)
     location_clicked = traitlets.List([0, 0]).tag(sync=True)  # [lon, lat] of last click
@@ -36,15 +37,15 @@ class MapSelector(anywidget.AnyWidget):
 
     def __init__(
         self,
-        points: Dict[str, Tuple[float, float]]|None = None,
-        center: List[float]|None = None,
-        zoom: int|None = None,
-        default: str|None = None,
+        points: Dict[str, Tuple[float, float]] | None = None,
+        center: List[float] | None = None,
+        zoom: int | None = None,
+        default: str | None = None,
     ):
         # Initialize with keyword arguments
         super().__init__(
             points=points if points is not None else {},
-            value=default if default is not None else '',
+            value=default if default is not None else "",
             center=center if center is not None else [0, 0],
             zoom=zoom if zoom is not None else 2,
             location_clicked=[0, 0],
@@ -53,7 +54,7 @@ class MapSelector(anywidget.AnyWidget):
     @property
     def selected_value(self) -> str:
         """Returns the currently selected point ID.
-        
+
         Returns:
             str: The ID of the currently selected point.
         """

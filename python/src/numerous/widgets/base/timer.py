@@ -6,6 +6,7 @@ from .config import get_widget_paths
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("TimerWidget")
 
+
 class Timer(anywidget.AnyWidget):
     """
     A widget that triggers a callback at regular intervals.
@@ -16,6 +17,7 @@ class Timer(anywidget.AnyWidget):
         active: Whether the timer starts active
         label: The label for the timer button
     """
+
     # Define traitlets for the widget properties
     interval = traitlets.Float().tag(sync=True)
     is_active = traitlets.Bool().tag(sync=True)
@@ -40,7 +42,7 @@ class Timer(anywidget.AnyWidget):
             last_tick=0.0,
         )
         self._callback = callback
-        self.observe(self._handle_tick, names=['last_tick'])
+        self.observe(self._handle_tick, names=["last_tick"])
 
     def _handle_tick(self, change: Dict[str, Any]) -> None:
         """Called when a tick occurs in the frontend"""
@@ -55,4 +57,4 @@ class Timer(anywidget.AnyWidget):
     @active.setter
     def active(self, value: bool) -> None:
         """Sets whether the timer is active"""
-        self.is_active = value 
+        self.is_active = value

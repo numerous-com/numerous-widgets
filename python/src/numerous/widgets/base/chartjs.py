@@ -6,6 +6,7 @@ from .config import get_widget_paths
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("ChartWidget")
 
+
 class Chart(anywidget.AnyWidget):
     """
     A widget for displaying Chart.js charts.
@@ -15,6 +16,7 @@ class Chart(anywidget.AnyWidget):
         data: The data configuration for the chart
         options: Optional chart configuration options
     """
+
     # Define traitlets for the widget properties
     chart_type = traitlets.Unicode().tag(sync=True)
     chart_data = traitlets.Dict().tag(sync=True)
@@ -27,15 +29,12 @@ class Chart(anywidget.AnyWidget):
     def __init__(
         self,
         type: str = "line",
-        data: Dict[str, Any]|None = None,
-        options: Dict[str, Any]|None = None,
+        data: Dict[str, Any] | None = None,
+        options: Dict[str, Any] | None = None,
     ) -> None:
         if data is None:
-            data = {
-                "labels": [],
-                "datasets": []
-            }
-        
+            data = {"labels": [], "datasets": []}
+
         if options is None:
             options = {}
 
@@ -47,7 +46,7 @@ class Chart(anywidget.AnyWidget):
 
     def update_data(self, data: Dict[str, Any]) -> None:
         """Updates the chart data.
-        
+
         Args:
             data: The new chart data configuration
         """
@@ -55,7 +54,7 @@ class Chart(anywidget.AnyWidget):
 
     def update_options(self, options: Dict[str, Any]) -> None:
         """Updates the chart options.
-        
+
         Args:
             options: The new chart options configuration
         """

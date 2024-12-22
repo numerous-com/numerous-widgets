@@ -6,16 +6,18 @@ from .config import get_widget_paths
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("TableWidget")
 
+
 class Table(anywidget.AnyWidget):
     """
     A table widget with sorting, pagination, and column resizing capabilities.
-    
+
     Args:
         data: List of dictionaries containing the table data
         columns: List of column configurations
         page_size: Number of rows per page (default: 10)
         className: Optional CSS class name for styling
     """
+
     # Define traitlets for the widget properties
     data = traitlets.List(trait=traitlets.Dict()).tag(sync=True)
     columns = traitlets.List(trait=traitlets.Dict()).tag(sync=True)
@@ -36,7 +38,7 @@ class Table(anywidget.AnyWidget):
     ):
         """
         Initialize the table widget.
-        
+
         Column configuration example:
         [
             {"accessorKey": "name", "header": "Name"},
@@ -45,10 +47,10 @@ class Table(anywidget.AnyWidget):
         """
         if not isinstance(data, list):
             raise ValueError("Data must be a list of dictionaries")
-        
+
         if not isinstance(columns, list):
             raise ValueError("Columns must be a list of dictionaries")
-        
+
         if page_size < 1:
             raise ValueError("Page size must be positive")
 
@@ -81,4 +83,4 @@ class Table(anywidget.AnyWidget):
 
     def clear_selection(self) -> None:
         """Clear the current row selection."""
-        self.selected_rows = [] 
+        self.selected_rows = []

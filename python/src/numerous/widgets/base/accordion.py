@@ -1,10 +1,10 @@
 import anywidget
 import traitlets
-from typing import Dict, Union
 from .config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("AccordionWidget")
+
 
 class Accordion(anywidget.AnyWidget):
     """
@@ -16,6 +16,7 @@ class Accordion(anywidget.AnyWidget):
         tooltip: The tooltip of the accordion.
         expanded: Whether the accordion is expanded.
     """
+
     # Define traitlets for the widget properties
     title = traitlets.Unicode().tag(sync=True)
     ui_label = traitlets.Unicode().tag(sync=True)
@@ -30,7 +31,7 @@ class Accordion(anywidget.AnyWidget):
         self,
         title: str,
         label: str = "",
-        tooltip: str|None = None,
+        tooltip: str | None = None,
         expanded: bool = False,
     ):
         # Initialize with keyword arguments
