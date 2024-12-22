@@ -1,7 +1,7 @@
 import anywidget
 import traitlets
 from typing import Optional, Dict, Any
-from python.src.numerous.widgets.base.config import get_widget_paths
+from numerous.widgets.base.config import get_widget_paths
 from io import BytesIO, StringIO
 
 # Get environment-appropriate paths
@@ -33,7 +33,7 @@ class FileLoader(anywidget.AnyWidget):
     def __init__(
         self,
         label: str = "Load File",
-        tooltip: str = None,
+        tooltip: str | None = None,
         accept: str = "*",
         encoding: str = "utf-8",
     ):

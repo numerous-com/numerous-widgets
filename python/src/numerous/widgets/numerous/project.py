@@ -1,6 +1,6 @@
 import anywidget
 import traitlets
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Tuple, Optional
 from numerous.widgets.numerous.projects import (
     get_project,
     get_scenario,
@@ -12,6 +12,7 @@ from numerous.widgets.numerous.projects import (
     list_projects,
     ScenarioMetadata,
     save_scenario_metadata,
+    Scenario,
 )
 from numerous.widgets.base.config import get_widget_paths
 
@@ -21,8 +22,8 @@ ESM, CSS = get_widget_paths("ProjectMenuWidget")
 
 class ProjectBrowserBase(anywidget.AnyWidget):
 
-    projects = traitlets.List([str, str, str]).tag(sync=True)
-    scenarios = traitlets.List([str, str, str, str]).tag(sync=True)
+    projects = traitlets.List(trait=traitlets.Dict()).tag(sync=True)
+    scenarios = traitlets.List(trait=traitlets.Dict()).tag(sync=True)
 
     selected_project_id = traitlets.Unicode(allow_none=True).tag(sync=True)
     selected_scenario_id = traitlets.Unicode(allow_none=True).tag(sync=True)
@@ -57,39 +58,43 @@ class ProjectBrowserBase(anywidget.AnyWidget):
             project = get_project(change["new"])
             print("Loading scenarios for project:", project)
 
-            new_scenarios = [
-                {
-                    "id": s.id,
-                    "name": s.name,
-                    "description": s.description,
-                    "projectId": change["new"],
-                }
-                for s in project.scenarios.values()
-            ]
-
-            self.scenarios = new_scenarios
-            print("Updated scenarios:", self.scenarios)
+            if project and project.scenarios:
+                new_scenarios = [
+                    {
+                        "id": s.id,
+                        "name": s.name,
+                        "description": s.description,
+                        "projectId": change["new"],
+                    }
+                    for s in project.scenarios.values()
+                ]
+                self.scenarios = new_scenarios
+                print("Updated scenarios:", self.scenarios)
 
     @traitlets.observe("selected_scenario_id")
     def _selected_scenario_id_changed(self, change: traitlets.Bunch) -> None:
         if change.new and self.selected_project_id:
-            self.scenario = get_scenario(self.selected_project_id, change.new)
+            self.scenario: Optional[Scenario] = get_scenario(
+                self.selected_project_id, change.new
+            )
         else:
             self.scenario = None
 
     def get_document(self, name: str) -> Any:
         if name in self._documents:
             return self._documents[name]
-        else:
+        elif self.selected_project_id and self.selected_scenario_id:
             return get_document(
                 self.selected_project_id, self.selected_scenario_id, name
             )
+        return None
 
-    def get_file(self, name: str) -> str:
+    def get_file(self, name: str) -> Optional[str]:
         if name in self._files:
             return self._files[name]
-        else:
+        elif self.selected_project_id and self.selected_scenario_id:
             return get_file(self.selected_project_id, self.selected_scenario_id, name)
+        return None
 
 
 class ProjectsMenu(ProjectBrowserBase):
@@ -110,8 +115,17 @@ class ProjectsMenu(ProjectBrowserBase):
         if _save:
             print("saving!")
             self.changed = False
+
+            if not self.selected_project_id or not self.selected_scenario_id:
+                print("Cannot save: project_id or scenario_id is None")
+                return
+
             scenario = get_scenario(self.selected_project_id, self.selected_scenario_id)
             project = get_project(self.selected_project_id)
+
+            if not project or not scenario:
+                print("Cannot save: project or scenario not found")
+                return
 
             save_scenario(project, scenario)
             print("documents:")

@@ -4,9 +4,10 @@ import traceback
 import sys
 from datetime import datetime
 from numerous.widgets.base.task import Task as TaskWidget
-from numerous.widgets.base.timer import Timer
-from typing import Callable, Dict, Any, Optional, Tuple, List, Union
+from typing import Callable, Any, Optional, Tuple, List, Union, IO
 import subprocess
+from multiprocessing import Queue
+from threading import Thread
 
 
 class ProcessTask:
@@ -75,11 +76,13 @@ class ProcessTask:
             if self.capture_stdout:
                 # Redirect stdout and stderr to capture all output
                 class StreamToQueue:
-                    def __init__(self, queue):
+                    def __init__(
+                        self, queue: Queue[Tuple[datetime, str, str, str]]
+                    ) -> None:
                         self.queue = queue
                         self.original_stdout = sys.stdout
 
-                    def write(self, text):
+                    def write(self, text: str) -> None:
                         if text.strip():  # Only queue non-empty strings
                             timestamp = datetime.now()
                             self.queue.put(
@@ -87,7 +90,7 @@ class ProcessTask:
                             )
                         self.original_stdout.write(text)
 
-                    def flush(self):
+                    def flush(self) -> None:
                         self.original_stdout.flush()
 
                 sys.stdout = StreamToQueue(self._log_queue)
@@ -178,7 +181,7 @@ class ProcessTask:
                 self._started = True
                 self._exit_pending = True
         else:
-            self.started = True
+            self._started = True
             self._exit_pending = True
 
             # Run directly in the same thread
@@ -215,7 +218,7 @@ class ProcessTask:
             return False
         # A process is only considered alive if it's running (exitcode is None)
         # return self._process.is_alive() and self._process.exitcode is None
-        return self._exit_flag.value == 0
+        return bool(self._exit_flag.value == 0)
 
     @property
     def started(self) -> bool:
@@ -255,7 +258,7 @@ class ProcessTask:
         Returns:
             float: Progress value between 0.0 and 1.0.
         """
-        return self._progress.value
+        return float(self._progress.value)
 
     def set_progress(self, value: float) -> None:
         """Set the progress of the task.
@@ -302,7 +305,13 @@ class ProcessTask:
     @property
     def exception(
         self,
-    ) -> Optional[Union[Tuple[Exception, str], Tuple[Exception, str, datetime]]]:
+    ) -> Optional[
+        Union[
+            Tuple[Exception | None, str | None],
+            Tuple[Exception | None, str | None, Any | None],
+            None,
+        ]
+    ]:
         """Get any exception that occurred during task execution.
 
         Returns:
@@ -315,9 +324,10 @@ class ProcessTask:
 
         if not self._exception_queue.empty():
             self.exception_timestamp, self.exc, self.tb = self._exception_queue.get()
-            return self.exc, self.tb, self.exception_timestamp
+            if all([self.exc, self.tb, self.exception_timestamp]):
+                return self.exc, self.tb, self.exception_timestamp
 
-        if self.exc is not None:
+        if all([self.exc, self.tb]):
             return self.exc, self.tb, self.exception_timestamp
         return None
 
@@ -384,13 +394,10 @@ def run_in_subprocess(
             universal_newlines=True,
         )
 
-        from queue import Queue
-        from threading import Thread
+        stdout_queue: Queue[str] = Queue()
+        stderr_queue: Queue[str] = Queue()
 
-        stdout_queue = Queue()
-        stderr_queue = Queue()
-
-        def pipe_reader(pipe, queue):
+        def pipe_reader(pipe: IO[str], queue: Queue[str]) -> None:
             """Continuously read from pipe and put lines into queue."""
             try:
                 for line in iter(pipe.readline, ""):
@@ -477,17 +484,27 @@ class SubprocessTask(ProcessTask):
     Captures stdout and stderr, with progress parsing from stdout.
     """
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(
+        self, capture_stdout: bool = True, run_in_process: bool = True
+    ) -> None:
         """Initialize the subprocess task."""
-        super().__init__(*args, stop_message="Process was terminated.", **kwargs)
+        super().__init__(
+            stop_message="Process was terminated.",
+            capture_stdout=capture_stdout,
+            run_in_process=run_in_process,
+        )
 
-    def run(self, *args: Tuple[Any], **kwargs: Dict[str, Any]) -> Any:
-        return run_in_subprocess(self, *args, **kwargs)
+    def run(
+        self, cmd: Union[str, List[str]], shell: bool = False, cwd: Optional[str] = None
+    ) -> Any:
+        return run_in_subprocess(self, cmd, shell, cwd)
 
 
 def sync_with_task(
-    task_widget: TaskWidget, process_task: ProcessTask, on_stopped: Callable = None
-) -> None:
+    task_widget: TaskWidget,
+    process_task: ProcessTask,
+    on_stopped: Callable[[ProcessTask], None] | None = None,
+) -> bool:
     """Synchronize the task widget with the process task
 
     This function synchronizes the task widget with the process task by updating the progress, logs, and error state.
@@ -501,19 +518,25 @@ def sync_with_task(
     task_widget.progress = process_task.progress
     log_entries = process_task.log_entries
 
+    # Convert datetime objects to strings in log entries
+    formatted_logs = [
+        (entry[0].strftime("%Y-%m-%d %H:%M:%S"), entry[1], entry[2], entry[3])
+        for entry in log_entries
+    ]
+
     if process_task.exception is not None:
         task_widget.set_error(*process_task.exception)
 
     if process_task.exception is None and task_widget.error is not None:
         task_widget.clear_error()
 
-    task_widget.add_logs(log_entries)
+    task_widget.add_logs(formatted_logs)
 
     if process_task.completed and process_task.exception is None:
         task_widget.complete()
 
     if process_task.exited:
-        if on_stopped:
+        if on_stopped is not None:
             try:
                 on_stopped(process_task)
             except Exception as e:
@@ -526,10 +549,10 @@ def sync_with_task(
 
 def process_task_control(
     process_task: ProcessTask,
-    on_start: Callable,
-    on_stopped: Callable = None,
+    on_start: Callable[[], None] | None = None,
+    on_stopped: Callable[[ProcessTask], None] | None = None,
     update_interval: float = 1.0,
-) -> Tuple[TaskWidget, Timer]:
+) -> TaskWidget:
     """Control a process task with a task widget
 
     This function creates a task widget to synchronize the task widget with the process task.
@@ -544,9 +567,10 @@ def process_task_control(
         TaskWidget: The task widget
     """
 
-    def _sync_with_task(task_widget: TaskWidget) -> bool:
-
-        return sync_with_task(task_widget, process_task, on_stopped)
+    def _sync_with_task(task_widget: TaskWidget) -> None:
+        should_continue = sync_with_task(task_widget, process_task, on_stopped)
+        if not should_continue:
+            task_widget.stop_sync()
 
     def _on_stop() -> None:
         process_task.stop()

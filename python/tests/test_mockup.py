@@ -1,3 +1,2 @@
-
-def test_mockup():
+def test_mockup() -> None:
     assert True

@@ -1,7 +1,10 @@
 from pydantic import BaseModel, Field
 import numerous.widgets as wi
 from anywidget import AnyWidget
-from typing import Any
+from typing import Any, Dict, Tuple, Union, TypeVar
+from pydantic.fields import FieldInfo
+
+T = TypeVar("T")
 
 
 def number_field(
@@ -11,7 +14,7 @@ def number_field(
     stop: float,
     default: float,
     multiple_of: float,
-) -> Field:
+) -> Any:
     """Create a number field.
     Args:
         label: The label of the field.
@@ -33,13 +36,15 @@ def number_field(
     def generate_widget() -> AnyWidget:
         return widget
 
+    extra: Dict[str, Any] = {"widget_factory": generate_widget}
+
     return Field(
-        ge=start,
         default=default,
+        ge=start,
         le=stop,
         multiple_of=multiple_of,
-        widget_factory=generate_widget,
-        tooltip=tooltip,
+        json_schema_extra=extra,
+        description=tooltip,
     )
 
 
@@ -51,13 +56,18 @@ class StateModel(BaseModel):
         **kwargs: The keyword arguments to pass to the pydantic model.
     """
 
-    def __init__(self, *args, **kwargs):
-
+    def __init__(self, *args: Tuple[Any, ...], **kwargs: Dict[str, Any]) -> None:
         super().__init__(*args, **kwargs)
 
-        for k, v in self.model_fields.items():
-            if "widget_factory" in v.json_schema_extra:
-                v.json_schema_extra["widget"] = v.json_schema_extra["widget_factory"]()  # type: ignore[union-attr]
+        for v in self.model_fields.values():
+            if isinstance(v, FieldInfo):
+                extra = v.json_schema_extra
+                if isinstance(extra, dict):
+                    widget_factory = extra.get("widget_factory")
+                    if callable(widget_factory):
+                        widget = widget_factory()
+                        if isinstance(widget, AnyWidget):
+                            extra["widget"] = widget
 
     @property
     def changed(self) -> bool:
@@ -67,40 +77,53 @@ class StateModel(BaseModel):
         """
         _changed = []
         for k, v in self.model_fields.items():
-            _changed.append(getattr(self, k) != v.json_schema_extra["widget"].value)  # type: ignore[union-attr]
+            if isinstance(v, FieldInfo):
+                extra = v.json_schema_extra
+                if isinstance(extra, dict):
+                    widget = extra.get("widget")
+                    if isinstance(widget, AnyWidget):
+                        _changed.append(getattr(self, k) != widget.value)
         return any(_changed)
 
     def update_widgets(self) -> None:
         """Update the widgets with the values from the model."""
         for k, v in self.model_fields.items():
-            v.json_schema_extra["widget"].value = getattr(self, k)  # type: ignore[union-attr]
+            if isinstance(v, FieldInfo):
+                extra = v.json_schema_extra
+                if isinstance(extra, dict):
+                    widget = extra.get("widget")
+                    if isinstance(widget, AnyWidget):
+                        widget.value = getattr(self, k)
 
     def get_widget(self, field: str) -> AnyWidget:
-        """Get the widget for a field.
-        Args:
-            field: The field to get the widget for.
-        Returns:
-            AnyWidget: The widget for the field.
-        """
-        return self.model_fields[field].json_schema_extra["widget"]  # type: ignore[union-attr]
+        """Get the widget for a field."""
+        field_info = self.model_fields[field]
+        if isinstance(field_info, FieldInfo):
+            extra = field_info.json_schema_extra
+            if isinstance(extra, dict):
+                widget = extra.get("widget")
+                if isinstance(widget, AnyWidget):
+                    return widget
+        raise ValueError(f"No widget found for field {field}")
 
     def update_values(self) -> None:
         """Update the values of the model with the values from the widgets."""
         for k, v in self.model_fields.items():
-            setattr(self, k, v.json_schema_extra["widget"].value)  # type: ignore[union-attr]
+            if isinstance(v, FieldInfo):
+                extra = v.json_schema_extra
+                if isinstance(extra, dict):
+                    widget = extra.get("widget")
+                    if isinstance(widget, AnyWidget):
+                        setattr(self, k, widget.value)
 
     def widget_value_valid(self, field: str) -> bool:
-        """Check if the value of a widget is valid.
-        Args:
-            field: The field to check the value for.
-        Returns:
-            bool: True if the value is valid, False otherwise.
-        """
-        val = self.get_widget(field).value
-        # print("Field", field, " Value", val)
-        valid = self.validate(field, val)
-        # print("Valid", valid)
-        return valid
+        """Check if the value of a widget is valid."""
+        widget = self.get_widget(field)
+        try:
+            self.model_validate({field: widget.value})
+            return True
+        except Exception:
+            return False
 
     def all_valid(self) -> bool:
         """Check if all fields are valid.
@@ -111,7 +134,7 @@ class StateModel(BaseModel):
 
     def apply_values(
         self,
-        values: dict[str, Any] | BaseModel,
+        values: Union[dict[str, Any], BaseModel],
         to_widgets: bool = True,
         to_model: bool = True,
     ) -> None:
@@ -126,7 +149,13 @@ class StateModel(BaseModel):
 
         if to_widgets:
             for k, v in values.items():
-                self.model_fields[k].json_schema_extra["widget"].value = v  # type: ignore[union-attr]
+                field_info = self.model_fields[k]
+                if isinstance(field_info, FieldInfo):
+                    extra = field_info.json_schema_extra
+                    if isinstance(extra, dict):
+                        widget = extra.get("widget")
+                        if isinstance(widget, AnyWidget):
+                            widget.value = v
         if to_model:
             for k, v in values.items():
                 setattr(self, k, v)

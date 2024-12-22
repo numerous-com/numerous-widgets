@@ -1,7 +1,8 @@
 from jinja2 import Template
+from typing import Union, IO, Dict, Any
 
 
-def render_template(template, **kwargs):
+def render_template(template: Union[str, IO[str]], **kwargs: Dict[str, Any]) -> str:
     """
     Renders a Jinja2 template with processed keyword arguments.
 
@@ -15,9 +16,9 @@ def render_template(template, **kwargs):
     """
     # Convert template string or file to Jinja2 Template object
     if hasattr(template, "read"):  # File-like object
-        template = Template(template.read())
+        _template = Template(template.read())
     elif isinstance(template, str):
-        template = Template(template)
+        _template = Template(template)
 
     processed_kwargs = {}
 
@@ -31,4 +32,7 @@ def render_template(template, **kwargs):
                 else None
             )
 
-    return template.render(**processed_kwargs)
+    content = _template.render(**processed_kwargs)
+    if not isinstance(content, str):
+        raise ValueError("Template rendering returned a non-string value")
+    return content

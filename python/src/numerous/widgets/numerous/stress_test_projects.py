@@ -1,7 +1,13 @@
 import random
 from datetime import datetime
 import time
-from projects import Project, Scenario, save_project, save_scenario, save_document
+from numerous.widgets.numerous.projects import (
+    Project,
+    Scenario,
+    save_project,
+    save_scenario,
+    save_document,
+)
 from typing import Any, Dict
 
 # Configuration

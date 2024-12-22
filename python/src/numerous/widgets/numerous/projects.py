@@ -111,7 +111,7 @@ def get_scenario(project_name: str, scenario_name: str) -> Scenario:
 
     files_dict = {}
     for file in scenario.collection("files").files():
-        files_dict[file.key] = file.get()
+        files_dict[file.key] = file.read_text()
 
     if scenario_metadata is None:
         raise ValueError(
@@ -150,7 +150,7 @@ def get_file(project_name: str, scenario_name: str, file_key: str) -> Any | None
     """Returns a specific file from a scenario"""
     project = collection("projects").collection(project_name)
     scenario = project.collection("scenarios").collection(scenario_name)
-    file = scenario.collection("files").file(file_key).get()
+    file = scenario.collection("files").file(file_key).read_text()
     return file
 
 
