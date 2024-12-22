@@ -2,6 +2,13 @@
 
 
 
+## v0.1.5 (2024-12-22)
+
+### Fix
+
+* fix(widgets): Linting ([`02297a6`](https://github.com/numerous-com/numerous-widgets/commit/02297a6d3788c751ca58b44e4b4dfa7dcf473c89))
+
+
 ## v0.1.4 (2024-12-22)
 
 ### Fix
