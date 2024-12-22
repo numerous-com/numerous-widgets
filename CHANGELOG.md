@@ -2,6 +2,15 @@
 
 
 
+## v0.1.3 (2024-12-22)
+
+### Fix
+
+* fix(widgets): Black formatted ([`db6baba`](https://github.com/numerous-com/numerous-widgets/commit/db6babadf106b575ca057c90f3c2118f1e61b790))
+
+* fix(widgets): Linting ([`6cced83`](https://github.com/numerous-com/numerous-widgets/commit/6cced83fde39c451b61d64a3a4c5af5dfb5955a6))
+
+
 ## v0.1.2 (2024-12-21)
 
 ### Fix

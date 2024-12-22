@@ -1,6 +1,6 @@
 [project]
 name = "numerous-widgets"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = ["anywidget", "pydantic", "jinja2"]
 classifiers = [
     "Programming Language :: Python :: 3",
