@@ -2,6 +2,13 @@
 
 
 
+## v0.1.4 (2024-12-22)
+
+### Fix
+
+* fix(widgets): Liniting ([`aeb43ba`](https://github.com/numerous-com/numerous-widgets/commit/aeb43ba9f7f2de6b5921b4e117e85f22f2680c95))
+
+
 ## v0.1.3 (2024-12-22)
 
 ### Fix
