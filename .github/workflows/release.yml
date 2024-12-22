@@ -17,19 +17,19 @@ permissions:
   id-token: write
   contents: write
 jobs:
-  #lint:
-  #  name: Lint
-  #  timeout-minutes: 5
-  #  runs-on: ubuntu-latest
-  #  steps:
-  #    - uses: actions/checkout@v4
-  #    - uses: actions/setup-python@v5
-  #      with:
-  #        python-version: '3.12' 
-  #        cache: 'pip'
-  #    - run: pip install -e .[dev]
-  #    - run: python -m ruff .
-  #    - run: python -m mypy --strict .
+  lint:
+    name: Lint
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12' 
+          cache: 'pip'
+      - run: pip install -e .[dev]
+      - run: python -m ruff .
+      - run: python -m mypy --strict .
   test:
     name: Unit tests
     timeout-minutes: 5
@@ -96,7 +96,7 @@ jobs:
     name: Release
     environment: release
     needs: 
-      #- lint
+      - lint
       - test
       - build-widgets
       - build
