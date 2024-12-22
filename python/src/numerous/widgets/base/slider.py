@@ -1,7 +1,7 @@
 import anywidget
 import traitlets
 from typing import Optional
-from ._config import get_widget_paths
+from .config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("SliderWidget")
@@ -68,19 +68,12 @@ class Slider(anywidget.AnyWidget):
         return self.value
     
     @property
-    def val(self):
+    def val(self) -> float:
         return self.value
     
     @val.setter
-    def val(self, value):
+    def val(self, value: float) -> None:
         if not (self.min_value <= value <= self.max_value):
             raise ValueError("Value must be between min_value and max_value")
         self.value = value
-
-    def get_value(self):
-        return self.value
-    
-    def set_value(self, value):
-        if not (self.min_value <= value <= self.max_value):
-            raise ValueError("Value must be between min_value and max_value")
-        self.value = value 
+        

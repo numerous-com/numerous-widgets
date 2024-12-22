@@ -2,6 +2,7 @@ import random
 from datetime import datetime
 import time
 from projects import Project, Scenario, save_project, save_scenario, save_document
+from typing import Any, Dict
 
 # Configuration
 NUM_PROJECTS = 100
@@ -14,7 +15,7 @@ def generate_random_text(length: int = 100) -> str:
              "elit", "sed", "do", "eiusmod", "tempor", "incididunt", "ut", "labore"]
     return " ".join(random.choices(words, k=length))
 
-def create_test_document(doc_id: int) -> dict:
+def create_test_document(doc_id: int) -> Dict[str, Any]:
     """Create a test document with random content"""
     return {
         "key": f"doc_{doc_id}",
@@ -27,7 +28,7 @@ def create_test_document(doc_id: int) -> dict:
         }
     }
 
-def main():
+def main() -> None:
     start_time = time.time()
     total_documents = 0
     
@@ -52,7 +53,8 @@ def main():
                 id=f"stress-scenario-{p}-{s}",
                 name=f"Scenario {s} in Project {p}",
                 description=f"Auto-generated scenario {s} in project {p}",
-                documents={}
+                documents={},
+                files=None
             )
             
             print(f"  Creating scenario {s+1}/{SCENARIOS_PER_PROJECT}")

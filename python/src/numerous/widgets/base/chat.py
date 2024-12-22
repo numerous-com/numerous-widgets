@@ -1,8 +1,9 @@
 import anywidget
 import traitlets
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any, Callable
 from datetime import datetime
-from ._config import get_widget_paths
+from .config import get_widget_paths
+from anywidget import AnyWidget
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("ChatWidget")
@@ -30,7 +31,7 @@ class Chat(anywidget.AnyWidget):
 
     def __init__(
         self,
-        messages: Optional[List[Dict]] = None,
+        messages: Optional[List[Dict[str, Any]]] = None,
         placeholder: str = "Type a message...",
         max_height: str = "400px",
         className: str = "",
@@ -71,7 +72,7 @@ class Chat(anywidget.AnyWidget):
             new_message=None,
         )
 
-    def add_message(self, content: str, type: str = "system"):
+    def add_message(self, content: str, type: str = "system") -> None:
         """Add a new message to the chat."""
         message = {
             "id": str(len(self.messages)),
@@ -81,15 +82,15 @@ class Chat(anywidget.AnyWidget):
         }
         self.messages = self.messages + [message]
 
-    def clear_messages(self):
+    def clear_messages(self) -> None:
         """Clear all messages from the chat."""
         self.messages = []
 
     @property
-    def message_history(self) -> List[Dict]:
+    def message_history(self) -> List[Dict[str, Any]]:
         """Get the current message history."""
         return self.messages
 
-    def observe_new_messages(self, handler):
+    def observe_new_messages(self, handler: Callable[[AnyWidget], None]) -> None:
         """Observe new messages from the user."""
         self.observe(handler, names=['new_message']) 

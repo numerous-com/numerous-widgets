@@ -28,7 +28,7 @@ if IS_DEV:
 else:
     CSS = open(STATIC_DIR / "styles.css", "r").read()
 
-def get_widget_paths(component_name: str) -> tuple[Union[str, pathlib.Path], pathlib.Path]:
+def get_widget_paths(component_name: str) -> tuple[Union[str, pathlib.Path], Union[str, pathlib.Path]]:
     """
     Returns the ESM and CSS paths for a widget based on environment.
     
@@ -44,7 +44,7 @@ def get_widget_paths(component_name: str) -> tuple[Union[str, pathlib.Path], pat
         #css = STATIC_DIR / "style.css"
 
     else:
-        esm = STATIC_DIR / f"{component_name}.mjs"
+        esm = str(STATIC_DIR / f"{component_name}.mjs")
         css = CSS
     
     return esm, css

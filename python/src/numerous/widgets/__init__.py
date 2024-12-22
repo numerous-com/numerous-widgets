@@ -6,12 +6,12 @@ try:
 except importlib.metadata.PackageNotFoundError:
     __version__ = "unknown"
 
-from .base._config import CSS as CSS
+from .base.config import CSS as CSS
 
 from .base.button import Button as Button
 from .base.drop_down import DropDown as DropDown
 from .base.number import Number as Number
-from .base.tabs import Tabs as Tabs, render_tab_content as render_tab_content
+from .base.tabs import Tabs as Tabs
 from .base.checkbox import CheckBox as CheckBox
 from .base.map_selector import MapSelector as MapSelector
 from .base.card import card as card

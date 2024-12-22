@@ -1,7 +1,7 @@
 import anywidget
 import traitlets
-from typing import List, Dict
-from ._config import get_widget_paths
+from typing import List, Dict, Any
+from .config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("TableWidget")
@@ -29,7 +29,7 @@ class Table(anywidget.AnyWidget):
 
     def __init__(
         self,
-        data: List[Dict],
+        data: List[Dict[str, Any]],
         columns: List[Dict[str, str]],
         page_size: int = 10,
         className: str = "",
@@ -69,16 +69,16 @@ class Table(anywidget.AnyWidget):
             selected_rows=[],
         )
 
-    def update_data(self, data: List[Dict]):
+    def update_data(self, data: List[Dict[str, Any]]) -> None:
         """Update the table data."""
         if not isinstance(data, list):
             raise ValueError("Data must be a list of dictionaries")
         self.data = data
 
-    def get_selected_rows(self) -> List[Dict]:
+    def get_selected_rows(self) -> List[Dict[str, Any]]:
         """Get the currently selected rows."""
         return [self.data[i] for i in self.selected_rows]
 
-    def clear_selection(self):
+    def clear_selection(self) -> None:
         """Clear the current row selection."""
         self.selected_rows = [] 

@@ -1,5 +1,5 @@
-from numerous.widgets import render_template, css
-from numerous.widgets.base._config import IS_DEV
+from numerous.widgets import render_template, CSS
+from numerous.widgets.base.config import IS_DEV
 from pathlib import Path
 
 
@@ -9,7 +9,7 @@ with open(Path(__file__).parent.joinpath("page.html.j2"), "r") as f:
 logo = open(Path(__file__).parent.joinpath("logo.svg"), "r").read()
 
 def page(**page_variables):
-    page_variables["css"] = css
+    page_variables["css"] = CSS
     page_variables["logo"] = logo
 
     if IS_DEV:

@@ -2,7 +2,10 @@ from pydantic import BaseModel, Field
 import numerous.widgets as wi
 from anywidget import AnyWidget
 from pydantic import ValidationError
-def number_field(label, tooltip, start, stop, default, multiple_of):
+from typing import Any
+
+
+def number_field(label: str, tooltip: str, start: float, stop: float, default: float, multiple_of: float) -> Field:
     """Create a number field.
     Args:
         label: The label of the field.
@@ -12,9 +15,11 @@ def number_field(label, tooltip, start, stop, default, multiple_of):
         default: The default value of the field.
         multiple_of: The increment of the field.
     """
-    widget =  wi.Number(label=label, tooltip=tooltip, default=default, start=start, stop=stop, step=multiple_of)
-    def generate_widget():
+    widget = wi.Number(label=label, tooltip=tooltip, default=default, start=start, stop=stop, step=multiple_of)
+
+    def generate_widget() -> AnyWidget:
         return widget
+    
     return Field(ge = start, default=default, le =stop, multiple_of=multiple_of, widget_factory=generate_widget, tooltip=tooltip)
 
 class StateModel(BaseModel):
@@ -31,7 +36,7 @@ class StateModel(BaseModel):
 
         for k, v in self.model_fields.items():
             if "widget_factory" in v.json_schema_extra:
-                v.json_schema_extra['widget'] = v.json_schema_extra['widget_factory']()
+                v.json_schema_extra['widget'] = v.json_schema_extra['widget_factory']() # type: ignore[union-attr]
 
     @property
     def changed(self) -> bool:
@@ -41,13 +46,13 @@ class StateModel(BaseModel):
         """
         _changed = []
         for k, v in self.model_fields.items():
-            _changed.append(getattr(self,k) != v.json_schema_extra["widget"].value)
+            _changed.append(getattr(self,k) != v.json_schema_extra["widget"].value) # type: ignore[union-attr]
         return any(_changed)
 
     def update_widgets(self) -> None:
         """Update the widgets with the values from the model."""
         for k, v in self.model_fields.items():
-           v.json_schema_extra["widget"].value = getattr(self,k)
+           v.json_schema_extra["widget"].value = getattr(self,k) # type: ignore[union-attr]
 
     def get_widget(self, field: str) -> AnyWidget:
         """Get the widget for a field.
@@ -56,30 +61,12 @@ class StateModel(BaseModel):
         Returns:
             AnyWidget: The widget for the field.
         """
-        return self.model_fields[field].json_schema_extra["widget"]
+        return self.model_fields[field].json_schema_extra["widget"] # type: ignore[union-attr]
 
     def update_values(self) -> None:
         """Update the values of the model with the values from the widgets."""
         for k, v in self.model_fields.items():
-            setattr(self, k, v.json_schema_extra["widget"].value)
-
-    def validate(self, field, value, raise_error=False) -> bool:
-        """Validate a value for a field.
-        Args:
-            field: The field to validate the value for.
-            value: The value to validate.
-        Returns:
-            bool: True if the value is valid, False otherwise.
-        """
-        model = self.model_dump()
-        model[field] = value
-        try:
-            self.__class__(**model)
-        except ValidationError as e:
-            if raise_error:
-                raise e
-            return False
-        return True
+            setattr(self, k, v.json_schema_extra["widget"].value) # type: ignore[union-attr]
     
     def widget_value_valid(self, field: str) -> bool:
         """Check if the value of a widget is valid.
@@ -101,7 +88,7 @@ class StateModel(BaseModel):
         """
         return all(self.widget_value_valid(field) for field in self.model_fields.keys())
 
-    def apply_values(self, values: dict|BaseModel, to_widgets=True, to_model=True) -> None:
+    def apply_values(self, values: dict[str, Any]|BaseModel, to_widgets:bool=True, to_model:bool=True) -> None:
         """Apply values to the model or widgets.
         Args:
             values: The values to apply.
@@ -113,8 +100,7 @@ class StateModel(BaseModel):
             
         if to_widgets:
             for k, v in values.items():
-
-                self.model_fields[k].json_schema_extra['widget'].value = v
+                self.model_fields[k].json_schema_extra['widget'].value = v # type: ignore[union-attr]
         if to_model:
             for k, v in values.items():
                 setattr(self, k, v)

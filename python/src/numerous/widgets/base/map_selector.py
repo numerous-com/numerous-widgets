@@ -1,7 +1,7 @@
 import anywidget
 import traitlets
 from typing import Dict, List, Tuple
-from ._config import get_widget_paths
+from .config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("MapSelectorWidget")
@@ -36,10 +36,10 @@ class MapSelector(anywidget.AnyWidget):
 
     def __init__(
         self,
-        points: Dict[str, Tuple[float, float]] = None,
-        center: List[float] = None,
-        zoom: int = None,
-        default: str = None,
+        points: Dict[str, Tuple[float, float]]|None = None,
+        center: List[float]|None = None,
+        zoom: int|None = None,
+        default: str|None = None,
     ):
         # Initialize with keyword arguments
         super().__init__(

@@ -1,7 +1,0 @@
-anywidget
-
-[dev]
-anywidget[dev]
-python-dotenv
-marimo
-numerous

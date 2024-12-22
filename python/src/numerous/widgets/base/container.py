@@ -1,11 +1,11 @@
 from typing import Union, List
 import anywidget
 
-def container(content: Union[str, anywidget.AnyWidget, list] = None,
+def container(content: Union[str, anywidget.AnyWidget, List[Union[str, anywidget.AnyWidget]]]|None = None,
               hidden: bool = False,
               classes: str = "",
               styles: str = "",
-              ):
+              ) -> str:
     """
     Create a container widget for organizing content.
     
@@ -45,10 +45,11 @@ def container(content: Union[str, anywidget.AnyWidget, list] = None,
         </div>
     """
 
-def side_by_side_container(contents: List[tuple], 
+def side_by_side_container(contents: List[tuple[Union[str, anywidget.AnyWidget], float]], 
                            hidden: bool = False, 
                            classes: str = "", 
-                           styles: str = ""):
+                           styles: str = ""
+                           ) -> str:
     """
     Create a container widget with contents arranged side by side.
     

@@ -1,6 +1,7 @@
 import anywidget
 import traitlets
-from ._config import get_widget_paths
+from typing import Callable, Optional, Dict, Any
+from .config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("TimerWidget")
@@ -28,10 +29,10 @@ class Timer(anywidget.AnyWidget):
     def __init__(
         self,
         interval: float = 1.0,
-        callback = None,
+        callback: Optional[Callable[[], None]] = None,
         active: bool = False,
         label: str = "Timer",
-    ):
+    ) -> None:
         super().__init__(
             interval=interval,
             is_active=active,
@@ -41,7 +42,7 @@ class Timer(anywidget.AnyWidget):
         self._callback = callback
         self.observe(self._handle_tick, names=['last_tick'])
 
-    def _handle_tick(self, change):
+    def _handle_tick(self, change: Dict[str, Any]) -> None:
         """Called when a tick occurs in the frontend"""
         if self._callback is not None:
             self._callback()
@@ -52,6 +53,6 @@ class Timer(anywidget.AnyWidget):
         return self.is_active
 
     @active.setter
-    def active(self, value: bool):
+    def active(self, value: bool) -> None:
         """Sets whether the timer is active"""
         self.is_active = value 

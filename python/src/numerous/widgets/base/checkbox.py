@@ -1,6 +1,6 @@
 import anywidget
 import traitlets
-from ._config import get_widget_paths
+from .config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("CheckBoxWidget")
@@ -28,9 +28,9 @@ class CheckBox(anywidget.AnyWidget):
     def __init__(
         self,
         label: str,
-        tooltip: str = None,
+        tooltip: str | None = None,
         default: bool = False,
-    ):
+    ) -> None:
         # Initialize with keyword arguments
         super().__init__(
             ui_label=label,
@@ -44,15 +44,15 @@ class CheckBox(anywidget.AnyWidget):
         return self.value
     
     @property
-    def val(self):
+    def val(self) -> bool:
         return self.value
     
     @val.setter
-    def val(self, value):
+    def val(self, value: bool) -> None:
         self.value = value
 
-    def get_value(self):
+    def get_value(self) -> bool:
         return self.value
     
-    def set_value(self, value):
+    def set_value(self, value: bool) -> None:
         self.value = value

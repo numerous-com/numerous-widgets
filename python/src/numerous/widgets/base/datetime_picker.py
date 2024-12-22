@@ -2,7 +2,7 @@ import anywidget
 import traitlets
 from typing import Optional
 from datetime import datetime
-from ._config import get_widget_paths
+from .config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("DateTimePickerWidget")
@@ -68,11 +68,11 @@ class DateTimePicker(anywidget.AnyWidget):
         return datetime.fromisoformat(self.value)
     
     @property
-    def val(self):
+    def val(self) -> datetime:
         return datetime.fromisoformat(self.value)
     
     @val.setter
-    def val(self, value: datetime):
+    def val(self, value: datetime) -> None:
         if isinstance(value, str):
             value = datetime.fromisoformat(value)
         
@@ -84,10 +84,10 @@ class DateTimePicker(anywidget.AnyWidget):
             
         self.value = value.isoformat()
 
-    def get_value(self):
+    def get_value(self) -> datetime:
         return datetime.fromisoformat(self.value)
     
-    def set_value(self, value: datetime):
+    def set_value(self, value: datetime) -> None:
         if isinstance(value, str):
             value = datetime.fromisoformat(value)
             

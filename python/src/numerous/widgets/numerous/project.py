@@ -1,31 +1,32 @@
 import anywidget
 import traitlets
-from .projects import get_project, get_scenario, save_scenario, get_document, get_file, save_document, save_file, list_projects, ScenarioMetadata, save_scenario_metadata
-from ..base._config import get_widget_paths
+from typing import Any, Dict, Tuple, List
+from numerous.widgets.numerous.projects import get_project, get_scenario, save_scenario, get_document, get_file, save_document, save_file, list_projects, ScenarioMetadata, save_scenario_metadata
+from numerous.widgets.base.config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("ProjectMenuWidget")
 
 class ProjectBrowserBase(anywidget.AnyWidget):
     
-    projects = traitlets.List().tag(sync=True)
-    scenarios = traitlets.List().tag(sync=True)
+    projects = traitlets.List([str, str, str]).tag(sync=True)
+    scenarios = traitlets.List([str, str, str, str]).tag(sync=True)
 
     selected_project_id = traitlets.Unicode(allow_none=True).tag(sync=True)
     selected_scenario_id = traitlets.Unicode(allow_none=True).tag(sync=True)
 
     changed = traitlets.Bool(default_value=False).tag(sync=True)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Tuple[Any, ...], **kwargs: Dict[str, Any]) -> None:
         super().__init__(*args, **kwargs)
 
         self._update_projects()
         
         self.scenarios = []
-        self._documents = {}
-        self._files = {}
+        self._documents: Dict[str, Any] = {}
+        self._files: Dict[str, str] = {}
 
-    def _update_projects(self):
+    def _update_projects(self) -> None:
         projects_dict = list_projects()
         self.projects = [
             {
@@ -37,7 +38,7 @@ class ProjectBrowserBase(anywidget.AnyWidget):
         ]
     
     @traitlets.observe('selected_project_id')
-    def _selected_project_id_changed(self, change):
+    def _selected_project_id_changed(self, change: traitlets.Bunch) -> None:
         print("selected_project_id changed to:", change['new'])
 
         if change['new']:
@@ -58,19 +59,19 @@ class ProjectBrowserBase(anywidget.AnyWidget):
             print("Updated scenarios:", self.scenarios)
 
     @traitlets.observe('selected_scenario_id')
-    def _selected_scenario_id_changed(self, change):
+    def _selected_scenario_id_changed(self, change: traitlets.Bunch) -> None:
         if change.new and self.selected_project_id:
             self.scenario = get_scenario(self.selected_project_id, change.new)
         else:
             self.scenario = None
 
-    def get_document(self, name):
+    def get_document(self, name: str) -> Any:
         if name in self._documents:
             return self._documents[name]
         else:
             return get_document(self.selected_project_id, self.selected_scenario_id, name)
         
-    def get_file(self, name):
+    def get_file(self, name: str) -> str:
         if name in self._files:
             return self._files[name]
         else:
@@ -83,13 +84,13 @@ class ProjectsMenu(ProjectBrowserBase):
     changed = traitlets.Bool(default_value=False).tag(sync=True)
     do_save = traitlets.Bool(default_value=False).tag(sync=True)
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Tuple[Any, ...], **kwargs: Dict[str, Any]) -> None:
         super().__init__(*args, **kwargs)
         
         self._metadata_changed = False
 
     @traitlets.observe('do_save')
-    def _do_save_changed(self, event):
+    def _do_save_changed(self, event: traitlets.Bunch) -> None:
         _save = event.new
         if _save:
             print("saving!")
@@ -112,15 +113,15 @@ class ProjectsMenu(ProjectBrowserBase):
             if self._metadata_changed:
                 save_scenario_metadata(project, scenario, self._scenario_metadata)
 
-    def set_document(self, name, doc):
+    def set_document(self, name: str, doc: Any) -> None:
         self._documents[name] = doc
         self.changed = True
 
-    def set_file(self, name, file_path):
+    def set_file(self, name: str, file_path: str) -> None:
         self._files[name] = file_path
         self.changed = True
         
-    def set_scenario_metadata(self, metadata: ScenarioMetadata):
+    def set_scenario_metadata(self, metadata: ScenarioMetadata) -> None:
         self._scenario_metadata = metadata
         self.changed = True
         self._metadata_changed = True

@@ -1,6 +1,6 @@
 import anywidget
 import traitlets
-from ._config import get_widget_paths
+from numerous.widgets.base.config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("StringInputWidget")
@@ -33,7 +33,7 @@ class String(anywidget.AnyWidget):
     def __init__(
         self,
         label: str,
-        tooltip: str = None,
+        tooltip: str|None = None,
         default: str = "",
         placeholder: str = "",
         fit_to_content: bool = False,
@@ -60,7 +60,7 @@ class String(anywidget.AnyWidget):
         return self.value
     
     @val.setter
-    def val(self, value: str):
+    def val(self, value: str) -> None:
         """Sets the current input value.
         
         Args:

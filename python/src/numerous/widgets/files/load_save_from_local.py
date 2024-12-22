@@ -1,7 +1,7 @@
 import anywidget
 import traitlets
-from typing import Optional
-from numerous.widgets.base._config import get_widget_paths
+from typing import Optional, Dict, Any
+from python.src.numerous.widgets.base.config import get_widget_paths
 from io import BytesIO, StringIO
 
 # Get environment-appropriate paths
@@ -46,7 +46,7 @@ class FileLoader(anywidget.AnyWidget):
         self._bytes: Optional[bytes] = None
 
     @property
-    def content(self) -> Optional[bytes]:
+    def content(self) -> Dict[str, Any]:
         """Returns the loaded file content as bytes."""
         return self.file_content
     
@@ -56,7 +56,7 @@ class FileLoader(anywidget.AnyWidget):
         return self.filename
     
     @traitlets.observe('file_content')
-    def _observe_file_content(self, change):
+    def _observe_file_content(self, change: Dict[str, Any]) -> None:
         print("file_content changed")
         # Convert from dict where values are integers to bytes
         if isinstance(change['new'], dict):
@@ -65,7 +65,7 @@ class FileLoader(anywidget.AnyWidget):
             self._bytes = change['new']
     
     @property
-    def as_buffer(self):
+    def as_buffer(self) -> Optional[BytesIO]:
         """Returns a file-like object (BytesIO) containing the loaded file content.
         
         Example:
@@ -77,7 +77,7 @@ class FileLoader(anywidget.AnyWidget):
         return BytesIO(self._bytes)
     
     @property
-    def as_string(self, encoding: Optional[str] = None) -> StringIO:
+    def as_string(self, encoding: Optional[str] = None) -> Optional[StringIO]:
         """Returns the loaded file content as a string."""
         if self._bytes is None:
             return None

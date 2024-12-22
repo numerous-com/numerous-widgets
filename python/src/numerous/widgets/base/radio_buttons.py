@@ -1,7 +1,7 @@
 import anywidget
 import traitlets
 from typing import List, Optional
-from ._config import get_widget_paths
+from .config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("RadioButtonsWidget")
@@ -58,19 +58,19 @@ class RadioButtons(anywidget.AnyWidget):
         return self.value
     
     @property
-    def val(self):
+    def val(self) -> str:
         return self.value
     
     @val.setter
-    def val(self, value):
+    def val(self, value: str) -> None:
         if value not in self.options:
             raise ValueError("Value must be one of the options")
         self.value = value
 
-    def get_value(self):
+    def get_value(self) -> str:
         return self.value
     
-    def set_value(self, value):
+    def set_value(self, value: str) -> None:
         if value not in self.options:
             raise ValueError("Value must be one of the options")
         self.value = value 

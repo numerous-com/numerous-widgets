@@ -1,7 +1,7 @@
 import anywidget
 import traitlets
-from typing import Dict, List
-from ._config import get_widget_paths
+from typing import Dict, List, Any
+from .config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("PlotWidget")
@@ -16,9 +16,9 @@ class Plot(anywidget.AnyWidget):
         config: Optional plot configuration
     """
     # Define traitlets for the widget properties
-    plot_data = traitlets.List().tag(sync=True)
-    plot_layout = traitlets.Dict().tag(sync=True)
-    plot_config = traitlets.Dict().tag(sync=True)
+    plot_data: List[Dict[str, Any]]|None = traitlets.List(allow_none=True).tag(sync=True) # type: ignore[assignment]
+    plot_layout: Dict[str, Any]|None = traitlets.Dict(allow_none=True).tag(sync=True) # type: ignore[assignment]
+    plot_config: Dict[str, Any]|None = traitlets.Dict(allow_none=True).tag(sync=True) # type: ignore[assignment]
 
     # Load the JavaScript and CSS from external files
     _esm = ESM
@@ -26,9 +26,9 @@ class Plot(anywidget.AnyWidget):
 
     def __init__(
         self,
-        data: List[Dict] = None,
-        layout: Dict = None,
-        config: Dict = None,
+        data: List[Dict[str, Any]]|None = None,
+        layout: Dict[str, Any]|None = None,
+        config: Dict[str, Any]|None = None,
     ):
         if data is None:
             data = []
@@ -45,7 +45,7 @@ class Plot(anywidget.AnyWidget):
             plot_config=config,
         )
 
-    def update_data(self, data: List[Dict]):
+    def update_data(self, data: List[Dict[str, Any]]) -> None:
         """Updates the plot data.
         
         Args:
@@ -53,7 +53,7 @@ class Plot(anywidget.AnyWidget):
         """
         self.plot_data = data
 
-    def update_layout(self, layout: Dict):
+    def update_layout(self, layout: Dict[str, Any]) -> None:
         """Updates the plot layout.
         
         Args:
@@ -61,7 +61,7 @@ class Plot(anywidget.AnyWidget):
         """
         self.plot_layout = layout
 
-    def update_config(self, config: Dict):
+    def update_config(self, config: Dict[str, Any]) -> None:
         """Updates the plot configuration.
         
         Args:

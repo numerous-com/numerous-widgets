@@ -1,12 +1,21 @@
 import anywidget
 import traitlets
 from typing import Dict, Union
-from ._config import get_widget_paths
+from .config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("AccordionWidget")
 
 class Accordion(anywidget.AnyWidget):
+    """
+    A widget for creating an accordion.
+
+    Args:
+        title: The title of the accordion.
+        label: The label of the accordion.
+        tooltip: The tooltip of the accordion.
+        expanded: Whether the accordion is expanded.
+    """
     # Define traitlets for the widget properties
     title = traitlets.Unicode().tag(sync=True)
     ui_label = traitlets.Unicode().tag(sync=True)
@@ -21,7 +30,7 @@ class Accordion(anywidget.AnyWidget):
         self,
         title: str,
         label: str = "",
-        tooltip: str = None,
+        tooltip: str|None = None,
         expanded: bool = False,
     ):
         # Initialize with keyword arguments
@@ -30,16 +39,6 @@ class Accordion(anywidget.AnyWidget):
             ui_label=label,
             ui_tooltip=tooltip if tooltip is not None else "",
             is_expanded=expanded,
-        )
-
-    @staticmethod
-    def from_dict(config: Dict[str, Union[str, bool]]) -> "Accordion":
-        """Creates an AccordionWidget instance from a configuration dictionary."""
-        return Accordion(
-            title=config["title"],
-            label=config.get("ui_label", ""),
-            tooltip=config.get("ui_tooltip"),
-            expanded=config.get("expanded", False),
         )
 
     @property

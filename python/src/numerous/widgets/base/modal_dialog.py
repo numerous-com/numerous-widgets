@@ -1,7 +1,7 @@
 import anywidget
 import traitlets
-from typing import Optional
-from ._config import get_widget_paths
+from typing import Optional, Callable
+from .config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("ModalDialogWidget")
@@ -52,7 +52,7 @@ class ModalDialog(anywidget.AnyWidget):
             result=None,
         )
 
-    def show(self, title: Optional[str] = None, message: Optional[str] = None):
+    def show(self, title: str|None = None, message: str|None = None) -> None:
         """Show the modal dialog with optional new title and message."""
         if title is not None:
             self.title = title
@@ -61,10 +61,10 @@ class ModalDialog(anywidget.AnyWidget):
         self.result = None
         self.is_open = True
 
-    def hide(self):
+    def hide(self) -> None:
         """Hide the modal dialog."""
         self.is_open = False
 
-    def observe_result(self, handler):
+    def observe_result(self, handler: Callable[[str], None]) -> None:
         """Observe the result of the modal dialog."""
         self.observe(handler, names=['result']) 

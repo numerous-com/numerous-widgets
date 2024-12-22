@@ -1,6 +1,6 @@
 import anywidget
 import traitlets
-from ._config import get_widget_paths
+from .config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("ProgressBarWidget")
@@ -28,9 +28,9 @@ class ProgressBar(anywidget.AnyWidget):
     def __init__(
         self,
         value: float = 0.0,
-        label: str = None,
-        tooltip: str = None,
-    ):
+        label: str|None = None,
+        tooltip: str|None = None,
+    ) -> None:
         super().__init__(
             value=min(max(value, 0.0), 100.0),
             ui_label=label if label is not None else "",
@@ -43,6 +43,6 @@ class ProgressBar(anywidget.AnyWidget):
         return self.value
     
     @val.setter
-    def val(self, value: float):
+    def val(self, value: float) -> None:
         """Sets the progress value, clamped between 0 and 100."""
         self.value = min(max(value, 0.0), 100.0)

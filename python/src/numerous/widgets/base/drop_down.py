@@ -1,6 +1,6 @@
 from typing import List
 import traitlets
-from ._config import get_widget_paths
+from .config import get_widget_paths
 import anywidget
 
 # Get environment-appropriate paths
@@ -18,12 +18,12 @@ class DropDown(anywidget.AnyWidget):
         tooltip: The tooltip of the dropdown.
     """
     # Define traitlets for the widget properties
-    ui_label = traitlets.Unicode().tag(sync=True)
-    ui_tooltip = traitlets.Unicode().tag(sync=True)
-    selected_key = traitlets.Unicode().tag(sync=True)
-    selected_value = traitlets.Unicode().tag(sync=True)
-    options = traitlets.List().tag(sync=True)
-    fit_to_content = traitlets.Bool(default_value=False).tag(sync=True)
+    ui_label: str|None = traitlets.Unicode(allow_none=True).tag(sync=True) # type: ignore[assignment]
+    ui_tooltip: str|None = traitlets.Unicode(allow_none=True).tag(sync=True) # type: ignore[assignment]
+    selected_key: str|None = traitlets.Unicode(allow_none=True).tag(sync=True) # type: ignore[assignment]
+    selected_value: str|None = traitlets.Unicode(allow_none=True).tag(sync=True) # type: ignore[assignment]
+    options: List[str] = traitlets.List().tag(sync=True) # type: ignore[assignment]
+    fit_to_content: bool = traitlets.Bool(default_value=False).tag(sync=True) # type: ignore[assignment]
 
     # Load the JavaScript and CSS from external files
     _esm = ESM
@@ -31,11 +31,10 @@ class DropDown(anywidget.AnyWidget):
 
     def __init__(
         self,
-        
         options: List[str],
-        label: str = None,
-        tooltip: str = None,
-        default: str = None,
+        label: str|None = None,
+        tooltip: str|None = None,
+        default: str|None = None,
         fit_to_content: bool = False,
     ):
         # Initialize with keyword arguments
@@ -50,17 +49,17 @@ class DropDown(anywidget.AnyWidget):
         )
     
     @property
-    def val(self) -> str:
+    def val(self) -> str|None:
         """Returns the currently selected option."""
         return self.selected_value
     
-    def get_value(self):
+    def get_value(self) -> str|None:
         return self.selected_value
     
-    def set_value(self, value):
+    def set_value(self, value: str) -> None:
         self.selected_key = value
         self.selected_value = value
 
     @property
-    def name(self):
+    def name(self) -> str|None:
         return self.ui_label

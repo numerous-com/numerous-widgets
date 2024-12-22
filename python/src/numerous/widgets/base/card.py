@@ -1,7 +1,7 @@
-from typing import Union
+from typing import Union, List
 import anywidget
 
-def card(content: Union[str, anywidget.AnyWidget, list] = None, title: str = None, direction: str = "column", hidden: bool = False):
+def card(content: Union[str, anywidget.AnyWidget, List[Union[str, anywidget.AnyWidget]]], title: str|None = None, direction: str = "column", hidden: bool = False) -> str:
     """
     Create a card widget with optional title and flow direction.
     

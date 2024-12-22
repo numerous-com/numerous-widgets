@@ -1,6 +1,6 @@
 import anywidget
 import traitlets
-from ._config import get_widget_paths
+from .config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("MarkdownDrawerWidget")

@@ -1,7 +1,7 @@
 import anywidget
 import traitlets
 from typing import Dict, Union, List
-from ._config import get_widget_paths
+from .config import get_widget_paths
 from numerous.widgets.base.container import container
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("TabsWidget")
@@ -16,7 +16,7 @@ class Tabs(anywidget.AnyWidget):
     ui_label = traitlets.Unicode().tag(sync=True)
     ui_tooltip = traitlets.Unicode().tag(sync=True)
     value = traitlets.Unicode().tag(sync=True)
-    tabs = traitlets.List().tag(sync=True)
+    tabs = traitlets.List(trait=traitlets.Unicode()).tag(sync=True)
     content_updated = traitlets.Bool(default_value=False).tag(sync=True)
     active_tab = traitlets.Unicode().tag(sync=True)
 
@@ -29,8 +29,8 @@ class Tabs(anywidget.AnyWidget):
         self,
         tabs: List[str],
         label: str = "",
-        tooltip: str = None,
-        default: str = None,
+        tooltip: str|None = None,
+        default: str|None = None,
     ):
         # Get the initial active tab
         if not self.initial_tab:
@@ -48,40 +48,9 @@ class Tabs(anywidget.AnyWidget):
             active_tab=self.initial_tab,
         )
 
-    @staticmethod
-    def from_dict(config: Dict[str, Union[str, List[str]]]) -> "Tabs":
-        """Creates a Tabs instance from a configuration dictionary."""
-        return Tabs(
-            label=config["ui_label"],
-            tooltip=config["ui_tooltip"],
-            default=config["default"],
-            parent=config.get("parent"),
-        )
-
     @property
     def selected_value(self) -> str:
         """Returns the currently selected tab."""
         return self.active_tab
-    
-def render_tab_content(widgets, selection: str) -> str:
-    """Renders the content of a tab.
-    Args:
-        widgets: A dictionary of widgets to render.
-        selection: The currently selected tab.
-
-    Returns:
-        A string of HTML representing the content of the selected tab.
-    """
-    html = ""
-    found = False
-    for k, w in widgets.items():
-        html += container(w, hidden=k!=selection)
-        if k == selection:
-            print("selected")
-            print(container(w, hidden=k!=selection))
-            found = True
-    if not found:
-        raise ValueError(f"Tab {selection} not found")
-    return html
 
     

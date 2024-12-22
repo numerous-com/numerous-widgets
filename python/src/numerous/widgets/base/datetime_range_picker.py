@@ -2,7 +2,7 @@ import anywidget
 import traitlets
 from typing import Optional, Tuple
 from datetime import datetime
-from ._config import get_widget_paths
+from .config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("DateTimeRangePickerWidget")
@@ -85,11 +85,11 @@ class DateTimeRangePicker(anywidget.AnyWidget):
         )
     
     @property
-    def val(self):
+    def val(self) -> Tuple[datetime, datetime]:
         return self.selected_value
     
     @val.setter
-    def val(self, value: Tuple[datetime, datetime]):
+    def val(self, value: Tuple[datetime, datetime]) -> None:
         start, end = value
         if isinstance(start, str):
             start = datetime.fromisoformat(start)
@@ -113,8 +113,8 @@ class DateTimeRangePicker(anywidget.AnyWidget):
         self.start_value = start.isoformat()
         self.end_value = end.isoformat()
 
-    def get_value(self):
+    def get_value(self) -> Tuple[datetime, datetime]:
         return self.selected_value
     
-    def set_value(self, value: Tuple[datetime, datetime]):
+    def set_value(self, value: Tuple[datetime, datetime]) -> None:
         self.val = value 

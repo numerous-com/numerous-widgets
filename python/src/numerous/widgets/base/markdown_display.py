@@ -1,6 +1,6 @@
 import anywidget
 import traitlets
-from ._config import get_widget_paths
+from .config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("MarkdownDisplayWidget")
@@ -31,6 +31,6 @@ class MarkdownDisplay(anywidget.AnyWidget):
             class_name=className,
         )
 
-    def update_content(self, content: str):
+    def update_content(self, content: str) -> None:
         """Update the markdown content."""
         self.content = content 

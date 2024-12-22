@@ -1,6 +1,7 @@
 import anywidget
 import traitlets
-from ._config import get_widget_paths
+from typing import Any, Dict
+from .config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("NumberInputWidget")
@@ -35,7 +36,7 @@ class Number(anywidget.AnyWidget):
     def __init__(
         self,
         label: str,
-        tooltip: str = None,
+        tooltip: str|None = None,
         default: float = 0.0,
         start: float = 0.0,
         stop: float = 100.0,
@@ -72,7 +73,7 @@ class Number(anywidget.AnyWidget):
         return self.value
     
     @val.setter
-    def val(self, value: float):
+    def val(self, value: float) -> None:
         """Sets the currently selected numeric value.
         
         Args:
@@ -81,7 +82,7 @@ class Number(anywidget.AnyWidget):
         self.value = value
 
     @traitlets.observe('value')
-    def _validate_value(self, change):
+    def _validate_value(self, change: Dict[str, Any]) -> None:
         self.valid = self.start <= change['new'] <= self.stop
 
   

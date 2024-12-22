@@ -1,7 +1,7 @@
 import anywidget
 import traitlets
-from typing import Dict, Union, Callable
-from ._config import get_widget_paths
+from typing import Callable
+from .config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("ButtonWidget")
@@ -22,10 +22,10 @@ class Button(anywidget.AnyWidget):
     def __init__(
         self,
         label: str,
-        tooltip: str = None,
-        on_click: Callable = None,
+        tooltip: str|None = None,
+        on_click: Callable[[traitlets.BaseDescriptor], None]|None = None,
         disabled: bool = False,
-    ):
+    ) -> None:
         super().__init__(
             ui_label=label,
             ui_tooltip=tooltip if tooltip is not None else "",
@@ -37,23 +37,12 @@ class Button(anywidget.AnyWidget):
         
 
     @traitlets.observe('clicked')
-    def _handle_click(self, change):
-        #self.value = self.clicked > 0
-        if isinstance(self.on_click, Callable):
-            self.on_click(change)
+    def _handle_click(self, change: traitlets.BaseDescriptor) -> None:
 
-    @staticmethod
-    def from_dict(config: Dict[str, Union[str, Callable, bool]]) -> "Button":
-        """Creates a ButtonWidget instance from a configuration dictionary."""
-        return Button(
-            label=config["label"],
-            tooltip=config.get("tooltip"),
-            on_click=config.get("on_click"),
-            disabled=config.get("disabled", False),
-        )
+        if self.on_click is not None:
+            self.on_click(change)
     
     @property
     def val(self) -> bool:
         return self.value
-    
     

@@ -1,7 +1,7 @@
 import anywidget
 import traitlets
-from typing import Dict
-from ._config import get_widget_paths
+from typing import Dict, Any
+from .config import get_widget_paths
 
 # Get environment-appropriate paths
 ESM, CSS = get_widget_paths("ChartWidget")
@@ -27,9 +27,9 @@ class Chart(anywidget.AnyWidget):
     def __init__(
         self,
         type: str = "line",
-        data: Dict = None,
-        options: Dict = None,
-    ):
+        data: Dict[str, Any]|None = None,
+        options: Dict[str, Any]|None = None,
+    ) -> None:
         if data is None:
             data = {
                 "labels": [],
@@ -45,7 +45,7 @@ class Chart(anywidget.AnyWidget):
             chart_options=options,
         )
 
-    def update_data(self, data: Dict):
+    def update_data(self, data: Dict[str, Any]) -> None:
         """Updates the chart data.
         
         Args:
@@ -53,7 +53,7 @@ class Chart(anywidget.AnyWidget):
         """
         self.chart_data = data
 
-    def update_options(self, options: Dict):
+    def update_options(self, options: Dict[str, Any]) -> None:
         """Updates the chart options.
         
         Args:
