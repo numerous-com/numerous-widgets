@@ -1,5 +1,8 @@
 # Numerous Widgets
 
+[![pypi badge](https://img.shields.io/pypi/v/numerous-widgets)](https://pypi.python.org/pypi/numerous-widgets)
+[![Release workflow badge](https://github.com/numerous-com/numerous-widgets/actions/workflows/release.yml/badge.svg)](https://github.com/numerous-com/numerous-widgets/actions/workflows/release.yml) 
+
 Welcome to the widgets project.
 
 The project consists of widgets for use in Python apps, as well as python libraries for app state management and long running tasks.
@@ -139,9 +142,3 @@ mkdocs serve
 ```
 
 This will start a development server and open a browser window with the docs.
-
-## To Do
-
-- [ ] Setup pre-commit hooks for ruff, mypy and pytest
-- [ ] Add tests for the widgets
-- [ ] Finalize a basic widget set

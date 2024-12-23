@@ -41,4 +41,10 @@ model.apply_values(new_model)
 # number_widget.val = 20
 ```
 
+## ::: widgets.state.StateModel
+    options:
+        show_root_heading: true
 
+## ::: widgets.state.number_field
+    options:
+        show_root_heading: true

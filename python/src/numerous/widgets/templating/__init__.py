@@ -1,13 +1,14 @@
 """Templating is for rendering Jinja2 templates."""
 
-from typing import IO, Any
+from typing import IO
 
+from anywidget import AnyWidget
 from jinja2 import Template
 
 
-def render_template(template: str | IO[str], **kwargs: dict[str, Any]) -> str:
+def render_template(template: str | IO[str], **kwargs: dict[str, AnyWidget]) -> str:
     """
-    Render a Jinja2 template with processed keyword arguments.
+    Render a Jinja2 template with marimo widgets.
 
     Args:
         template: Either a template string or a file-like object containing the template

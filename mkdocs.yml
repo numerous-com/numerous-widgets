@@ -9,20 +9,57 @@ nav:
     - Widgets: widgets.md
     - Process Task: process_task.md
     - State Model: state_model.md
+    - Templating: templating.md
 
-theme: readthedocs
+theme:
+  name: material
+  logo: logo.svg
+  favicon: favicon.png
+  features:
+      - content.code.copy
+  palette:
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default 
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+
+
 plugins:
   - search
+  - gen-files:
+      scripts:
+        - scripts/gen_ref_pages.py
+  - literate-nav:
+      nav_file: SUMMARY.md
+  - section-index
   - mkdocstrings:
       default_handler: "python"
       handlers:
         python:
           setup_commands:
-            - "import sys; sys.path.insert(0, '.')"
-          paths: [.]
+            - "import sys; sys.path.insert(0, './python/src/numerous')"
+          paths: [./python/src/numerous]
           import:
             - https://docs.python.org/3/objects.inv
           rendering:
             show_source: true
             show_full_signature: true
             show_root_heading: true
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences

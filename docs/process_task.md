@@ -39,4 +39,15 @@ This example shows how to:
 3. Create a startup function
 4. Connect everything with `process_task_control`
 
+## ::: widgets.ProcessTask
+    options:
+        show_root_heading: true
+
+## ::: widgets.SubprocessTask
+    options:
+        show_root_heading: true
+
+## ::: widgets.process_task_control
+    options:
+        show_root_heading: true
 

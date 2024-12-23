@@ -2,78 +2,74 @@
 
 The widgets are available in the `widgets` module.
 
-## ::: numerous.widgets.Number
+## ::: widgets.Number
     options:
         show_root_heading: true
 
-## ::: numerous.widgets.CheckBox
+## ::: widgets.CheckBox
     options:
         show_root_heading: true
 
-## ::: numerous.widgets.DropDown
+## ::: widgets.DropDown
     options:
         show_root_heading: true
 
-## ::: numerous.widgets.Button
+## ::: widgets.Button
     options:
         show_root_heading: true
 
-## ::: numerous.widgets.ProgressBar
+## ::: widgets.ProgressBar
     options:
         show_root_heading: true
 
-## ::: numerous.widgets.Tabs
+## ::: widgets.Tabs
     options:
         show_root_heading: true
 
-## ::: numerous.widgets.render_tab_content
+## ::: widgets.container
     options:
         show_root_heading: true
 
-## ::: numerous.widgets.container
+## ::: widgets.Timer
     options:
         show_root_heading: true
 
-## ::: numerous.widgets.Timer
+## ::: widgets.Task
     options:
         show_root_heading: true
 
-## ::: numerous.widgets.Task
+## ::: widgets.MapSelector
     options:
         show_root_heading: true
 
-## ::: numerous.widgets.MapSelector
+## ::: widgets.Slider
     options:
         show_root_heading: true
 
-## ::: numerous.widgets.Slider
+## ::: widgets.RadioButtons
     options:
         show_root_heading: true
 
-## ::: numerous.widgets.RadioButtons
+## ::: widgets.String
     options:
         show_root_heading: true
 
-## ::: numerous.widgets.StringInput
+## ::: widgets.MarkdownDisplay
     options:
         show_root_heading: true
 
-## ::: numerous.widgets.MarkdownDisplay
+## ::: widgets.Accordion
     options:
         show_root_heading: true
 
-## ::: numerous.widgets.Accordion
+## ::: widgets.Chat
     options:
         show_root_heading: true
 
-## ::: numerous.widgets.Chat
+## ::: widgets.Table
     options:
         show_root_heading: true
 
-## ::: numerous.widgets.Table
-    options:
-        show_root_heading: true
-
-## ::: numerous.widgets.Task
+## ::: widgets.Task
     options:
         show_root_heading: true
