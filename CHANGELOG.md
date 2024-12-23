@@ -2,6 +2,13 @@
 
 
 
+## v0.1.9 (2024-12-23)
+
+### Fix
+
+* fix(TaskModal): Update timestamp formatting to 24-hour format and enhance warning type handling ([`db08ea0`](https://github.com/numerous-com/numerous-widgets/commit/db08ea020f8c5a112e532a98d4bef5a6389760fe))
+
+
 ## v0.1.8 (2024-12-23)
 
 ### Fix
