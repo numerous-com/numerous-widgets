@@ -2,6 +2,20 @@
 
 
 
+## v0.1.10 (2024-12-23)
+
+### Fix
+
+* fix(docs): Enhance documentation and configuration for numerous widgets
+
+- Updated mkdocs.yml to include new Templating section and improved theme settings with color scheme toggles.
+- Added new dependencies for mkdocs-material, mkdocs-gen-files, mkdocs-section-index, and mkdocs-literate-nav in pyproject.toml.
+- Expanded process_task.md, state_model.md, and widgets.md to include new widget documentation with show_root_heading options.
+- Modified render_template function in templating module to accept AnyWidget for keyword arguments.
+
+These changes improve the overall documentation structure and enhance the user experience with better theming and widget integration. ([`98a6af1`](https://github.com/numerous-com/numerous-widgets/commit/98a6af15526d183243b70d8d05d61ae4ec80743e))
+
+
 ## v0.1.9 (2024-12-23)
 
 ### Fix
