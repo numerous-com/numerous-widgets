@@ -58,26 +58,28 @@ export const ProjectMenu: React.FC<ProjectMenuProps> = ({
     <div className="inline-block relative">
       <div className="flex items-center h-9 border rounded-lg bg-white shadow-sm">
         <div className="flex items-center px-2 h-full border-r">
-          {selectedProjectName ? (
-            <div className="flex items-center gap-1.5">
-              {changed && (
-                <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-              )}
-              <span className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-md text-xs font-medium">
-                {selectedProjectName}
-              </span>
-              {selectedScenarioName && (
-                <>
-                  <span className="text-gray-400 text-sm">/</span>
-                  <span className="px-2 py-0.5 bg-green-100 text-green-800 rounded-md text-xs font-medium">
-                    {selectedScenarioName}
-                  </span>
-                </>
-              )}
-            </div>
-          ) : (
-            <span className="text-gray-500 italic text-xs">No project selected</span>
-          )}
+          <div className="flex items-center gap-1.5">
+            {changed && (
+              <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+            )}
+            {selectedProjectName ? (
+              <>
+                <span className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-md text-xs font-medium">
+                  {selectedProjectName}
+                </span>
+                {selectedScenarioName && (
+                  <>
+                    <span className="text-gray-400 text-sm">/</span>
+                    <span className="px-2 py-0.5 bg-green-100 text-green-800 rounded-md text-xs font-medium">
+                      {selectedScenarioName}
+                    </span>
+                  </>
+                )}
+              </>
+            ) : (
+              <span className="text-gray-500 italic text-xs">No project selected</span>
+            )}
+          </div>
         </div>
 
         <button
