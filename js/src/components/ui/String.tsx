@@ -31,12 +31,10 @@ export function StringInput({
     return (
         <div className={`string-input-container ${fitToContent ? 'fit-to-content' : ''}`}>
             <div className="input-wrapper" style={{ width: fitToContent ? 'auto' : '100%' }}>
-                <div className="string-label-container" style={{ alignItems: 'center' }}>
                     <label className="string-label">
-                        <span >{uiLabel}</span>
+                        <span className="string-label-text">{uiLabel}</span>
                         {uiTooltip && <Tooltip tooltip={uiTooltip} />}
                     </label>
-                </div>
                 <input 
                     type={isPassword ? "password" : "text"}
                     value={value}

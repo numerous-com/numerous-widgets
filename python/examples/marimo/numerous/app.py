@@ -98,7 +98,7 @@ def _(mo):
 
 @app.cell
 def _(aw, value, wi):
-    counter = aw(wi.Number(default=value(), label="Counter:", fit_to_content=True))
+    counter = aw(wi.Number(default=value(), label="Counter:", fit_to_content=True, tooltip="This is the value the counter has reached."))
     return (counter,)
 
 
