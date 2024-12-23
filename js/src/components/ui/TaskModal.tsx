@@ -57,7 +57,7 @@ export function TaskDetailModal({
     const formatTimestamp = (timestamp: string) => {
         try {
             const date = new Date(timestamp);
-            return date.toLocaleTimeString();
+            return date.toLocaleTimeString([], { hour12: false });
         } catch (e) {
             return timestamp;
         }
@@ -67,7 +67,7 @@ export function TaskDetailModal({
         switch (type.toLowerCase()) {
             case 'error':
                 return 'text-red-500';
-            case 'warning':
+            case 'warning' || '[warning]':
                 return 'text-yellow-500';
             case 'success':
                 return 'text-green-500';
