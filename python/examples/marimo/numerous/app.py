@@ -320,7 +320,7 @@ def _(aw, wi):
     def on_new_message(change):
         if change.new is not None:
             # Echo back the message
-            chat.add_message(f"You said: {change.new['content']}", type="user")
+            chat.add_message(f"You said: {change.new['content']}", msg_type="user")
 
     chat.observe_new_messages(on_new_message)
 

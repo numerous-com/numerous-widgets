@@ -52,7 +52,7 @@ class Chat(anywidget.AnyWidget):  # type: ignore[misc]
         {
             "id": str,
             "content": str,
-            "msg_type": "user" | "system",
+            "type": "user" | "system",
             "timestamp": str (ISO format)
         }
         """
@@ -65,8 +65,8 @@ class Chat(anywidget.AnyWidget):  # type: ignore[misc]
                 raise TypeError("Each message must be a dictionary.")
             if "content" not in msg:
                 raise TypeError("Each message must have 'content'.")
-            if "msg_type" not in msg:
-                msg["msg_type"] = "user"
+            if "type" not in msg:
+                msg["type"] = "user"
             if "timestamp" not in msg:
                 msg["timestamp"] = datetime.now().isoformat()
             if "id" not in msg:
@@ -82,12 +82,12 @@ class Chat(anywidget.AnyWidget):  # type: ignore[misc]
             new_message=None,
         )
 
-    def add_message(self, content: str, msg_type: str = "system") -> None:
+    def add_message(self, content: str, msg_type: str = "user") -> None:
         """Add a new message to the chat."""
         message = {
             "id": str(len(self.messages)),
             "content": content,
-            "msg_type": msg_type,
+            "type": msg_type,
             "timestamp": datetime.now().isoformat(),
         }
         self.messages = [*self.messages, message]
