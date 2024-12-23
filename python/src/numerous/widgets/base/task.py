@@ -91,7 +91,7 @@ class Task(anywidget.AnyWidget):  # type: ignore[misc]
 
     def _handle_sync(self, change: dict[str, Any]) -> None:  # noqa: ARG002
         """Handle sync events."""
-        if self._on_sync and self.sync_enabled:
+        if self._on_sync is not None and self.sync_enabled:
             _sync = self._on_sync(self)
 
             if _sync is None:
@@ -194,7 +194,8 @@ class Task(anywidget.AnyWidget):  # type: ignore[misc]
                         log[3],
                     )
                 )
-            self.logs += processed_logs
+
+            self.logs = self.logs + processed_logs
 
     def set_logs(self, logs: list[tuple[str, str, str, str]]) -> None:
         """Set the logs to a new list."""

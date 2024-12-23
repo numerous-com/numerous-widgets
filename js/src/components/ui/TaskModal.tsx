@@ -126,7 +126,7 @@ export function TaskDetailModal({
                             lineHeight: '25px'
                         }}
                     >
-                        {logs.slice(-20).map(([timestamp, type, source, message], index) => (
+                        {logs.slice(-100).map(([timestamp, type, source, message], index) => (
                             <div key={index} className="py-1 font-mono text-xs flex gap-2 h-[25px] items-center">
                                 <span className="text-gray-400">{formatTimestamp(timestamp)}</span>
                                 <span className={`font-medium ${getLogTypeColor(type)}`}>[{type}]</span>

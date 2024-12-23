@@ -98,7 +98,14 @@ def _(mo):
 
 @app.cell
 def _(aw, value, wi):
-    counter = aw(wi.Number(default=value(), label="Counter:", fit_to_content=True, tooltip="This is the value the counter has reached."))
+    counter = aw(
+        wi.Number(
+            default=value(),
+            label="Counter:",
+            fit_to_content=True,
+            tooltip="This is the value the counter has reached.",
+        )
+    )
     return (counter,)
 
 
@@ -153,14 +160,14 @@ def _(aw, wi):
 
 @app.cell
 def _(aw, wi):
-    task_button = aw(wi.Task())
-    return (task_button,)
+    sub_process_task = wi.task.SubprocessTask(run_in_process=True)
 
+    def on_start():
+        print("Starting")
+        sub_process_task.start(["echo 0%", "echo 100%"], shell=True)
 
-@app.cell
-def _(task_button):
-    task_button.progress = 0.25
-    return
+    task_button = aw(wi.task.process_task_control(sub_process_task, on_start=on_start))
+    return on_start, sub_process_task, task_button
 
 
 @app.cell

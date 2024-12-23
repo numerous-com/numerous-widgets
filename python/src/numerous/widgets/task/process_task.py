@@ -7,7 +7,6 @@ import time
 import traceback
 from collections.abc import Callable
 from datetime import datetime
-from multiprocessing import Queue
 from threading import Thread
 from typing import IO, Any
 
@@ -86,9 +85,7 @@ class ProcessTask:
             if self.capture_stdout:
                 # Redirect stdout and stderr to capture all output
                 class StreamToQueue:
-                    def __init__(
-                        self, queue: Queue[tuple[datetime, str, str, str]]
-                    ) -> None:
+                    def __init__(self, queue: multiprocessing.Queue) -> None:  # type: ignore[type-arg]
                         self.queue = queue
                         self.original_stdout = sys.stdout
 
@@ -277,18 +274,13 @@ class ProcessTask:
             return False
 
         # Process has exited if it was started, has an exitcode, and exit is pending
-        has_exited = (
+        return (
             not self.alive
             and
             # self._process.exitcode is not None and
             self.started
             and self._exit_pending
         )
-
-        if has_exited:
-            self._exit_pending = False
-
-        return has_exited
 
     @property
     def completed(self) -> bool:
@@ -431,7 +423,7 @@ class ProcessTask:
         """
 
 
-def run_in_subprocess(  # noqa: PLR0915, C901
+def run_in_subprocess(  # noqa: PLR0915, C901, PLR0912
     task: ProcessTask,
     cmd: str | list[str],
     shell: bool = False,
@@ -467,6 +459,9 @@ def run_in_subprocess(  # noqa: PLR0915, C901
     if not cmd:
         raise ValueError("Command cannot be empty or None")
 
+    if isinstance(cmd, list):
+        cmd = " ".join(cmd)
+
     if shell and isinstance(cmd, str):
         msg = "Using shell=True with string commands may pose security risks"
         task._log("warning", "process", msg)  # noqa: SLF001
@@ -485,10 +480,10 @@ def run_in_subprocess(  # noqa: PLR0915, C901
             universal_newlines=True,
         )
 
-        stdout_queue: Queue[str] = Queue()
-        stderr_queue: Queue[str] = Queue()
+        stdout_queue: multiprocessing.Queue = multiprocessing.Queue()  # type: ignore[type-arg]
+        stderr_queue: multiprocessing.Queue = multiprocessing.Queue()  # type: ignore[type-arg]
 
-        def pipe_reader(pipe: IO[str], queue: Queue[str]) -> None:
+        def pipe_reader(pipe: IO[str], queue: multiprocessing.Queue) -> None:  # type: ignore[type-arg]
             """Continuously read from pipe and put lines into queue."""
             try:
                 for line in iter(pipe.readline, ""):
@@ -664,10 +659,8 @@ def process_task_control(
 
     """
 
-    def _sync_with_task(task_widget: TaskWidget) -> None:
-        should_continue = sync_with_task(task_widget, process_task, on_stopped)
-        if not should_continue:
-            task_widget.stop_sync()
+    def _sync_with_task(task_widget: TaskWidget) -> bool:
+        return sync_with_task(task_widget, process_task, on_stopped)
 
     def _on_stop() -> None:
         process_task.stop()
