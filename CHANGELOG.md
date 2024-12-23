@@ -2,6 +2,13 @@
 
 
 
+## v0.1.7 (2024-12-23)
+
+### Fix
+
+* fix(chat): Rename &#39;msg_type&#39; to &#39;type&#39; in message structure; update add_message method and related usage ([`6685cfd`](https://github.com/numerous-com/numerous-widgets/commit/6685cfd871e94dcaddc43a0906e8e12284161223))
+
+
 ## v0.1.6 (2024-12-23)
 
 ### Fix
