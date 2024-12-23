@@ -28,7 +28,7 @@ jobs:
           python-version: '3.12' 
           cache: 'pip'
       - run: pip install -e .[dev]
-      - run: python -m ruff .
+      - run: python -m ruff check .
       - run: python -m mypy --strict .
   test:
     name: Unit tests
