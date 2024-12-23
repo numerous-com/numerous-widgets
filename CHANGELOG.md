@@ -2,6 +2,13 @@
 
 
 
+## v0.1.8 (2024-12-23)
+
+### Fix
+
+* fix(Task): Enhance log display, improve code readability, and update task handling logic ([`853184e`](https://github.com/numerous-com/numerous-widgets/commit/853184e5a67722b10daf766d270f19d5f24326b9))
+
+
 ## v0.1.7 (2024-12-23)
 
 ### Fix
