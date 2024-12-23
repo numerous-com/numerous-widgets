@@ -2,6 +2,17 @@
 
 
 
+## v0.1.6 (2024-12-23)
+
+### Fix
+
+* fix(widgets): Disable mypy ([`7890758`](https://github.com/numerous-com/numerous-widgets/commit/789075823b14dd2ee081d4ad0ca2b5d539e979f0))
+
+* fix(widgets): add check to ruff cmd ([`4d22d83`](https://github.com/numerous-com/numerous-widgets/commit/4d22d83680cbcfee5750aba06d120dabf761b672))
+
+* fix(widgets): Enable linting on github ([`5a0bd64`](https://github.com/numerous-com/numerous-widgets/commit/5a0bd6408632dbdd759747414be2ca1287393a3a))
+
+
 ## v0.1.5 (2024-12-22)
 
 ### Fix
