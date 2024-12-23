@@ -1,5 +1,6 @@
 """Module providing a stress test for the Numerous projects module."""
 
+import logging
 import random
 import time
 from datetime import datetime
@@ -59,13 +60,16 @@ def create_test_document(doc_id: int) -> dict[str, Any]:
 
 
 def main() -> None:
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    )
     start_time = time.time()
     total_documents = 0
 
-    print("Starting stress test with:")  # noqa: T201
-    print(f"- {NUM_PROJECTS} projects")  # noqa: T201
-    print(f"- {SCENARIOS_PER_PROJECT} scenarios per project")  # noqa: T201
-    print(f"- {DOCUMENTS_PER_SCENARIO} documents per scenario")  # noqa: T201
+    logging.info("Starting stress test with:")
+    logging.info(f"- {NUM_PROJECTS} projects")
+    logging.info(f"- {SCENARIOS_PER_PROJECT} scenarios per project")
+    logging.info(f"- {DOCUMENTS_PER_SCENARIO} documents per scenario")
 
     for p in range(NUM_PROJECTS):
         project = Project(
@@ -75,7 +79,7 @@ def main() -> None:
             scenarios={},
         )
 
-        print(f"\nCreating project {p+1}/{NUM_PROJECTS}")  # noqa: T201
+        logging.info(f"\nCreating project {p+1}/{NUM_PROJECTS}")
         save_project(project)
 
         for s in range(SCENARIOS_PER_PROJECT):
@@ -87,7 +91,7 @@ def main() -> None:
                 files=None,
             )
 
-            print(f"  Creating scenario {s+1}/{SCENARIOS_PER_PROJECT}")  # noqa: T201
+            logging.info(f"  Creating scenario {s+1}/{SCENARIOS_PER_PROJECT}")
             save_scenario(project, scenario)
 
             for d in range(DOCUMENTS_PER_SCENARIO):
@@ -96,15 +100,17 @@ def main() -> None:
                 total_documents += 1
 
                 if d % 10 == 0:  # Progress indicator every 10 documents
-                    print(f"    Saved {d} documents...")  # noqa: T201
+                    logging.info(f"    Saved {d} documents...")
 
     end_time = time.time()
     duration = end_time - start_time
 
-    print("\nStress test completed!")  # noqa: T201
-    print(f"Created {NUM_PROJECTS} projects with {total_documents} total documents")  # noqa: T201
-    print(f"Total time: {duration:.2f} seconds")  # noqa: T201
-    print(f"Average time per document: {(duration/total_documents):.3f} seconds")  # noqa: T201
+    logging.info("\nStress test completed!")
+    logging.info(
+        f"Created {NUM_PROJECTS} projects with {total_documents} total documents"
+    )
+    logging.info(f"Total time: {duration:.2f} seconds")
+    logging.info(f"Average time per document: {(duration/total_documents):.3f} seconds")
 
 
 if __name__ == "__main__":
