@@ -2,6 +2,13 @@
 
 
 
+## v0.1.11 (2024-12-28)
+
+### Fix
+
+* fix(widgets): Do not refer to ModalWIdget ([`3ce852a`](https://github.com/numerous-com/numerous-widgets/commit/3ce852af8fc2dc72da5735452d23dad83a796c02))
+
+
 ## v0.1.10 (2024-12-23)
 
 ### Fix
