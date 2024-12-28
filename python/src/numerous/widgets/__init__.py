@@ -27,7 +27,6 @@ from .base.drop_down import DropDown as DropDown
 from .base.map_selector import MapSelector as MapSelector
 from .base.markdown_display import MarkdownDisplay as MarkdownDisplay
 from .base.markdown_drawer import MarkdownDrawer as MarkdownDrawer
-from .base.modal_dialog import ModalDialog as ModalDialog
 from .base.number import Number as Number
 from .base.progress_bar import ProgressBar as ProgressBar
 from .base.radio_buttons import RadioButtons as RadioButtons
