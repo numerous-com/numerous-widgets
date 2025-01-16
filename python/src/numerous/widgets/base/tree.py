@@ -92,7 +92,7 @@ class TreeBrowser(anywidget.AnyWidget):  # type: ignore[misc]
                     item_data.get("is_expanded", _id in (expanded_ids or []))
                 ),
             )
-            serialized_items[id] = tree_item.to_dict()
+            serialized_items[_id] = tree_item.to_dict()
 
         # Create a new dictionary to ensure the change is detected
         self.items = dict(serialized_items)
