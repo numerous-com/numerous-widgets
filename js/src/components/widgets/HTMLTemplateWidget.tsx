@@ -1,6 +1,7 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import '../../css/styles.css';
+import { noop } from "chart.js/helpers";
 
 function HTMLTemplateWidget() {
     const [template] = useModelState<string>("template");
@@ -10,12 +11,7 @@ function HTMLTemplateWidget() {
 
     // Add effect to log when values change
     React.useEffect(() => {
-        console.log("JS state update:", {
-            template,
-            variables,
-            renderedHtml,
-            className
-        });
+        noop
     }, [template, variables, renderedHtml, className]);
 
     return (

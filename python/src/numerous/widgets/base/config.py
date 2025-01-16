@@ -10,8 +10,9 @@ try:
 
     # Load environment variables from .env file
     load_dotenv()
-    # Default to production mode if not set
-    IS_DEV = os.getenv("WIDGET_ENV", "production").lower() == "development"
+    # Only set IS_DEV to True if WIDGET_ENV is explicitly set to "development"
+    widget_env = os.getenv("WIDGET_ENV", "production").lower()
+    IS_DEV = widget_env == "development"
 
 except ImportError:
     IS_DEV = False
