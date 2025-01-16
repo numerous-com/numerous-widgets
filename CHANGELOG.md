@@ -2,6 +2,21 @@
 
 
 
+## v0.1.12 (2025-01-16)
+
+### Fix
+
+* fix(widgets): Update widget configuration and enhance styling
+
+- Replaced hardcoded widget names in build scripts with dynamic loading from a configuration file (widget-config.json) for better maintainability.
+- Added new styles for tree browser components, including hover and disabled states, to improve user experience.
+- Introduced a new HTML template widget for rendering dynamic content with variables.
+- Updated various widgets to utilize the new tree structure and improved styling.
+- Enhanced task widget to display more log entries and updated timestamp formatting to 24-hour format.
+
+These changes streamline widget management and enhance the overall UI consistency. ([`2a46535`](https://github.com/numerous-com/numerous-widgets/commit/2a46535e25aa481cac729deb608afd5af6ff7b2b))
+
+
 ## v0.1.11 (2024-12-28)
 
 ### Fix
