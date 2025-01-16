@@ -2,6 +2,18 @@
 
 
 
+## v0.1.14 (2025-01-16)
+
+### Fix
+
+* fix(widget): Remove console logging and refine environment variable handling
+
+- Replaced console logging in HTMLTemplateWidget with a no-operation function to reduce noise during state updates.
+- Updated the configuration in base/config.py to only set IS_DEV to True when WIDGET_ENV is explicitly set to &#34;development&#34;, improving clarity in environment management.
+
+These changes enhance performance and maintainability of the widget components. ([`e0d4821`](https://github.com/numerous-com/numerous-widgets/commit/e0d482103c98d607199afaf6bc9115e44f863278))
+
+
 ## v0.1.13 (2025-01-16)
 
 ### Fix
