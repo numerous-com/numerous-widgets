@@ -7,6 +7,7 @@
 	"dependencies": {
 		"@anywidget/react": "^0.0.8",
 		"@headlessui/react": "^2.2.0",
+		"@minoru/react-dnd-treeview": "^3.4.4",
 		"@radix-ui/react-dialog": "^1.1.2",
 		"@tanstack/react-table": "^8.11.7",
 		"@types/plotly.js": "^2.35.1",
@@ -17,6 +18,8 @@
 		"plotly.js": "^2.35.2",
 		"react": "^18.3.1",
 		"react-chartjs-2": "^5.2.0",
+		"react-dnd": "^16.0.1",
+		"react-dnd-html5-backend": "^16.0.1",
 		"react-dom": "^18.3.1",
 		"react-markdown": "^9.0.1",
 		"react-plotly.js": "^2.6.0",

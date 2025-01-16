@@ -1,0 +1,29 @@
+{
+  "widgets": [
+    "AccordionWidget",
+    "ButtonWidget",
+    "ChatWidget",
+    "ChartWidget",
+    "CheckBoxWidget",
+    "DateTimePickerWidget",
+    "DateTimeRangePickerWidget",
+    "DropDownWidget",
+    "HTMLTemplateWidget",
+    "MapSelectorWidget",
+    "MarkdownDisplayWidget",
+    "MarkdownDrawerWidget",
+    "ModalDialogWidget",
+    "NumberInputWidget",
+    "PlotWidget",
+    "ProgressBarWidget",
+    "ProjectMenuWidget",
+    "RadioButtonsWidget",
+    "SliderWidget",
+    "StringInputWidget",
+    "TableWidget",
+    "TabsWidget",
+    "TaskWidget",
+    "TimerWidget",
+    "TreeBrowserWidget"
+  ]
+} 

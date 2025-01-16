@@ -680,7 +680,14 @@ select::-ms-expand {
   white-space: nowrap;
 }
 
-.widget-button:hover {
+.widget-button:disabled {
+  cursor: not-allowed;
+  color: var(--ui-widget-secondary-text);
+  background-color: var(--ui-widget-secondary-background);
+  opacity: 0.7;
+}
+
+.widget-button:hover:not(:disabled) {
   background-color: var(--ui-widget-hover-background-dark);
 }
 
@@ -1320,7 +1327,6 @@ select::-ms-expand {
   opacity: 1;
 }
 
-
 .checkbox-container {
   display: flex;
   flex-direction: column;
@@ -1411,7 +1417,6 @@ select::-ms-expand {
   vertical-align: top;
 }
 
-
 .string-input-container.fit-to-content {
   width: fit-content;
   display: inline-flex;
@@ -1426,7 +1431,6 @@ select::-ms-expand {
   padding-left: 8px;
   margin-bottom: 0;
 }
-
 
 .input-wrapper {
   position: relative;
@@ -2230,4 +2234,130 @@ input[type="text"].invalid:focus {
     height: 100%;
     margin-top: 0;
     margin-bottom: 0;
+}
+
+/* Tree Browser Styles */
+.tree-browser {
+    font-family: "Nunito Sans", sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    border: 1px solid var(--ui-widget-border-color);
+    border-radius: 4px;
+    background-color: var(--ui-widget-primary-background);
+    min-height: 200px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.tree-root {
+    width: 100%;
+    padding: 8px;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.tree-node {
+    display: flex;
+    align-items: center;
+    padding: 4px 8px;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 4px;
+    color: var(--ui-widget-primary-text);
+    transition: background-color 0.2s;
+}
+
+.tree-node:hover {
+    background-color: var(--ui-widget-hover-background);
+}
+
+.tree-node.selected {
+    background-color: rgba(31, 128, 242, 0.1);
+}
+
+.tree-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    margin-right: 4px;
+    cursor: pointer;
+    color: var(--ui-widget-secondary-text);
+}
+
+.tree-toggle svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s ease;
+}
+
+.tree-toggle.open svg {
+    transform: rotate(-180deg);
+}
+
+.tree-label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Disable drag and drop visual styles */
+.dragging {
+    opacity: 0 !important;
+}
+
+.drop-target {
+    background-color: transparent !important;
+}
+
+.tree-node.disabled {
+    cursor: not-allowed;
+    color: var(--ui-widget-secondary-text);
+    opacity: 0.7;
+}
+
+.tree-node.disabled:hover {
+    background-color: transparent;
+}
+
+.tree-toggle.disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.tree-node.disabled.selected {
+    background-color: rgba(31, 128, 242, 0.05);
+}
+
+.html-template {
+    color: var(--ui-widget-primary-text);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.html-template h1 {
+    font-size: 1.8em;
+    margin-bottom: 1em;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid var(--ui-widget-border-color);
+}
+
+.html-template h2 {
+    font-size: 1.5em;
+    margin: 1em 0 0.5em;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid var(--ui-widget-border-color);
+}
+
+.html-template h3 {
+    font-size: 1.3em;
+    margin: 1em 0 0.5em;
+}
+
+.html-template p {
+    margin: 1em 0;
 }

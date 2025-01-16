@@ -24,6 +24,7 @@ from .base.container import (
 from .base.datetime_picker import DateTimePicker as DateTimePicker
 from .base.datetime_range_picker import DateTimeRangePicker as DateTimeRangePicker
 from .base.drop_down import DropDown as DropDown
+from .base.html_template import HTMLTemplate as HTMLTemplate
 from .base.map_selector import MapSelector as MapSelector
 from .base.markdown_display import MarkdownDisplay as MarkdownDisplay
 from .base.markdown_drawer import MarkdownDrawer as MarkdownDrawer
@@ -36,6 +37,7 @@ from .base.table import Table as Table
 from .base.tabs import Tabs as Tabs
 from .base.task import Task as Task
 from .base.timer import Timer as Timer
+from .base.tree import TreeBrowser as TreeBrowser
 from .numerous.project import ProjectsMenu as ProjectsMenu
 from .task.process_task import (
     ProcessTask as ProcessTask,

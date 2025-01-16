@@ -10,31 +10,9 @@ if ($currentPolicy -eq "Restricted") {
     }
 }
 
-# List of widget names (without the .tsx extension)
-$widgets = @(
-    "ButtonWidget",
-    "ChartWidget",
-    "CheckBoxWidget",
-    "DropDownWidget",
-    "MapSelectorWidget",
-    "MarkdownDrawerWidget",
-    "NumberInputWidget",
-    "PlotWidget",
-    "ProgressBarWidget",
-    "ProjectMenuWidget",
-    "TabsWidget",
-    "TaskWidget",
-    "TimerWidget",
-    "TableWidget",
-    "ChatWidget",
-    "MarkdownDisplayWidget",
-    "StringInputWidget",
-    "AccordionWidget",
-    "RadioButtonsWidget",
-    "SliderWidget",
-    "DateTimePickerWidget",
-    "DateTimeRangePickerWidget"
-)
+# Read widgets from config file
+$widgetConfig = Get-Content 'widget-config.json' | ConvertFrom-Json
+$widgets = $widgetConfig.widgets
 
 # Create output directory if it doesn't exist
 $outputDir = "../python/src/widgets/static"

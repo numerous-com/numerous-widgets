@@ -5803,7 +5803,7 @@ function Pd({
     g.target === g.currentTarget && t();
   }, m = (g) => {
     try {
-      return new Date(g).toLocaleTimeString();
+      return new Date(g).toLocaleTimeString([], { hour12: !1 });
     } catch {
       return g;
     }
@@ -5835,7 +5835,7 @@ function Pd({
           lineHeight: "25px"
         }
       },
-      l.slice(-20).map(([g, k, S, O], f) => /* @__PURE__ */ w.createElement("div", { key: f, className: "py-1 font-mono text-xs flex gap-2 h-[25px] items-center" }, /* @__PURE__ */ w.createElement("span", { className: "text-gray-400" }, m(g)), /* @__PURE__ */ w.createElement("span", { className: `font-medium ${p(k)}` }, "[", k, "]"), /* @__PURE__ */ w.createElement("span", { className: "text-gray-500" }, S, ":"), /* @__PURE__ */ w.createElement("span", { className: "text-gray-700" }, O)))
+      l.slice(-100).map(([g, k, S, O], f) => /* @__PURE__ */ w.createElement("div", { key: f, className: "py-1 font-mono text-xs flex gap-2 h-[25px] items-center" }, /* @__PURE__ */ w.createElement("span", { className: "text-gray-400" }, m(g)), /* @__PURE__ */ w.createElement("span", { className: `font-medium ${p(k)}` }, "[", k, "]"), /* @__PURE__ */ w.createElement("span", { className: "text-gray-500" }, S, ":"), /* @__PURE__ */ w.createElement("span", { className: "text-gray-700" }, O)))
     ), /* @__PURE__ */ w.createElement("div", { className: "flex items-center justify-between mt-auto" }, /* @__PURE__ */ w.createElement(
       zd,
       {

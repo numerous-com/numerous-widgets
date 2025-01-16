@@ -341,39 +341,81 @@ def _(aw, wi):
 
 @app.cell
 def _(aw, wi):
-    # Create modal dialog
-    dialog = aw(
-        wi.ModalDialog(
-            title="Confirm Action",
-            message="Are you sure you want to proceed?",
-            show_cancel=True,
-            ok_label="Yes, proceed",
-            cancel_label="No, go back",
-        )
-    )
+    items = {
+        'root': {
+            'id': 'root',  # Add id field
+            'label': 'Root',
+            'parent_id': None,
+            'is_expanded': True  # Add is_expanded field
+        },
+        'branch1': {
+            'id': 'branch1',
+            'label': 'Branch 1',
+            'parent_id': 'root',
+            'is_expanded': True
+        },
+        'leaf1': {
+            'id': 'leaf1',
+            'label': 'Leaf 1',
+            'parent_id': 'branch1',
+            'is_expanded': False
+        },
+        'leaf2': {
+            'id': 'leaf2',
+            'label': 'Leaf 2',
+            'parent_id': 'branch1',
+            'is_expanded': False
+        },
+        'branch3': {
+            'id': 'branch3',
+            'label': 'Branch 3',
+            'parent_id': 'root',
+            'is_expanded': True
+        },
+    }
 
-    # Handle dialog result
-    def on_result(change):
-        if change.new == "ok":
-            print("User clicked OK")
-        elif change.new == "cancel":
-            print("User clicked Cancel")
-
-    dialog.observe_result(on_result)
-
-    # Show with different message
-    dialog.show(title="Success", message="Operation completed successfully!")
-
-    # Hide the dialog programmatically
-    dialog.hide()
-    dialog
-    return dialog, on_result
+    tree = aw(wi.TreeBrowser(
+        items=items,
+        selection_mode='single',
+        expanded_ids=['root', 'branch1']
+    ))
+    tree
+    return items, tree
 
 
 @app.cell
-def _(dialog):
-    # Show the dialog
-    dialog.show()
+def _(tree):
+    tree.selected
+    return
+
+
+@app.cell
+def _(aw, wi):
+    # Create a template with variables
+    template = """
+    <div>
+        <h1>Welcome, {{name}}!</h1>
+        <p>Your age is {{age}} years old.</p>
+        <p>Your favorite color is {{color}}.</p>
+    </div>
+    """
+
+    # Define variables
+    variables = {
+        "name": "John Doe",
+        "age": 32,
+        "color": "blue"
+    }
+
+    # Create the widget
+    widget_html = aw(wi.HTMLTemplate(template=template, variables=variables))
+    widget_html
+    return template, variables, widget_html
+
+
+@app.cell
+def _(widget_html):
+    widget_html.update_variable("age", 50)
     return
 
 

@@ -6,31 +6,9 @@ if [ -z "$BASH_VERSION" ]; then
     exit 1
 fi
 
-# List of widget names (without the .tsx extension)
-widgets=(
-    "ButtonWidget"
-    "ChartWidget"
-    "CheckBoxWidget"
-    "DropDownWidget"
-    "MapSelectorWidget"
-    "MarkdownDrawerWidget"
-    "NumberInputWidget"
-    "PlotWidget"
-    "ProgressBarWidget"
-    "ProjectMenuWidget"
-    "TabsWidget"
-    "TaskWidget"
-    "TimerWidget"
-    "TableWidget"
-    "ChatWidget"
-    "MarkdownDisplayWidget"
-    "StringInputWidget"
-    "AccordionWidget"
-    "RadioButtonsWidget"
-    "SliderWidget"
-    "DateTimePickerWidget"
-    "DateTimeRangePickerWidget"
-)
+# Read widgets from config file
+widgets=($(cat widget-config.json | jq -r '.widgets[]'))
+
 
 # Create output directory if it doesn't exist
 outputDir="../python/src/widgets/static"
