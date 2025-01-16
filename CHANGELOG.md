@@ -2,6 +2,16 @@
 
 
 
+## v0.1.13 (2025-01-16)
+
+### Fix
+
+* fix(tree): Correct variable reference in TreeBrowser serialization
+
+- Updated the variable reference from &#39;id&#39; to &#39;_id&#39; in the TreeBrowser class to ensure accurate serialization of tree items.
+- This change improves the integrity of the serialized data structure used in the widget. ([`8902e21`](https://github.com/numerous-com/numerous-widgets/commit/8902e21963ca8661235e0c31801e50464d435021))
+
+
 ## v0.1.12 (2025-01-16)
 
 ### Fix
