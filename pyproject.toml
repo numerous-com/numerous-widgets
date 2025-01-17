@@ -119,3 +119,6 @@ exclude = ["python/examples"]
 [project.urls]
 Homepage = "https://github.com/pypa/sampleproject"
 Issues = "https://github.com/pypa/sampleproject/issues"
+
+[project.scripts]
+numerous-widgets = "numerous.widgets.cli:main"

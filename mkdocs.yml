@@ -10,6 +10,7 @@ nav:
     - Process Task: process_task.md
     - State Model: state_model.md
     - Templating: templating.md
+    - Styling: styling.md
 
 theme:
   name: material
