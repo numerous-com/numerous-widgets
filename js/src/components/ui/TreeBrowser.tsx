@@ -19,6 +19,9 @@ interface TreeBrowserProps {
     selectionMode: 'none' | 'single' | 'multiple';
     onChange: (selectedIds: string[]) => void;
     disabled?: boolean;
+    label_update: { [key: string]: string };
+    onLabelUpdate: (nodeId: string, newLabel: string) => void;
+    model?: any;
 }
 
 export function TreeBrowser({
@@ -27,6 +30,9 @@ export function TreeBrowser({
     selectionMode,
     onChange,
     disabled = false,
+    label_update,
+    onLabelUpdate,
+    model,
 }: TreeBrowserProps) {
     const processedItems = React.useMemo(() => {
         const result: { [key: string]: TreeItem } = {};
@@ -80,6 +86,66 @@ export function TreeBrowser({
         });
     };
 
+    const [editingNodeId, setEditingNodeId] = React.useState<string | null>(null);
+    const [editingLabel, setEditingLabel] = React.useState("");
+
+    const handleDoubleClick = (nodeId: string, label: string) => {
+        if (!disabled) {
+            setEditingNodeId(nodeId);
+            setEditingLabel(label);
+        }
+    };
+
+    const handleLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setEditingLabel(e.target.value);
+    };
+
+    const handleLabelSubmit = async (nodeId: string) => {
+        if (editingLabel.trim()) {
+            try {
+                // Wait for the update to be confirmed by the backend
+                await onLabelUpdate(nodeId, editingLabel.trim());
+                // Only reset editing state after successful update
+                setEditingNodeId(null);
+            } catch (error) {
+                console.error('Failed to update label:', error);
+                setEditingLabel(items[nodeId].label);
+                setEditingNodeId(null);
+            }
+        } else {
+            setEditingNodeId(null);
+        }
+    };
+
+    const handleKeyDown = async (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' && editingNodeId) {
+            // Immediately prevent default to stop multiple submissions
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Store the current editing node ID as it might change during await
+            const nodeId = editingNodeId;
+            const currentLabel = editingLabel;
+            
+            // Clear editing state immediately
+            setEditingNodeId(null);
+            
+            // Then process the update
+            if (currentLabel.trim()) {
+                try {
+                    await onLabelUpdate(nodeId, currentLabel.trim());
+                } catch (error) {
+                    console.error('Failed to update label:', error);
+                }
+            }
+        } else if (e.key === 'Escape') {
+            setEditingNodeId(null);
+            setEditingLabel(items[editingNodeId!]?.label || '');
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    };
+
     const renderTreeNode = (nodeId: string, depth: number = 0) => {
         const node = processedItems[nodeId];
         if (!node) return null;
@@ -88,12 +154,14 @@ export function TreeBrowser({
             .filter(item => item.parent_id === nodeId);
         const hasChildren = children.length > 0;
         const isExpanded = expanded.has(nodeId);
+        const isEditing = editingNodeId === nodeId;
 
         return (
             <div key={nodeId} style={{ paddingLeft: `${depth * 24}px` }}>
                 <div
-                    className={`tree-node ${selectedIds.includes(nodeId) ? 'selected' : ''} ${disabled ? 'disabled' : ''}`}
+                    className={`tree-node ${selectedIds.includes(nodeId) ? 'selected' : ''} ${disabled ? 'disabled' : ''} ${isEditing ? 'editing' : ''}`}
                     onClick={() => handleSelect(nodeId)}
+                    onDoubleClick={() => handleDoubleClick(nodeId, node.label)}
                 >
                     {hasChildren && (
                         <span
@@ -117,7 +185,20 @@ export function TreeBrowser({
                             </svg>
                         </span>
                     )}
-                    <span className="tree-label">{node.label}</span>
+                    {isEditing ? (
+                        <input
+                            type="text"
+                            value={editingLabel}
+                            onChange={handleLabelChange}
+                            onKeyDown={handleKeyDown}
+                            onBlur={async () => await handleLabelSubmit(nodeId)}
+                            autoFocus
+                            onClick={(e) => e.stopPropagation()}
+                            className="tree-label-input"
+                        />
+                    ) : (
+                        <span className="tree-label">{node.label}</span>
+                    )}
                 </div>
                 {hasChildren && isExpanded && (
                     <div className="tree-children">

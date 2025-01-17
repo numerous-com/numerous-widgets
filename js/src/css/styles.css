@@ -2361,3 +2361,29 @@ input[type="text"].invalid:focus {
 .html-template p {
     margin: 1em 0;
 }
+
+.tree-label-input {
+    width: 100%;
+    padding: 2px 4px;
+    margin: -3px 0;
+    border: 1px solid var(--ui-widget-border-color);
+    border-radius: 4px;
+    font-size: inherit;
+    font-family: inherit;
+    background-color: var(--ui-widget-primary-background);
+    color: var(--ui-widget-primary-text);
+}
+
+.tree-label-input:focus {
+    outline: none;
+    border-color: var(--ui-widget-focus-border);
+    box-shadow: var(--ui-widget-focus-shadow);
+}
+
+.tree-node.editing {
+    background-color: transparent;
+}
+
+.tree-node.editing:hover {
+    background-color: transparent;
+}

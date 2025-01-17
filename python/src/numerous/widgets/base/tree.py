@@ -1,5 +1,6 @@
 """Module providing a tree browser widget for the numerous library."""
 
+from collections.abc import Callable
 from typing import Literal
 
 import anywidget
@@ -43,6 +44,10 @@ class TreeBrowser(anywidget.AnyWidget):  # type: ignore[misc]
         selection_mode: Type of selection allowed ('none', 'single', 'multiple')
         expanded_ids: List of IDs that should be initially expanded
         disabled: Whether the tree browser is disabled
+        validate_label: Optional callback to validate label changes. \
+            Should return True if valid.
+            Signature: (item_id: str, new_label: str) -> bool
+            Default accepts all changes.
 
     """
 
@@ -55,6 +60,7 @@ class TreeBrowser(anywidget.AnyWidget):  # type: ignore[misc]
         ["none", "single", "multiple"], default_value="single"
     ).tag(sync=True)
     disabled = traitlets.Bool(default_value=False).tag(sync=True)
+    label_update = traitlets.Dict().tag(sync=True)
 
     # Load the JavaScript and CSS from external files
     _esm = ESM
@@ -66,13 +72,16 @@ class TreeBrowser(anywidget.AnyWidget):  # type: ignore[misc]
         selection_mode: Literal["none", "single", "multiple"] = "single",
         expanded_ids: list[str] | None = None,
         disabled: bool = False,  # noqa: ARG002
+        validate_label: Callable[[str, str], bool] | None = None,
     ) -> None:
         """Initialize the tree browser widget."""
         super().__init__(
             items={},  # Start with empty items
             selection_mode=selection_mode,
             selected_ids=[],
+            label_update={},
         )
+        self._validate_label = validate_label or (lambda _id, _label: True)
         # Set items after initialization to trigger the observer
         self.update_items(items, expanded_ids)
 
@@ -151,4 +160,24 @@ class TreeBrowser(anywidget.AnyWidget):  # type: ignore[misc]
         if item_id in self.items:
             items = dict(self.items)  # Create a new copy
             del items[item_id]
+            self.items = items  # Assign the new copy to trigger update
+
+    @traitlets.observe("label_update")  # type: ignore[misc]
+    def _handle_label_update(self, change: traitlets.Dict) -> None:
+        """Handle label updates from the frontend."""
+        new_labels = change["new"]
+
+        if new_labels:
+            for item_id, new_label in new_labels.items():
+                if item_id in self.items and self._validate_label(item_id, new_label):
+                    self.update_label(item_id, new_label)
+            # Don't clear the _label_update dict - let the frontend handle that
+            # after it sees the items update
+
+    def update_label(self, item_id: str, new_label: str) -> None:
+        """Update the label of a specific tree item."""
+        if item_id in self.items:
+            items = dict(self.items)  # Create a new copy
+            items[item_id] = dict(items[item_id])  # Create a new copy of the item
+            items[item_id]["label"] = new_label
             self.items = items  # Assign the new copy to trigger update
