@@ -2,6 +2,20 @@
 
 
 
+## v0.1.15 (2025-01-17)
+
+### Fix
+
+* fix(tree): Implement label editing functionality in TreeBrowser component
+
+- Added support for inline label editing in the TreeBrowser component, allowing users to double-click on a node to edit its label.
+- Introduced new props `label_update` and `onLabelUpdate` to manage label changes and communicate updates to the backend.
+- Enhanced the TreeBrowserWidget to handle label updates and maintain state consistency.
+- Updated CSS styles for the editing input field to improve user experience.
+
+These changes enhance the interactivity of the TreeBrowser, providing a more intuitive way for users to modify node labels. ([`ac47007`](https://github.com/numerous-com/numerous-widgets/commit/ac47007ad24649b166be1d6443eff54467f9ea0d))
+
+
 ## v0.1.14 (2025-01-16)
 
 ### Fix
