@@ -2,6 +2,21 @@
 
 
 
+## v0.1.16 (2025-01-17)
+
+### Fix
+
+* fix(tree): Add drag-and-drop functionality to TreeBrowser component
+
+- Introduced drag-and-drop capabilities for reordering tree nodes within the TreeBrowser component.
+- Added new props `move_update` and `onMoveUpdate` to handle item movement and communicate updates to the backend.
+- Implemented visual indicators for valid drop targets and positions (above, below, child) during drag operations.
+- Enhanced the TreeBrowserWidget to manage move updates and maintain state consistency.
+- Updated CSS styles to support drag-and-drop interactions and improve user experience.
+
+These changes significantly enhance the interactivity and usability of the TreeBrowser, allowing users to easily rearrange nodes. ([`7307c0c`](https://github.com/numerous-com/numerous-widgets/commit/7307c0c70b6ea2f64c62c93deab6b60b22dad741))
+
+
 ## v0.1.15 (2025-01-17)
 
 ### Fix
