@@ -22,6 +22,8 @@ interface TreeBrowserProps {
     label_update: { [key: string]: string };
     onLabelUpdate: (nodeId: string, newLabel: string) => void;
     model?: any;
+    move_update: { item_id: string; parent_id: string | null };
+    onMoveUpdate: (itemId: string, newParentId: string | null) => Promise<boolean>;
 }
 
 export function TreeBrowser({
@@ -32,6 +34,8 @@ export function TreeBrowser({
     disabled = false,
     label_update,
     onLabelUpdate,
+    move_update,
+    onMoveUpdate,
     model,
 }: TreeBrowserProps) {
     const processedItems = React.useMemo(() => {
@@ -89,7 +93,15 @@ export function TreeBrowser({
     const [editingNodeId, setEditingNodeId] = React.useState<string | null>(null);
     const [editingLabel, setEditingLabel] = React.useState("");
 
-    const handleDoubleClick = (nodeId: string, label: string) => {
+    const handleClick = (e: React.MouseEvent, nodeId: string) => {
+        e.stopPropagation();
+        if (!disabled && !editingNodeId) {
+            handleSelect(nodeId);
+        }
+    };
+
+    const handleDoubleClick = (e: React.MouseEvent, nodeId: string, label: string) => {
+        e.stopPropagation();
         if (!disabled) {
             setEditingNodeId(nodeId);
             setEditingLabel(label);
@@ -146,6 +158,113 @@ export function TreeBrowser({
         }
     };
 
+    const [draggedId, setDraggedId] = React.useState<string | null>(null);
+    const [dropTarget, setDropTarget] = React.useState<string | null>(null);
+    const [dropPosition, setDropPosition] = React.useState<'above' | 'below' | 'child' | null>(null);
+
+    // Helper function to check if nodeId is a descendant of potentialAncestor
+    const isDescendant = (nodeId: string, potentialAncestor: string): boolean => {
+        let current = items[nodeId]?.parent_id;
+        while (current) {
+            if (current === potentialAncestor) return true;
+            current = items[current]?.parent_id;
+        }
+        return false;
+    };
+
+    const handleDragStart = (e: React.DragEvent, nodeId: string) => {
+        if (disabled) {
+            e.preventDefault();
+            return;
+        }
+        e.stopPropagation();
+        setDraggedId(nodeId);
+        e.dataTransfer.setData('text/plain', nodeId);
+        e.dataTransfer.effectAllowed = 'move';
+        
+        // Add a drag image or use the default
+        const dragImage = document.createElement('div');
+        dragImage.textContent = items[nodeId]?.label || '';
+        dragImage.style.position = 'absolute';
+        dragImage.style.top = '-1000px';
+        document.body.appendChild(dragImage);
+        e.dataTransfer.setDragImage(dragImage, 0, 0);
+        setTimeout(() => document.body.removeChild(dragImage), 0);
+    };
+
+    const handleDragOver = (e: React.DragEvent, nodeId: string) => {
+        if (disabled || !draggedId) return;
+        
+        // Prevent dropping on self or descendants
+        if (draggedId === nodeId || isDescendant(nodeId, draggedId)) {
+            e.dataTransfer.dropEffect = 'none';
+            return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Get the target element's bounding rectangle
+        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+        const mouseY = e.clientY;
+        const relativeY = mouseY - rect.top;
+        
+        // Determine drop position based on mouse position
+        // Top 25% = above, bottom 25% = below, middle 50% = child
+        if (relativeY < rect.height * 0.25) {
+            setDropPosition('above');
+        } else if (relativeY > rect.height * 0.75) {
+            setDropPosition('below');
+        } else {
+            setDropPosition('child');
+        }
+
+        setDropTarget(nodeId);
+        e.dataTransfer.dropEffect = 'move';
+    };
+
+    const handleDragLeave = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.currentTarget.contains(e.relatedTarget as Node)) {
+            return;
+        }
+        setDropTarget(null);
+        setDropPosition(null);
+    };
+
+    const handleDragEnd = (e: React.DragEvent) => {
+        setDraggedId(null);
+        setDropTarget(null);
+        setDropPosition(null);
+    };
+
+    const handleDrop = async (e: React.DragEvent, targetId: string | null) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const sourceId = draggedId;
+        const position = dropPosition;
+        setDropTarget(null);
+        setDropPosition(null);
+        setDraggedId(null);
+
+        if (!sourceId || sourceId === targetId || isDescendant(targetId!, sourceId)) {
+            return;
+        }
+
+        try {
+            // Get the target's parent for 'above' and 'below' positions
+            const targetParentId = position === 'child' ? targetId : items[targetId!].parent_id;
+            const success = await onMoveUpdate(sourceId, targetParentId);
+            if (!success) {
+                console.log('Move validation failed');
+            }
+        } catch (error) {
+            console.error('Failed to move item:', error);
+        }
+    };
+
     const renderTreeNode = (nodeId: string, depth: number = 0) => {
         const node = processedItems[nodeId];
         if (!node) return null;
@@ -155,13 +274,28 @@ export function TreeBrowser({
         const hasChildren = children.length > 0;
         const isExpanded = expanded.has(nodeId);
         const isEditing = editingNodeId === nodeId;
+        const isDragging = draggedId === nodeId;
+        const isDropTarget = dropTarget === nodeId;
+        const isValidDropTarget = draggedId && draggedId !== nodeId && !isDescendant(nodeId, draggedId);
 
         return (
-            <div key={nodeId} style={{ paddingLeft: `${depth * 24}px` }}>
+            <div 
+                key={nodeId} 
+                className={`tree-node-wrapper 
+                    ${isDragging ? 'dragging' : ''} 
+                    ${isDropTarget && isValidDropTarget ? `drop-target drop-${dropPosition}` : ''}`}
+                >
                 <div
                     className={`tree-node ${selectedIds.includes(nodeId) ? 'selected' : ''} ${disabled ? 'disabled' : ''} ${isEditing ? 'editing' : ''}`}
-                    onClick={() => handleSelect(nodeId)}
-                    onDoubleClick={() => handleDoubleClick(nodeId, node.label)}
+                    style={{ paddingLeft: `${depth * 24}px` }}
+                    draggable={!disabled && !isEditing}
+                    onClick={(e) => handleClick(e, nodeId)}
+                    onDoubleClick={(e) => handleDoubleClick(e, nodeId, node.label)}
+                    onDragStart={(e) => handleDragStart(e, nodeId)}
+                    onDragOver={(e) => handleDragOver(e, nodeId)}
+                    onDragLeave={handleDragLeave}
+                    onDragEnd={handleDragEnd}
+                    onDrop={(e) => handleDrop(e, nodeId)}
                 >
                     {hasChildren && (
                         <span

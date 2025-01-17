@@ -9,6 +9,10 @@ function TreeBrowserWidget({ model }: { model?: any }) {
     const [selectionMode] = useModelState<'none' | 'single' | 'multiple'>("selection_mode");
     const [disabled] = useModelState<boolean>("disabled");
     const [labelUpdate, setLabelUpdate] = useModelState<{[key: string]: string}>("label_update");
+    const [moveUpdate, setMoveUpdate] = useModelState<{
+        item_id: string;
+        parent_id: string | null;
+    }>("move_update");
 
     const handleChange = (newSelectedIds: string[]) => {
         if (!disabled) {
@@ -36,6 +40,25 @@ function TreeBrowserWidget({ model }: { model?: any }) {
         });
     };
 
+    const handleMoveUpdate = async (itemId: string, newParentId: string | null) => {
+        await setMoveUpdate({ item_id: itemId, parent_id: newParentId });
+        // Wait for the items to update before returning
+        return new Promise<boolean>((resolve) => {
+            const initialParentId = items[itemId]?.parent_id;
+            const checkUpdate = setInterval(() => {
+                if (items[itemId]?.parent_id === newParentId) {
+                    clearInterval(checkUpdate);
+                    resolve(true);
+                }
+            }, 100);
+            // Timeout after 2 seconds
+            setTimeout(() => {
+                clearInterval(checkUpdate);
+                resolve(false);
+            }, 2000);
+        });
+    };
+
     return (
         <TreeBrowser
             items={items}
@@ -46,6 +69,8 @@ function TreeBrowserWidget({ model }: { model?: any }) {
             label_update={labelUpdate}
             onLabelUpdate={handleLabelUpdate}
             model={model}
+            move_update={moveUpdate}
+            onMoveUpdate={handleMoveUpdate}
         />
     );
 }
