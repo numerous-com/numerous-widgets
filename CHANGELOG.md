@@ -2,6 +2,20 @@
 
 
 
+## v0.1.17 (2025-01-17)
+
+### Fix
+
+* fix(config): Enhance CSS handling and export functionality
+
+- Added support for custom CSS file path through the environment variable `NUMEROUS_WIDGETS_CSS`, allowing users to specify their own styles.
+- Implemented logic to load custom CSS if provided; otherwise, defaults to the built-in styles.
+- Introduced a new function `export_default_css` to export the default CSS to a specified file or return it as a string, improving usability for developers.
+- Updated `mkdocs.yml` to include a new section for styling documentation.
+
+These changes improve the flexibility and usability of the widget&#39;s styling options. ([`59ce7a2`](https://github.com/numerous-com/numerous-widgets/commit/59ce7a260a90d1cd94dde2a270070c0328e68418))
+
+
 ## v0.1.16 (2025-01-17)
 
 ### Fix
