@@ -1,5 +1,7 @@
 """Module providing a markdown drawer widget for the numerous library."""
 
+import textwrap
+
 import anywidget
 import traitlets
 
@@ -36,8 +38,10 @@ class MarkdownDrawer(anywidget.AnyWidget):  # type: ignore[misc]
         content: str,
         is_open: bool = False,
     ) -> None:
+        # Dedent the content to remove unnecessary indentation
+        dedented_content = textwrap.dedent(content)
         super().__init__(
             title=title,
-            content=content,
+            content=dedented_content,
             is_open=is_open,
         )
