@@ -2,6 +2,21 @@
 
 
 
+## v0.1.18 (2025-01-18)
+
+### Fix
+
+* fix(mark-down-drawer): Enhance MarkdownDrawer component with new features and styling
+
+- Added `lucide-react` dependency for icon support in the MarkdownDrawer.
+- Implemented click outside functionality to close the drawer when it is open.
+- Refactored the drawer toggle button to include an icon and improve accessibility.
+- Updated CSS styles for the MarkdownDrawer to enhance positioning and appearance.
+- Modified the Python backend to dedent content before rendering, improving formatting.
+
+These changes improve the user experience and visual appeal of the MarkdownDrawer component. ([`d259173`](https://github.com/numerous-com/numerous-widgets/commit/d259173ab566f8ef35920a377f74772d035d21a5))
+
+
 ## v0.1.17 (2025-01-17)
 
 ### Fix
