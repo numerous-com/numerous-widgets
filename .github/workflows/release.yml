@@ -65,7 +65,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: widgets
-          path: python/src/widgets/static/
+          path: python/src/numerous/widgets/static/
   build:
     needs: build-widgets
     timeout-minutes: 15
@@ -116,7 +116,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: widgets
-          path: ./python/src/widgets/static
+          path: ./python/src/numerous/widgets/static
       - run: pip install python-semantic-release==9.6.0
       - run: semantic-release version --commit --tag --push
       - run: semantic-release publish  
