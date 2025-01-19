@@ -65,7 +65,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: widgets
-          path: python/src/widgets/static/*.mjs
+          path: python/src/widgets/static/
   build:
     needs: build-widgets
     timeout-minutes: 15
