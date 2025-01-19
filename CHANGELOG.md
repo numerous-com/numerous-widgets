@@ -2,6 +2,35 @@
 
 
 
+## v0.1.19 (2025-01-19)
+
+### Fix
+
+* fix(release): Update artifact paths in release workflow
+
+- Changed the artifact paths in the GitHub Actions release workflow to reflect the new directory structure for the widgets, ensuring that all relevant static files are correctly uploaded and downloaded.
+- This adjustment enhances the reliability of the release process by maintaining consistency in file locations.
+
+These changes contribute to a more efficient and organized release workflow for the numerous widgets. ([`7ebe264`](https://github.com/numerous-com/numerous-widgets/commit/7ebe26482212deb9aa2e56e1f9ffb8d56ab58915))
+
+* fix(release): Update artifact path in release workflow
+
+- Changed the artifact path in the GitHub Actions release workflow to include all static files from the widgets directory, improving the artifact upload process.
+- This adjustment ensures that all relevant files are included in the release, enhancing the deployment efficiency.
+
+These changes contribute to a more streamlined release process for the widget components. ([`83bf4e2`](https://github.com/numerous-com/numerous-widgets/commit/83bf4e2142d52c13ce12b569f4054cce499aca9f))
+
+* fix(release): Update release workflow and enhance widget components
+
+- Modified the GitHub Actions workflow to download multiple artifacts, improving the release process.
+- Removed unnecessary console logs from the HTMLTemplateWidget for cleaner code.
+- Refactored the MarkdownDrawerWidget to improve accessibility and user experience.
+- Updated the TreeBrowserWidget to support drag-and-drop functionality and inline label editing, enhancing interactivity.
+- Improved CSS styles across components for better visual consistency.
+
+These changes collectively enhance the functionality and usability of the numerous widgets. ([`6841579`](https://github.com/numerous-com/numerous-widgets/commit/6841579764b4b65153491619455e835fb3f9f2e2))
+
+
 ## v0.1.18 (2025-01-18)
 
 ### Fix
