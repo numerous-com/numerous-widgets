@@ -5715,12 +5715,6 @@ function Cd(e) {
 function _d() {
   const [e] = yr("template"), [n] = yr("variables"), [t] = yr("rendered_html"), [r] = yr("class_name");
   return Le.useEffect(() => {
-    console.log("JS state update:", {
-      template: e,
-      variables: n,
-      renderedHtml: t,
-      className: r
-    });
   }, [e, n, t, r]), /* @__PURE__ */ Le.createElement(
     "div",
     {

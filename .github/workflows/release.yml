@@ -108,11 +108,15 @@ jobs:
         with:
           python-version: "3.12"
           cache: "pip"
+      # Download both artifacts
       - uses: actions/download-artifact@v4
-        id: download
         with:
           name: package
           path: ./dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: widgets
+          path: ./python/src/widgets/static
       - run: pip install python-semantic-release==9.6.0
       - run: semantic-release version --commit --tag --push
       - run: semantic-release publish  
