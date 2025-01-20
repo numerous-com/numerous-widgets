@@ -37,6 +37,7 @@ from .base.table import Table as Table
 from .base.tabs import Tabs as Tabs
 from .base.task import Task as Task
 from .base.timer import Timer as Timer
+from .base.toggle_button import ToggleButton as ToggleButton
 from .base.tree import TreeBrowser as TreeBrowser
 from .numerous.project import ProjectsMenu as ProjectsMenu
 from .task.process_task import (

@@ -697,6 +697,17 @@ select::-ms-expand {
   box-shadow: var(--ui-widget-focus-shadow);
 }
 
+.widget-button[aria-pressed="true"] {
+  background-color: var(--ui-widget-focus-border);
+  color: white;
+  border-color: var(--ui-widget-focus-border);
+}
+
+.widget-button[aria-pressed="true"]:hover:not(:disabled) {
+  background-color: #1a6cd6;
+  border-color: #1a6cd6;
+}
+
 .ol-map {
   width: 100%;
   height: 100%;
@@ -1425,6 +1436,18 @@ select::-ms-expand {
 .string-input-container.fit-to-content {
   width: fit-content;
   display: inline-flex;
+}
+
+.string-input-container .input-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.string-input-container .input-wrapper.label-top {
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .string-label {
@@ -2444,4 +2467,25 @@ input[type="text"].invalid:focus {
 
 .tree-node[draggable="true"]:active {
     cursor: grabbing;
+}
+
+.toggle-button-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.toggle-check-icon {
+    animation: check-appear 0.2s ease-out;
+}
+
+@keyframes check-appear {
+    from {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }

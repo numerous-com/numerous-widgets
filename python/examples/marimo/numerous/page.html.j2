@@ -59,6 +59,8 @@
         {{ increment_counter }}
         {{ selection_widget}}
         {{ string_input }}
+        {{ toggle_button }}
+        {{ check_box }}
         {{ radio }}
         {{ slider }}
         {{ picker }}
@@ -90,6 +92,12 @@
     </div>
     <div class="column_with_spacing" style="display: {{'flex' if show_task else 'none'}}">
         {{ task }}
+    </div>
+    <div class="column_with_spacing" style="display: {{'flex' if show_tree else 'none'}}">
+        {{ tree }}
+    </div>
+    <div class="column_with_spacing" style="display: {{'flex' if show_html_template else 'none'}}">
+        {{ html_template }}
     </div>
 </div>
    

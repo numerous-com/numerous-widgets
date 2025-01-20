@@ -10,8 +10,10 @@ function StringWidget() {
     const [uiTooltip] = useModelState<string>("ui_tooltip");
     const [placeholder] = useModelState<string>("placeholder");
     const [fitToContent] = useModelState<boolean>("fit_to_content");
-    const [validationRegex] = useModelState<string>("validation_regex");
+    const [isValid] = useModelState<boolean>("is_valid");
     const [isPassword] = useModelState<boolean>("is_password");
+    const [validationMessage] = useModelState<string>("validation_message");
+    const [labelInline] = useModelState<boolean>("label_inline");
 
     return (
         <StringInput
@@ -20,8 +22,10 @@ function StringWidget() {
             uiTooltip={uiTooltip}
             placeholder={placeholder}
             fitToContent={fitToContent}
-            validationRegex={validationRegex}
+            isValid={isValid}
             isPassword={isPassword}
+            validationMessage={validationMessage}
+            labelInline={labelInline}
             onChange={setValue}
         />
     );

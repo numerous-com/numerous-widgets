@@ -20,6 +20,7 @@ def _():
 def _(
     accordion,
     chat,
+    check_box,
     counter,
     ht,
     increment_counter,
@@ -37,6 +38,9 @@ def _(
     table,
     tabs,
     task_button,
+    toggle_button,
+    tree,
+    widget_html,
 ):
     ht(
         page(
@@ -48,7 +52,9 @@ def _(
             show_task=tabs.active_tab == "Task",
             show_table=tabs.active_tab == "Table",
             show_markdown=tabs.active_tab == "Markdown",
-            show_chat=tabs.active_tab == "Chat",
+            show_chat = tabs.active_tab == "Chat",
+            show_tree = tabs.active_tab == "Tree",
+            show_html_template = tabs.active_tab == "HTML Template",
             counter=counter,
             increment_counter=increment_counter,
             selection_widget=selection_widget,
@@ -57,6 +63,7 @@ def _(
             accordion=accordion,
             show_accordion=accordion.expanded,
             project_widget=project_widget,
+            toggle_button=toggle_button,
             radio=radio,
             slider=slider,
             picker=picker,
@@ -66,6 +73,9 @@ def _(
             chat=chat,
             task=task_button,
             make_a_change=make_a_change,
+            tree=tree,
+            html_template=widget_html,
+            check_box=check_box
         )
     )
     return
@@ -84,6 +94,8 @@ def _(aw, wi):
                 "Table",
                 "Markdown",
                 "Chat",
+                "Tree",
+                "HTML Template"
             ]
         )
     )
@@ -102,7 +114,7 @@ def _(aw, value, wi):
         wi.Number(
             default=value(),
             label="Counter:",
-            fit_to_content=True,
+            fit_to_content=False,
             tooltip="This is the value the counter has reached.",
         )
     )
@@ -128,6 +140,12 @@ def _(aw, wi):
 
 @app.cell
 def _(aw, wi):
+    def on_validation(value):
+        if value == value.lower():
+            return True
+
+        return "All characters must be lower case!"
+
     string_input = aw(
         wi.String(
             label="Enter text",
@@ -135,11 +153,12 @@ def _(aw, wi):
             default="Hello",
             placeholder="Type something...",
             fit_to_content=True,
-            validation_regex=r"^[a-z]*$",
+            label_inline=True,
+            on_validation=on_validation,
             is_password=False,
         )
     )
-    return (string_input,)
+    return on_validation, string_input
 
 
 @app.cell
@@ -195,6 +214,22 @@ def _(aw, wi):
         )
     )
     return (accordion,)
+
+
+@app.cell
+def _(aw, wi):
+    toggle_button = aw(
+        wi.ToggleButton(label="Toogle Something")
+    )
+    return (toggle_button,)
+
+
+@app.cell
+def _(aw, wi):
+    check_box = aw(
+        wi.CheckBox(label="Check Something")
+    )
+    return (check_box,)
 
 
 @app.cell
@@ -333,10 +368,7 @@ def _(aw, wi):
 
     # Add a new system message
     chat.add_message("This is a system message", msg_type="system")
-
-    # Get message history
-    history = chat.message_history
-    return chat, history, on_new_message
+    return chat, on_new_message
 
 
 @app.cell
@@ -379,14 +411,7 @@ def _(aw, wi):
         selection_mode='single',
         expanded_ids=['root', 'branch1']
     ))
-    tree
     return items, tree
-
-
-@app.cell
-def _(tree):
-    tree.selected
-    return
 
 
 @app.cell
@@ -409,7 +434,6 @@ def _(aw, wi):
 
     # Create the widget
     widget_html = aw(wi.HTMLTemplate(template=template, variables=variables))
-    widget_html
     return template, variables, widget_html
 
 
