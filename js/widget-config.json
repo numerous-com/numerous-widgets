@@ -24,6 +24,7 @@
     "TabsWidget",
     "TaskWidget",
     "TimerWidget",
+    "ToggleButtonWidget",
     "TreeBrowserWidget"
   ]
 } 
