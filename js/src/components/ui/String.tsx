@@ -28,21 +28,31 @@ export function StringInput({
 }: StringInputProps) {
     
     return (
-        <div className={`string-input-container ${fitToContent ? 'fit-to-content' : ''}`}>
-            <div className={`input-wrapper ${!labelInline ? 'label-top' : ''}`}>
-                <label className="string-label">
+        <div className={`input-container string-input-container ${fitToContent ? 'fit-to-content' : ''} ${labelInline ? 'label-inline' : ''}`}>
+            {!labelInline && (
+                <label className="input-label string-label">
                     <span className="string-label-text">{uiLabel}</span>
                     {uiTooltip && <Tooltip tooltip={uiTooltip} />}
                 </label>
+            )}
+            <div className={`input-wrapper ${!isValid ? 'invalid' : ''}`}>
+                {labelInline && (
+                    <label className="input-label string-label">
+                        <span className="string-label-text">{uiLabel}</span>
+                        {uiTooltip && <Tooltip tooltip={uiTooltip} />}
+                    </label>
+                )}
                 <input 
                     type={isPassword ? "password" : "text"}
                     value={value}
                     placeholder={placeholder}
                     onChange={(e) => onChange(e.target.value)}
-                    style={{ flexGrow: fitToContent ? 0 : 1 }}
-                    className={!isValid ? 'invalid' : ''}
-                    title={validationMessage || undefined}
                 />
+                {!isValid && validationMessage && (
+                    <div className="validation-message">
+                        {validationMessage}
+                    </div>
+                )}
             </div>
         </div>
     );

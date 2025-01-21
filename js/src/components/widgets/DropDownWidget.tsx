@@ -11,6 +11,7 @@ function DropDownWidget() {
     const [uiLabel] = useModelState<string>("ui_label");
     const [uiTooltip] = useModelState<string>("ui_tooltip");
     const [fitToContent] = useModelState<boolean>("fit_to_content");
+    const [labelInline] = useModelState<boolean>("label_inline");
     
     const handleChange = (value: string) => {
         setSelectedKey(value);
@@ -25,6 +26,7 @@ function DropDownWidget() {
             uiTooltip={uiTooltip}
             onChange={handleChange}
             fitToContent={fitToContent}
+            labelInline={labelInline}
         />
     );
 }

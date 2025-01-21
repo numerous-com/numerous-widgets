@@ -9,6 +9,9 @@ interface NumberInputProps {
     uiLabel: string;
     uiTooltip: string;
     onChange: (value: number) => void;
+    fitToContent?: boolean;
+    labelInline?: boolean;
+    unit?: string;
 }
 
 export function NumberInput({ 
@@ -19,8 +22,10 @@ export function NumberInput({
     uiLabel, 
     uiTooltip, 
     onChange,
-    fitToContent
-}: NumberInputProps & { fitToContent: boolean }) {
+    fitToContent = false,
+    labelInline = true,
+    unit
+}: NumberInputProps) {
     const isValid = start <= value && value <= stop;
 
     // Helper function to coerce to nearest step multiple and round to step precision
@@ -44,12 +49,20 @@ export function NumberInput({
     };
 
     return (
-        <div className={`number-input-container ${fitToContent ? 'fit-to-content' : ''} ${!isValid ? 'invalid' : ''}`}>
-            <div className="input-wrapper" style={{ width: fitToContent ? 'auto' : '100%' }}>
-                <label className="number-label">
-                    <span>{uiLabel}</span>
+        <div className={`input-container number-input-container ${fitToContent ? 'fit-to-content' : ''} ${labelInline ? 'label-inline' : ''}`}>
+            {!labelInline && (
+                <label className="input-label number-label">
+                    <span className="string-label-text">{uiLabel}</span>
                     {uiTooltip && <Tooltip tooltip={uiTooltip} />}
                 </label>
+            )}
+            <div className={`input-wrapper ${!isValid ? 'invalid' : ''}`}>
+                {labelInline && (
+                    <label className="input-label number-label">
+                        <span className="string-label-text">{uiLabel}</span>
+                        {uiTooltip && <Tooltip tooltip={uiTooltip} />}
+                    </label>
+                )}
                 <input 
                     type="number"
                     value={value}
@@ -57,17 +70,17 @@ export function NumberInput({
                     max={stop}
                     step={step}
                     onChange={(e) => handleChange(Number(e.target.value))}
-                    style={{ flexGrow: fitToContent ? 0 : 1 }}
                 />
+                {unit && <span className="unit-badge">{unit}</span>}
                 <div className="buttons">
                     <button 
-                        className="step-button"
+                        className="step-button down"
                         onClick={() => handleChange(value - step)}
                     >
                         −
                     </button>
                     <button 
-                        className="step-button"
+                        className="step-button up"
                         onClick={() => handleChange(value + step)}
                     >
                         +

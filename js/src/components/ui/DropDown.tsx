@@ -8,6 +8,7 @@ interface DropDownProps {
     uiTooltip: string;
     onChange: (selected_key: string) => void;
     fitToContent: boolean;
+    labelInline: boolean;
 }
 
 export function DropDown({ 
@@ -16,19 +17,16 @@ export function DropDown({
     uiLabel, 
     uiTooltip, 
     onChange,
-    fitToContent
+    fitToContent,
+    labelInline
 }: DropDownProps) {
     const [isOpen, setIsOpen] = React.useState(false);
-    const dropdownRef = React.useRef<HTMLDivElement>(null);
-    const optionsRef = React.useRef<HTMLDivElement>(null);
+    const containerRef = React.useRef<HTMLDivElement>(null);
 
-    // Add click outside handler
-    React.useEffect(() => {
+    // Click outside handler
+    /*React.useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && 
-                !dropdownRef.current.contains(event.target as Node) &&
-                optionsRef.current && 
-                !optionsRef.current.contains(event.target as Node)) {
+            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
                 setIsOpen(false);
             }
         };
@@ -37,7 +35,7 @@ export function DropDown({
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, []);
+    }, []);*/
 
     const handleOptionClick = (option: string) => {
         onChange(option);
@@ -49,17 +47,21 @@ export function DropDown({
     };
 
     return (
-        <div className={`dropdown-container ${fitToContent ? 'fit-to-content' : ''}`}>
-            <label className="dropdown-label">
-                <span>{uiLabel}</span>
-                {uiTooltip && <Tooltip tooltip={uiTooltip} />}
-            </label>
-            <div 
-                className="select-wrapper-dropdown"
-                //style={{ zIndex: 1 }}
-            >
+        <div className={`input-container dropdown-input-container ${fitToContent ? 'fit-to-content' : ''} ${labelInline ? 'label-inline' : ''}`}>
+            {!labelInline && (
+                <label className="input-label dropdown-label">
+                    <span className="string-label-text">{uiLabel}</span>
+                    {uiTooltip && <Tooltip tooltip={uiTooltip} />}
+                </label>
+            )}
+            <div className="input-wrapper" ref={containerRef}>
+                {labelInline && (
+                    <label className="input-label dropdown-label">
+                        <span className="string-label-text">{uiLabel}</span>
+                        {uiTooltip && <Tooltip tooltip={uiTooltip} />}
+                    </label>
+                )}
                 <div 
-                    ref={dropdownRef}
                     className="custom-select" 
                     tabIndex={0}
                     onClick={toggleDropdown}
@@ -67,24 +69,19 @@ export function DropDown({
                     <div className="selected-value">{selected_key}</div>
                     <div className="dropdown-arrow"></div>
                 </div>
-                <div 
-                    ref={optionsRef}
-                    className="options-container"
-                    style={{ display: isOpen ? 'block' : 'none' }}
-                >
-                    {options.map(option => (
-                        <div
-                            key={option}
-                            className={`option ${option === selected_key ? 'selected' : ''}`}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleOptionClick(option);
-                            }}
-                        >
-                            {option}
-                        </div>
-                    ))}
-                </div>
+                {isOpen && (
+                    <div className="options-container">
+                        {options.map(option => (
+                            <div
+                                key={option}
+                                className={`option ${option === selected_key ? 'selected' : ''}`}
+                                onClick={() => handleOptionClick(option)}
+                            >
+                                {option}
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

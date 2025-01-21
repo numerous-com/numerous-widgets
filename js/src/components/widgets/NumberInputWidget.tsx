@@ -12,6 +12,8 @@ function NumberWidget() {
     const [uiLabel] = useModelState<string>("ui_label");
     const [uiTooltip] = useModelState<string>("ui_tooltip");
     const [fitToContent] = useModelState<boolean>("fit_to_content");
+    const [labelInline] = useModelState<boolean>("label_inline");
+    const [unit] = useModelState<string>("unit");
 
     return (
         <NumberInput
@@ -22,6 +24,8 @@ function NumberWidget() {
             uiLabel={uiLabel}
             uiTooltip={uiTooltip}
             fitToContent={fitToContent}
+            labelInline={labelInline}
+            unit={unit || undefined}
             onChange={setValue}
         />
     );
