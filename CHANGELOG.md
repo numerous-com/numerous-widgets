@@ -2,6 +2,22 @@
 
 
 
+## v0.1.20 (2025-01-21)
+
+### Fix
+
+* fix(dropdown): fix issues with z-index too high ([`05a9321`](https://github.com/numerous-com/numerous-widgets/commit/05a932137447b32dd66475791511989ce39e0b12))
+
+* fix(ui): Enhance StringInput and introduce ToggleButton widget
+
+- Updated StringInput component to include new props: `isValid`, `validationMessage`, and `labelInline`, improving validation handling and layout options.
+- Refactored validation logic to utilize a callback for custom validation, enhancing flexibility.
+- Introduced a new ToggleButton widget for better user interaction, complete with icon support and state management.
+- Updated CSS styles for improved layout and visual consistency across components.
+
+These changes collectively enhance the functionality and usability of the numerous widgets. ([`de23add`](https://github.com/numerous-com/numerous-widgets/commit/de23add8a5f10941566e59f36ee916e610e88490))
+
+
 ## v0.1.19 (2025-01-19)
 
 ### Fix
