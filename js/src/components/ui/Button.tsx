@@ -21,7 +21,6 @@ export function Button({
                 className="widget-button"
                 onClick={onClick}
                 disabled={disabled}
-                aria-pressed={value}
                 title={tooltip}
             >
                 {label}

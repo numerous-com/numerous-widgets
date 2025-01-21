@@ -22,15 +22,29 @@ export function DropDown({
     const dropdownRef = React.useRef<HTMLDivElement>(null);
     const optionsRef = React.useRef<HTMLDivElement>(null);
 
+    // Add click outside handler
+    React.useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && 
+                !dropdownRef.current.contains(event.target as Node) &&
+                optionsRef.current && 
+                !optionsRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     const handleOptionClick = (option: string) => {
-
         onChange(option);
         setIsOpen(false);
     };
 
     const toggleDropdown = () => {
-
         setIsOpen(!isOpen);
     };
 
@@ -40,7 +54,10 @@ export function DropDown({
                 <span>{uiLabel}</span>
                 {uiTooltip && <Tooltip tooltip={uiTooltip} />}
             </label>
-            <div className="select-wrapper">
+            <div 
+                className="select-wrapper-dropdown"
+                //style={{ zIndex: 1 }}
+            >
                 <div 
                     ref={dropdownRef}
                     className="custom-select" 
@@ -55,21 +72,18 @@ export function DropDown({
                     className="options-container"
                     style={{ display: isOpen ? 'block' : 'none' }}
                 >
-                    {options.map(option => {
-
-return (
-                            <div
-                                key={option}
-                                className={`option ${option === selected_key ? 'selected' : ''}`}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleOptionClick(option);
-                                }}
-                            >
-                                {option}
-                            </div>
-                        );
-                    })}
+                    {options.map(option => (
+                        <div
+                            key={option}
+                            className={`option ${option === selected_key ? 'selected' : ''}`}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleOptionClick(option);
+                            }}
+                        >
+                            {option}
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>

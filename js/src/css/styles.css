@@ -14,6 +14,14 @@
   --ui-widget-focus-shadow: 0 0 0 2px #1F80F2;
   --ui-widget-dropdown-shadow: 0 0 6px rgba(0, 0, 0, 0.03);
   --ui-widget-secondary-text: #666666;
+
+  /* Z-index hierarchy */
+  --z-modal: 9999;        /* Highest: Modal dialogs */
+  --z-overlay: 400;      /* Overlays like markdown drawer */
+  --z-drawer-content: 300; /* Content within drawers */
+  --z-menu: 200;         /* Dropdown menus, popovers */
+  --z-select: 100;       /* Select wrapper */
+  --z-tooltip: 100;       /* Tooltips */
 }
 
 .marimo {
@@ -183,7 +191,7 @@ button.secondary:hover {
   visibility: hidden;
   opacity: 0;
   transition: opacity 0.2s;
-  z-index: 1000;
+  z-index: var(--z-tooltip);
 }
 
 .tooltip-icon:hover::after {
@@ -270,14 +278,14 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 [data-radix-popper-content-wrapper] {
-  z-index: 9999 !important;
+  z-index: var(--z-menu) !important;
 }
 
 [data-radix-dialog-overlay] {
   position: fixed !important;
   inset: 0 !important;
   background-color: rgba(0, 0, 0, 0.5) !important;
-  z-index: 9998 !important;
+  z-index: var(--z-overlay) !important;
 }
 
 [data-radix-dialog-content] {
@@ -285,7 +293,7 @@ input[type="number"]::-webkit-outer-spin-button {
   left: 50% !important;
   top: 50% !important;
   transform: translate(-50%, -50%) !important;
-  z-index: 9999 !important;
+  z-index: var(--z-modal) !important;
   background-color: var(--ui-widget-primary-background);
   border-radius: 8px;
   box-shadow: var(--ui-widget-dropdown-shadow);
@@ -440,11 +448,11 @@ button[role="option"]:last-child {
   font-size: 14px;
 }
 
-.select-wrapper {
+.select-wrapper-dropdown {
   position: relative;
   width: auto;
   height: 32px;
-  z-index: 9998;
+  z-index: var(--z-select);
 }
 
 .custom-select {
@@ -515,7 +523,7 @@ button[role="option"]:last-child {
   border-radius: 4px;
   max-height: 200px;
   overflow-y: auto;
-  z-index: 9999;
+  z-index: var(--z-menu);
   box-shadow: var(--ui-widget-dropdown-shadow);
   white-space: nowrap;
 }
@@ -785,7 +793,7 @@ select::-ms-expand {
   border: 1px solid var(--ui-widget-border-color);
   border-radius: 8px;
   box-shadow: var(--ui-widget-dropdown-shadow);
-  z-index: 1000;
+  z-index: var(--z-overlay);
   display: flex;
   flex-direction: column;
 }
@@ -812,7 +820,7 @@ select::-ms-expand {
   border-radius: 8px;
   padding: 8px;
   box-shadow: var(--ui-widget-dropdown-shadow);
-  z-index: 1000;
+  z-index: var(--z-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -832,6 +840,7 @@ select::-ms-expand {
   padding: 15px;
   overflow-y: auto;
   flex-grow: 1;
+  z-index: var(--z-drawer-content);
 }
 
 .drawer-content h1 {
@@ -1400,7 +1409,7 @@ select::-ms-expand {
   position: fixed !important;
   inset: 0 !important;
   background-color: rgba(0, 0, 0, 0.5) !important;
-  z-index: 9998 !important;
+  z-index: var(--z-overlay) !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1415,7 +1424,7 @@ select::-ms-expand {
   max-width: 90vw;
   max-height: 85vh;
   overflow: auto;
-  z-index: 9999 !important;
+  z-index: var(--z-modal) !important;
 }
 
 .string-label-text {
@@ -2174,7 +2183,7 @@ input[type="text"].invalid:focus {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: var(--z-overlay);
 }
 
 .modal-dialog {
