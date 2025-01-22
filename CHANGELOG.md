@@ -2,6 +2,19 @@
 
 
 
+## v0.1.22 (2025-01-22)
+
+### Fix
+
+* fix(ui): Enhance ProgressBar and Slider components with new props
+
+- Added `fitToContent` and `labelInline` props to ProgressBar and Slider components, improving layout flexibility and user experience.
+- Updated corresponding widget components (ProgressBarWidget and SliderWidget) to utilize the new props for better rendering options.
+- Refactored CSS styles to support the new props, enhancing visual consistency and responsiveness across the UI components.
+
+These changes collectively improve the interactivity and presentation of the numerous widgets. ([`d9ad153`](https://github.com/numerous-com/numerous-widgets/commit/d9ad153580ef6c968bfc681dfbaab199a83486aa))
+
+
 ## v0.1.21 (2025-01-22)
 
 ### Fix
