@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import { Slider } from "../ui/Slider";
-import '../../css/styles.css';
+import '../../css/styles.scss';
 
 function SliderWidget() {
     // Model states

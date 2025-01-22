@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 
-import '../../css/styles.css';
+import '../../css/styles.scss';
 
 function ProjectMenuWidget() {
 	const [projects] = useModelState<Array<{

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import { MarkdownDisplay } from "../ui/MarkdownDisplay";
-import '../../css/styles.css';
+import '../../css/styles.scss';
 
 function MarkdownDisplayWidget() {
     const [content] = useModelState<string>("content");

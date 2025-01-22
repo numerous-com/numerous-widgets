@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import { RadioButtons } from "../ui/RadioButtons";
-import '../../css/styles.css';
+import '../../css/styles.scss';
 
 function RadioButtonsWidget() {
     // Model states

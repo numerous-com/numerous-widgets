@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import { TreeBrowser } from "../ui/TreeBrowser";
-import '../../css/styles.css';
+import '../../css/styles.scss';
 
 function TreeBrowserWidget({ model }: { model?: any }) {
     const [items] = useModelState("items");

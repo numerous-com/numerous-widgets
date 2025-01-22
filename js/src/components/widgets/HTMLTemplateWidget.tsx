@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
-import '../../css/styles.css';
+import '../../css/styles.scss';
 import { noop } from "chart.js/helpers";
 
 function HTMLTemplateWidget() {

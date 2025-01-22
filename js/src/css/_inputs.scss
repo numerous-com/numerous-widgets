@@ -1,0 +1,94 @@
+/* Base Input Container */
+.input-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  vertical-align: top;
+
+  &.fit-to-content {
+    width: fit-content;
+    display: inline-flex;
+  }
+}
+
+/* Label Styling */
+.input-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ui-widget-primary-text);
+  font-size: 14px;
+  margin-bottom: 0;
+  padding-left: 8px;
+}
+
+/* Input Wrapper */
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--ui-widget-border-color);
+  border-radius: 4px;
+  background-color: var(--ui-widget-primary-background);
+  width: auto;
+  height: 32px;
+
+  &:focus-within {
+    border-color: var(--ui-widget-focus-border);
+    box-shadow: var(--ui-widget-focus-shadow);
+  }
+
+  &.invalid {
+    border-color: #ef4444;
+
+    &:focus-within {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+    }
+
+    &:hover .validation-message {
+      display: block;
+    }
+  }
+
+  .input-label {
+    padding-left: 8px;
+    margin-right: 8px;
+    flex: 1;
+    text-align: left;
+  }
+
+  input[type="number"] {
+    text-align: right;
+    width: 80px;
+  }
+}
+
+/* Input Validation */
+.validation-message {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  background-color: #fef2f2;
+  border: 1px solid #ef4444;
+  border-radius: 4px;
+  color: #ef4444;
+  font-size: 12px;
+  white-space: nowrap;
+  margin-bottom: 4px;
+  z-index: var(--z-tooltip);
+}
+
+/* Base Input Styles */
+input[type="text"],
+input[type="password"],
+input[type="number"] {
+  padding: 4px 8px;
+  font-size: 14px;
+  border: none;
+  outline: none;
+  background-color: var(--ui-widget-primary-background);
+}

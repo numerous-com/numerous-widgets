@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import { MapSelector } from "../ui/MapSelector";
-import '../../css/styles.css';
+import '../../css/styles.scss';
 
 function MapSelectorWidget() {
     const [points, setPoints] = useModelState<Record<string, [number, number]>>("points");

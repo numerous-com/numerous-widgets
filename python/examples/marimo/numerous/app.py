@@ -22,8 +22,10 @@ def _(
     chat,
     check_box,
     counter,
+    fit_to_content_checkbox,
     ht,
     increment_counter,
+    inline_label_checkbox,
     make_a_change,
     map,
     md,
@@ -75,7 +77,9 @@ def _(
             make_a_change=make_a_change,
             tree=tree,
             html_template=widget_html,
-            check_box=check_box
+            check_box=check_box,
+            fit_to_content_checkbox=fit_to_content_checkbox,
+            inline_label_checkbox=inline_label_checkbox
         )
     )
     return
@@ -109,6 +113,35 @@ def _(mo):
 
 
 @app.cell
+def _(aw, check_box, counter, selection_widget, slider, string_input, wi):
+    layout_adjustable_widgets = [counter, selection_widget, string_input, slider, check_box]
+
+    def on_fit_to_content_change(value):
+        for widget in layout_adjustable_widgets:
+            widget.fit_to_content = value
+
+    fit_to_content_checkbox = aw(wi.CheckBox(label="Fit to content", on_change=on_fit_to_content_change))
+
+    def on_inline_labvel_change(value):
+        for widget in layout_adjustable_widgets:
+            widget.label_inline = value
+
+    inline_label_checkbox = aw(wi.CheckBox(label="Inline Label", on_change=on_inline_labvel_change))
+    return (
+        fit_to_content_checkbox,
+        inline_label_checkbox,
+        layout_adjustable_widgets,
+        on_fit_to_content_change,
+        on_inline_labvel_change,
+    )
+
+
+@app.cell
+def _():
+    return
+
+
+@app.cell
 def _(aw, value, wi):
     counter = aw(
         wi.Number(
@@ -116,6 +149,7 @@ def _(aw, value, wi):
             label="Counter:",
             fit_to_content=False,
             tooltip="This is the value the counter has reached.",
+            unit="MW"
         )
     )
     return (counter,)
@@ -255,6 +289,7 @@ def _(aw, wi):
             step=1,
             default=50,
             tooltip="Drag to adjust the value",
+            label_inline=False
         )
     )
     return (slider,)

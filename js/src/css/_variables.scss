@@ -1,0 +1,24 @@
+/* UI Widget Colors */
+:root {
+  --ui-widget-primary-text: #141414;
+  --ui-widget-tooltip-icon: #666666;
+  --ui-widget-tooltip-background: #f5f5f5;
+  --ui-widget-border-color: #e7e7e7;
+  --ui-widget-primary-background: #ffffff;
+  --ui-widget-secondary-background: #f5f5f5;
+  --ui-widget-hover-background: rgba(255, 255, 255, 0.7);
+  --ui-widget-hover-background-dark: rgba(244, 244, 244, 1);
+  --ui-widget-focus-border: #333333;
+  --ui-widget-focus-shadow: 0 0 0 2px #1F80F2;
+  --ui-widget-dropdown-shadow: 0 0 6px rgba(0, 0, 0, 0.03);
+  --ui-widget-secondary-text: #666666;
+
+  /* Z-index hierarchy */
+  --z-modal: 9999;        /* Highest: Modal dialogs */
+  --z-overlay: 400;       /* Overlays like markdown drawer */
+  --z-drawer-content: 300; /* Content within drawers */
+  --z-menu-items: 250;    /* Menu items */
+  --z-menu: 200;          /* Dropdown menus, popovers */
+  --z-select: 100;        /* Select wrapper */
+  --z-tooltip: 100;       /* Tooltips */
+}

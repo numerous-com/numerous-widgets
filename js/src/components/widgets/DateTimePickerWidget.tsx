@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import { DateTimePicker } from "../ui/DateTimePicker";
-import '../../css/styles.css';
+import '../../css/styles.scss';
 
 function DateTimePickerWidget() {
     // Model states

@@ -30,6 +30,7 @@ class DropDown(anywidget.AnyWidget):  # type: ignore[misc]
     selected_value: str | None = traitlets.Unicode(allow_none=True).tag(sync=True)
     options: list[str] = traitlets.List().tag(sync=True)
     fit_to_content: bool = traitlets.Bool(default_value=False).tag(sync=True)
+    label_inline = traitlets.Bool(default_value=True).tag(sync=True)
 
     # Load the JavaScript and CSS from external files
     _esm = ESM
@@ -42,6 +43,7 @@ class DropDown(anywidget.AnyWidget):  # type: ignore[misc]
         tooltip: str | None = None,
         default: str | None = None,
         fit_to_content: bool = False,
+        label_inline: bool = True,
     ) -> None:
         # Initialize with keyword arguments
         default_key = default if default is not None else options[0]
@@ -52,6 +54,7 @@ class DropDown(anywidget.AnyWidget):  # type: ignore[misc]
             selected_value=default_key,
             options=options,
             fit_to_content=fit_to_content,
+            label_inline=label_inline,
         )
 
     @property

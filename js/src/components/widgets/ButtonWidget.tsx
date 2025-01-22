@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import { Button } from "../ui/Button";
-import '../../css/styles.css';
+import '../../css/styles.scss';
 
 function ButtonWidget() {
     const [uiLabel] = useModelState<string>("ui_label");

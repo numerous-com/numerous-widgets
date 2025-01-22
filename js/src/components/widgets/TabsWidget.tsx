@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import { Tabs } from "../ui/Tabs";
-import '../../css/styles.css';
+import '../../css/styles.scss';
 
 function TabsWidget({ model }: { model?: any }) {
     const [tabs] = useModelState<string[]>("tabs");

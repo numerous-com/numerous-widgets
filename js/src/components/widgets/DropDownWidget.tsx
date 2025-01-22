@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import { DropDown } from "../ui/DropDown";
-import '../../css/styles.css';
+import '../../css/styles.scss';
 
 function DropDownWidget() {
     // Model states

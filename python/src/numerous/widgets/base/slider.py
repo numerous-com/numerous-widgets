@@ -23,6 +23,7 @@ class Slider(anywidget.AnyWidget):  # type: ignore[misc]
         step: The step size between values.
         default: The default value of the slider.
         tooltip: The tooltip of the slider.
+        label_inline: Whether the label should be displayed inline.
 
     """
 
@@ -33,6 +34,7 @@ class Slider(anywidget.AnyWidget):  # type: ignore[misc]
     min_value = traitlets.Float().tag(sync=True)
     max_value = traitlets.Float().tag(sync=True)
     step = traitlets.Float().tag(sync=True)
+    label_inline = traitlets.Bool(default_value=True).tag(sync=True)
 
     # Load the JavaScript and CSS from external files
     _esm = ESM
@@ -46,6 +48,7 @@ class Slider(anywidget.AnyWidget):  # type: ignore[misc]
         step: float = 1.0,
         default: float | None = None,
         tooltip: str | None = None,
+        label_inline: bool = True,
     ) -> None:
         if min_value >= max_value:
             raise ValueError("min_value must be less than max_value")
@@ -66,6 +69,7 @@ class Slider(anywidget.AnyWidget):  # type: ignore[misc]
             min_value=min_value,
             max_value=max_value,
             step=step,
+            label_inline=label_inline,
         )
 
     @property

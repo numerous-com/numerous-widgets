@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import { Chat } from "../ui/Chat";
-import '../../css/styles.css';
+import '../../css/styles.scss';
 
 function ChatWidget() {
     const [messages] = useModelState<any[]>("messages");

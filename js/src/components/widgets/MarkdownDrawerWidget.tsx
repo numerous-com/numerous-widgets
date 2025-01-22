@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import { MarkdownDrawer } from "../ui/MarkdownDrawer";
-import '../../css/styles.css';
+import '../../css/styles.scss';
 
 function MarkdownDrawerWidget() {
     const [title] = useModelState<string>("title");

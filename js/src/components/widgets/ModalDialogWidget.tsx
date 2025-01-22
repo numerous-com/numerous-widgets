@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import { ModalDialog } from "../ui/ModalDialog";
-import '../../css/styles.css';
+import '../../css/styles.scss';
 
 function ModalDialogWidget() {
     const [isOpen] = useModelState<boolean>("is_open");

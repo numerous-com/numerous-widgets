@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import { ProgressBar } from "../ui/ProgressBar";
-import '../../css/styles.css';
+import '../../css/styles.scss';
 
 function ProgressBarWidget() {
     const [value] = useModelState<number>("value");

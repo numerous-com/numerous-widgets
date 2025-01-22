@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import { CheckBox } from "../ui/CheckBox";
-import '../../css/styles.css';
+import '../../css/styles.scss';
 
 function CheckBoxWidget() {
     // Model states

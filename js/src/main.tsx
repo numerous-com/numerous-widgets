@@ -6,7 +6,7 @@ import { Tabs } from './components/ui/Tabs';
 import { DropDown } from './components/ui/Dropdown';
 import { MapSelector } from './components/ui/MapSelector';
 import { ChartComponent } from './components/ui/Chart';
-import './css/styles.css';
+import './css/styles.scss';
 import {
   Chart as ChartJS,
   CategoryScale,

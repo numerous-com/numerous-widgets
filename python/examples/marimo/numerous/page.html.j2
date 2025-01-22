@@ -55,6 +55,10 @@
 </div>
 <div class="bordered_container">
     <div class="column_with_spacing" style="display: {{'flex' if show_basic else 'none'}}">
+        <div class="column_with_spacing" style="flex-direction: row; gap: 1em;">
+        {{ inline_label_checkbox }}
+        {{ fit_to_content_checkbox }}
+        </div>
         {{ counter }}
         {{ increment_counter }}
         {{ selection_widget}}

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import { Table } from "../ui/Table";
-import '../../css/styles.css';
+import '../../css/styles.scss';
 
 function TableWidget() {
     const [data] = useModelState<any[]>("data");

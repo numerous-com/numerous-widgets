@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import { Accordion } from "../ui/Accordion";
-import '../../css/styles.css';
+import '../../css/styles.scss';
 
 function AccordionWidget({ model }: { model?: any }) {
     const [title] = useModelState<string>("title");

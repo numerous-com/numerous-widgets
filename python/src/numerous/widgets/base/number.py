@@ -22,6 +22,12 @@ class Number(anywidget.AnyWidget):  # type: ignore[misc]
         label: The label of the number input.
         tooltip: The tooltip of the number input.
         default: The default value of the number input.
+        start: The minimum value allowed.
+        stop: The maximum value allowed.
+        step: The step size for increments/decrements.
+        fit_to_content: Whether to fit the width to the content.
+        label_inline: Whether to show the label inline.
+        unit: Optional unit label to display after the value.
 
     """
 
@@ -33,9 +39,9 @@ class Number(anywidget.AnyWidget):  # type: ignore[misc]
     stop = traitlets.Float().tag(sync=True)
     step = traitlets.Float().tag(sync=True)
     valid = traitlets.Bool().tag(sync=True)
-
-    # New traitlet to control layout mode
     fit_to_content = traitlets.Bool(default_value=False).tag(sync=True)
+    label_inline = traitlets.Bool(default_value=True).tag(sync=True)
+    unit = traitlets.Unicode(default_value="").tag(sync=True)  # New traitlet for unit
 
     # Load the JavaScript and CSS from external files
     _esm = ESM
@@ -50,6 +56,8 @@ class Number(anywidget.AnyWidget):  # type: ignore[misc]
         stop: float = 100.0,
         step: float = 1.0,
         fit_to_content: bool = False,
+        label_inline: bool = True,
+        unit: str | None = None,  # New parameter
     ) -> None:
         # Initialize with keyword arguments
         super().__init__(
@@ -60,6 +68,8 @@ class Number(anywidget.AnyWidget):  # type: ignore[misc]
             stop=stop,
             step=step,
             fit_to_content=fit_to_content,
+            label_inline=label_inline,
+            unit=unit if unit is not None else "",  # Initialize unit
         )
 
     @property

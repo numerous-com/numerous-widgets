@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import { StringInput } from "../ui/String";
-import '../../css/styles.css';
+import '../../css/styles.scss';
 
 function StringWidget() {
     // Model states

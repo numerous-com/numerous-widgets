@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import { TaskButton } from "../ui/TaskButton";
-import '../../css/styles.css';
+import '../../css/styles.scss';
 
 function TaskWidget() {
     const [isRunning, setIsRunning] = useModelState<boolean>("is_running");

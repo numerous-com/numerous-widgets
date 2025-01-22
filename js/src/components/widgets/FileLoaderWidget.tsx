@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import { FileLoader } from "../ui/FileLoader";
-import '../../css/styles.css';
+import '../../css/styles.scss';
 
 function FileLoaderWidget() {
     const [uiLabel] = useModelState<string>("ui_label");

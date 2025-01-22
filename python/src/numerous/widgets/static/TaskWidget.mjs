@@ -5764,7 +5764,6 @@ function Nd({
       className: "widget-button",
       onClick: n,
       disabled: r,
-      "aria-pressed": l,
       title: t
     },
     e
