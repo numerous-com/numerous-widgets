@@ -1,0 +1,112 @@
+@use '../_inputs';
+@use '../_variables';
+
+.slider-container {
+    @extend .input-container;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    vertical-align: top;
+
+    // Fit to content variant
+    &.fit-to-content {
+        width: fit-content;
+        display: inline-flex;
+
+        .input-wrapper {
+            width: auto;
+            min-width: 200px;  // Minimum width for slider
+        }
+    }
+
+    &:not(.fit-to-content) {
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .slider-track-container {
+            flex: 1 1 auto;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+        }
+    }
+
+    .slider-value {
+        color: var(--ui-widget-secondary-text);
+        font-size: 14px;
+        min-width: 40px;
+        text-align: right;
+        padding: 0 8px;
+        flex: 0 0 auto;  // Fixed width, no grow, no shrink
+    }
+
+    .slider-track-container {
+        display: flex;
+        align-items: center;
+    }
+
+    .slider-input {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 4px;
+        border-radius: 2px;
+        outline: none;
+        background: var(--ui-widget-secondary-background);
+
+        &::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--ui-widget-primary-background);
+            border: 2px solid var(--ui-widget-focus-border);
+            cursor: pointer;
+            transition: transform 0.1s;
+
+            &:hover {
+                transform: scale(1.1);
+            }
+        }
+
+        &::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--ui-widget-primary-background);
+            border: 2px solid var(--ui-widget-focus-border);
+            cursor: pointer;
+            transition: transform 0.1s;
+
+            &:hover {
+                transform: scale(1.1);
+            }
+        }
+
+        // Remove default track styles if needed
+        &::-webkit-slider-runnable-track {
+            background: transparent;
+        }
+
+        &::-moz-range-track {
+            background: transparent;
+        }
+    }
+
+    // Layout adjustments
+    &:not(.label-inline):not(.fit-to-content) .input-wrapper {
+        justify-content: flex-start;
+    }
+
+    .input-label {
+        flex: 0 0 auto; // Fixed width, no grow, no shrink
+    }
+}
+
+.slider-label {
+    @extend .input-label;
+} 

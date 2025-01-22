@@ -23,6 +23,7 @@ class Slider(anywidget.AnyWidget):  # type: ignore[misc]
         step: The step size between values.
         default: The default value of the slider.
         tooltip: The tooltip of the slider.
+        fit_to_content: Whether to fit the width to the content.
         label_inline: Whether the label should be displayed inline.
 
     """
@@ -34,6 +35,7 @@ class Slider(anywidget.AnyWidget):  # type: ignore[misc]
     min_value = traitlets.Float().tag(sync=True)
     max_value = traitlets.Float().tag(sync=True)
     step = traitlets.Float().tag(sync=True)
+    fit_to_content = traitlets.Bool(default_value=False).tag(sync=True)
     label_inline = traitlets.Bool(default_value=True).tag(sync=True)
 
     # Load the JavaScript and CSS from external files
@@ -48,6 +50,7 @@ class Slider(anywidget.AnyWidget):  # type: ignore[misc]
         step: float = 1.0,
         default: float | None = None,
         tooltip: str | None = None,
+        fit_to_content: bool = False,
         label_inline: bool = True,
     ) -> None:
         if min_value >= max_value:
@@ -69,6 +72,7 @@ class Slider(anywidget.AnyWidget):  # type: ignore[misc]
             min_value=min_value,
             max_value=max_value,
             step=step,
+            fit_to_content=fit_to_content,
             label_inline=label_inline,
         )
 

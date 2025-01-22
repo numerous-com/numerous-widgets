@@ -114,7 +114,7 @@ def _(mo):
 
 @app.cell
 def _(aw, check_box, counter, selection_widget, slider, string_input, wi):
-    layout_adjustable_widgets = [counter, selection_widget, string_input, slider, check_box]
+    layout_adjustable_widgets = [counter, selection_widget, string_input, slider, check_box, slider]
 
     def on_fit_to_content_change(value):
         for widget in layout_adjustable_widgets:
@@ -186,8 +186,8 @@ def _(aw, wi):
             tooltip="Type your text here",
             default="Hello",
             placeholder="Type something...",
-            fit_to_content=True,
-            label_inline=True,
+            fit_to_content=False,
+            label_inline=False,
             on_validation=on_validation,
             is_password=False,
         )
@@ -289,7 +289,8 @@ def _(aw, wi):
             step=1,
             default=50,
             tooltip="Drag to adjust the value",
-            label_inline=False
+            label_inline=False,
+            fit_to_content=False
         )
     )
     return (slider,)
