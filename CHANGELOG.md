@@ -2,6 +2,28 @@
 
 
 
+## v0.1.21 (2025-01-22)
+
+### Fix
+
+* fix(ui): Enhance widget components with new props and styling
+
+- Added `fitToContent` and `labelInline` props to various widgets, including CheckBox, DropDown, and NumberInput, improving layout flexibility and user experience.
+- Introduced new `inline_label_checkbox` and `fit_to_content_checkbox` in the app to control widget display options dynamically.
+- Updated the CSS styles for better responsiveness and visual consistency across all widgets.
+- Refactored existing components to utilize the new props, enhancing their functionality and usability.
+
+These changes collectively improve the interactivity and presentation of the numerous widgets. ([`43b8df9`](https://github.com/numerous-com/numerous-widgets/commit/43b8df9e649e8b85f5a0086a483f9056a8d018f9))
+
+* fix(NumberInput): Add new props for enhanced functionality and styling
+
+- Introduced `fitToContent`, `labelInline`, and `unit` props to the NumberInput component for improved layout and usability.
+- Updated the NumberInputWidget to utilize the new props, allowing for more flexible rendering options.
+- Refactored CSS styles to support the new props, enhancing the visual consistency and responsiveness of the input component.
+
+These changes collectively enhance the NumberInput component&#39;s functionality and user experience. ([`5d51cd0`](https://github.com/numerous-com/numerous-widgets/commit/5d51cd0721a661498bab35f630c974320287b07b))
+
+
 ## v0.1.20 (2025-01-21)
 
 ### Fix
