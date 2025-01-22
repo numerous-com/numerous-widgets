@@ -179,3 +179,16 @@ class StateModel(BaseModel):
         if to_model:
             for k, v in values.items():
                 setattr(self, k, v)
+
+    @property
+    def widgets(self) -> dict[str, AnyWidget]:
+        """Get the widgets of the model."""
+        result = {}
+        for k, v in self.model_fields.items():
+            if isinstance(v, FieldInfo):
+                extra = v.json_schema_extra
+                if isinstance(extra, dict) and "widget" in extra:
+                    widget = extra["widget"]
+                    if isinstance(widget, AnyWidget):
+                        result[k] = widget
+        return result
