@@ -65,7 +65,9 @@ jobs:
           cache: 'npm'
           cache-dependency-path: js/package-lock.json
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm install  # First update the lock file
+          npm ci       # Then do a clean install
         working-directory: js
       - name: Build widgets
         run: bash build-widgets.sh
