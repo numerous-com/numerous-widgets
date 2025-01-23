@@ -33,6 +33,7 @@ class Chat(anywidget.AnyWidget):  # type: ignore[misc]
     max_height = traitlets.Unicode().tag(sync=True)
     class_name = traitlets.Unicode().tag(sync=True)
     new_message = traitlets.Dict(default_value=None, allow_none=True).tag(sync=True)
+    thinking_states = traitlets.Dict(default_value={}).tag(sync=True)
 
     # Load the JavaScript and CSS from external files
     _esm = ESM
@@ -80,6 +81,7 @@ class Chat(anywidget.AnyWidget):  # type: ignore[misc]
             max_height=max_height,
             class_name=class_name,
             new_message=None,
+            thinking_states={},  # Initialize empty thinking states
         )
 
     def add_message(self, content: str, msg_type: str = "user") -> None:
@@ -104,3 +106,7 @@ class Chat(anywidget.AnyWidget):  # type: ignore[misc]
     def observe_new_messages(self, handler: Callable[[AnyWidget], None]) -> None:
         """Observe new messages from the user."""
         self.observe(handler, names=["new_message"])
+
+    def set_thinking(self, user_type: str, thinking: bool) -> None:
+        """Set the thinking state for a specific user type."""
+        self.thinking_states = {**self.thinking_states, user_type: thinking}

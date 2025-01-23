@@ -479,5 +479,12 @@ def _(widget_html):
     return
 
 
+@app.cell
+def _(chat):
+    chat.set_thinking("system", True)
+
+    return
+
+
 if __name__ == "__main__":
     app.run()

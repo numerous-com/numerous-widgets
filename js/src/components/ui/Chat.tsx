@@ -14,6 +14,7 @@ interface ChatProps {
     maxHeight: string;
     className?: string;
     onNewMessage: (message: Message) => void;
+    thinkingStates: Record<string, boolean>;
 }
 
 export function Chat({
@@ -22,6 +23,7 @@ export function Chat({
     maxHeight,
     className = "",
     onNewMessage,
+    thinkingStates,
 }: ChatProps) {
     const [input, setInput] = React.useState("");
     const messagesEndRef = React.useRef<HTMLDivElement>(null);
@@ -56,6 +58,10 @@ export function Chat({
         });
     };
 
+    const getLastMessageByType = (type: string) => {
+        return messages.filter(msg => msg.type === type).pop();
+    };
+
     return (
         <div 
             className={`chat-container ${className}`}
@@ -76,6 +82,20 @@ export function Chat({
                             {formatTimestamp(message.timestamp)}
                         </div>
                     </div>
+                ))}
+                {Object.entries(thinkingStates).map(([userType, thinking]) => (
+                    thinking && getLastMessageByType(userType) && (
+                        <div 
+                            key={`thinking-${userType}`}
+                            className={`chat-message ${userType}`}
+                        >
+                            <div className="thinking-indicator">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                    )
                 ))}
                 <div ref={messagesEndRef} />
             </div>
