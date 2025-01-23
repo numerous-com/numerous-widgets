@@ -2,6 +2,21 @@
 
 
 
+## v0.1.24 (2025-01-23)
+
+### Fix
+
+* fix(chat): Enhance Chat component with thinking states and styling
+
+- Added `thinkingStates` prop to the Chat component to manage user thinking indicators.
+- Implemented a new function `getLastMessageByType` to retrieve the last message of a specific type.
+- Updated ChatWidget to pass `thinkingStates` from the model state.
+- Refactored CSS styles to improve the layout and appearance of chat messages and thinking indicators.
+- Introduced a new method `set_thinking` in the backend to manage thinking states for different user types.
+
+These changes collectively enhance the interactivity and user experience of the chat interface. ([`63ee8c5`](https://github.com/numerous-com/numerous-widgets/commit/63ee8c5a4f0ab642ded7810fa0d9efacf6dcb030))
+
+
 ## v0.1.23 (2025-01-23)
 
 ### Fix
