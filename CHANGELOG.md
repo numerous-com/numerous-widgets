@@ -2,6 +2,18 @@
 
 
 
+## v0.1.23 (2025-01-23)
+
+### Fix
+
+* fix(tabs): Added function to generate tabs_hidden variables ([`6973fc0`](https://github.com/numerous-com/numerous-widgets/commit/6973fc0109daf8c08af002733f05bdcce4407ab0))
+
+* fix(state): Add widgets property to StateModel for enhanced widget access
+
+- Introduced a new property `widgets` in the StateModel class to retrieve the widgets associated with the model.
+- This property returns a dictionary of widgets, improving the accessibility of widget information within the model. ([`c7ee38d`](https://github.com/numerous-com/numerous-widgets/commit/c7ee38db90f010474d1715fa01a61054fc6403a2))
+
+
 ## v0.1.22 (2025-01-22)
 
 ### Fix
