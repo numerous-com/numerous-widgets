@@ -2,6 +2,21 @@
 
 
 
+## v0.1.25 (2025-01-29)
+
+### Fix
+
+* fix(ui): Improve chart, map, and dropdown components with enhanced styling and functionality
+
+- Updated Chart component with default options and responsive settings
+- Modified MapSelector to handle coordinate order and improve map interactions
+- Refactored DropDown component with improved styling and focus states
+- Removed unnecessary props from Chat component
+- Updated global Chart.js defaults and font settings
+- Adjusted CSS variables and styles for better visual consistency
+- Improved table and chart container styling ([`30ca5ba`](https://github.com/numerous-com/numerous-widgets/commit/30ca5bab738c3da539bfb3713890088fb5e35c45))
+
+
 ## v0.1.24 (2025-01-23)
 
 ### Fix
