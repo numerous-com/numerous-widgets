@@ -30,4 +30,8 @@ ChartJS.register(
   BarController,
   PieController,
   DoughnutController
-); 
+);
+
+// Set global font defaults
+ChartJS.defaults.font.family = '"Nunito Sans", sans-serif';
+ChartJS.defaults.font.size = 12; 

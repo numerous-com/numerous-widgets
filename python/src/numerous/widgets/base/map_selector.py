@@ -15,7 +15,7 @@ class MapSelector(anywidget.AnyWidget):  # type: ignore[misc]
     A widget for selecting a point on a map.
 
     The widget is initialized with a dictionary of points, where each point is a \
-        tuple of longitude and latitude.
+        tuple of latitude and longitude.
     The widget also has a center and zoom level, which can be specified at \
         initialization.
 
@@ -24,9 +24,9 @@ class MapSelector(anywidget.AnyWidget):  # type: ignore[misc]
     The last location clicked can be accessed via the `location_clicked` property.
 
     Args:
-        points: A dictionary of points, where each point is a tuple of longitude \
-            and latitude.
-        center: The center of the map, as a tuple of longitude and latitude.
+        points: A dictionary of points, where each point is a tuple of latitude \
+            and longitude.
+        center: The center of the map, as a tuple of latitude and longitude.
         zoom: The zoom level of the map.
 
     """
@@ -34,9 +34,9 @@ class MapSelector(anywidget.AnyWidget):  # type: ignore[misc]
     # Define traitlets for the widget properties
     points = traitlets.Dict({}).tag(sync=True)
     value = traitlets.Unicode("").tag(sync=True)
-    center = traitlets.List([0, 0]).tag(sync=True)  # [lon, lat]
+    center = traitlets.List([0, 0]).tag(sync=True)  # [lat, lon]
     zoom = traitlets.Int(2).tag(sync=True)
-    location_clicked = traitlets.List([0, 0]).tag(sync=True)  # [lon, lat] of last click
+    location_clicked = traitlets.List([0, 0]).tag(sync=True)  # [lat, lon] of last click
 
     # Load the JavaScript and CSS from external files
     _esm = ESM

@@ -49,14 +49,14 @@ export function DropDown({
     return (
         <div className={`input-container dropdown-input-container ${fitToContent ? 'fit-to-content' : ''} ${labelInline ? 'label-inline' : ''}`}>
             {!labelInline && (
-                <label className="input-label dropdown-label">
+                <label className="input-label">
                     <span className="string-label-text">{uiLabel}</span>
                     {uiTooltip && <Tooltip tooltip={uiTooltip} />}
                 </label>
             )}
             <div className="input-wrapper" ref={containerRef}>
                 {labelInline && (
-                    <label className="input-label dropdown-label">
+                    <label className="input-label">
                         <span className="string-label-text">{uiLabel}</span>
                         {uiTooltip && <Tooltip tooltip={uiTooltip} />}
                     </label>

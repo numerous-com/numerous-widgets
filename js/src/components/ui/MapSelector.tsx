@@ -40,7 +40,7 @@ export function MapSelector({ points = {}, value, center = [0, 0], zoom, onChang
             Object.entries(points).forEach(([id, point]) => {
                 if (Array.isArray(point) && point.length === 2) {
                     const feature = new Feature({
-                        geometry: new Point(fromLonLat([point[0], point[1]]))
+                        geometry: new Point(fromLonLat([point[1], point[0]]))
                     });
                     feature.set('id', id);
                     vectorSource.addFeature(feature);
@@ -62,7 +62,7 @@ export function MapSelector({ points = {}, value, center = [0, 0], zoom, onChang
     React.useEffect(() => {
         if (!map) return;
         
-        map.getView().setCenter(fromLonLat(center));
+        map.getView().setCenter(fromLonLat([center[1], center[0]]));
         map.getView().setZoom(zoom);
     }, [map, center, zoom]);
 
@@ -100,8 +100,8 @@ export function MapSelector({ points = {}, value, center = [0, 0], zoom, onChang
         const clickHandler = (evt: any) => {
             // Convert clicked coordinates from Web Mercator to WGS84 (lat/lon)
             const coords = transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326');
-            // Always update clicked location
-            onLocationClick([coords[0], coords[1]]);
+            // Always update clicked location, swap to [lat, lon] order
+            onLocationClick([coords[1], coords[0]]);
 
             // Handle point selection separately
             const feature = mapInstance.forEachFeatureAtPixel(evt.pixel, (feature) => feature);

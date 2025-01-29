@@ -42,13 +42,10 @@ else:
 
 # Load custom CSS if provided, otherwise use default
 if CUSTOM_CSS_PATH:
-    try:
-        with pathlib.Path(CUSTOM_CSS_PATH).expanduser().resolve().open() as f:
-            CSS = f.read()
-        logging.info(f"Loaded custom CSS from {CUSTOM_CSS_PATH}")
-    except (FileNotFoundError, PermissionError) as e:
-        logging.warning(f"Failed to load custom CSS from {CUSTOM_CSS_PATH}: {e}")
-        CSS = DEFAULT_CSS
+    with pathlib.Path(CUSTOM_CSS_PATH).expanduser().resolve().open() as f:
+        CSS = f.read()
+    logging.info(f"Loaded custom CSS from {CUSTOM_CSS_PATH}")
+
 else:
     CSS = DEFAULT_CSS
 

@@ -30,7 +30,6 @@ class Chat(anywidget.AnyWidget):  # type: ignore[misc]
     # Define traitlets for the widget properties
     messages = traitlets.List(trait=traitlets.Dict()).tag(sync=True)
     placeholder = traitlets.Unicode().tag(sync=True)
-    max_height = traitlets.Unicode().tag(sync=True)
     class_name = traitlets.Unicode().tag(sync=True)
     new_message = traitlets.Dict(default_value=None, allow_none=True).tag(sync=True)
     thinking_states = traitlets.Dict(default_value={}).tag(sync=True)
@@ -43,7 +42,6 @@ class Chat(anywidget.AnyWidget):  # type: ignore[misc]
         self,
         messages: list[dict[str, Any]] | None = None,
         placeholder: str = "Type a message...",
-        max_height: str = "400px",
         class_name: str = "",
     ) -> None:
         """
@@ -78,7 +76,6 @@ class Chat(anywidget.AnyWidget):  # type: ignore[misc]
         super().__init__(
             messages=messages,
             placeholder=placeholder,
-            max_height=max_height,
             class_name=class_name,
             new_message=None,
             thinking_states={},  # Initialize empty thinking states

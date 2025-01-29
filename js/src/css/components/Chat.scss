@@ -4,10 +4,13 @@
     border: 1px solid var(--ui-widget-border-color);
     border-radius: 8px;
     overflow: hidden;
+    height: 100%; // Add this line
+    min-height: 0; // Add this line
 }
 
 .chat-messages {
-    flex-grow: 1;
+    flex: 1 1 auto; // Change from flex-grow: 1
+    min-height: 0; // Add this line
     overflow-y: auto;
     padding: 16px;
     display: flex;

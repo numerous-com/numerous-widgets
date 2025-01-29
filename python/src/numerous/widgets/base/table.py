@@ -67,7 +67,7 @@ class Table(anywidget.AnyWidget):  # type: ignore[misc]
             if "accessorKey" not in col:
                 raise TypeError("Each column must have an 'accessorKey'")
             if "header" not in col:
-                col["header"] = col["accessorKey"].capitalize()
+                col["header"] = col["accessorKey"]
 
         super().__init__(
             data=data,

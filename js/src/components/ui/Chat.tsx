@@ -11,7 +11,6 @@ interface Message {
 interface ChatProps {
     messages: Message[];
     placeholder: string;
-    maxHeight: string;
     className?: string;
     onNewMessage: (message: Message) => void;
     thinkingStates: Record<string, boolean>;
@@ -20,7 +19,6 @@ interface ChatProps {
 export function Chat({
     messages,
     placeholder,
-    maxHeight,
     className = "",
     onNewMessage,
     thinkingStates,
@@ -65,7 +63,6 @@ export function Chat({
     return (
         <div 
             className={`chat-container ${className}`}
-            style={{ maxHeight }}
         >
             <div className="chat-messages">
                 {messages.map((message) => (
