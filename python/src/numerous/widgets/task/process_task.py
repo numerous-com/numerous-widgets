@@ -641,6 +641,7 @@ def process_task_control(
     on_start: Callable[[], None] | None = None,
     on_stopped: Callable[[ProcessTask], None] | None = None,
     update_interval: float = 1.0,
+    **kwargs: dict[str, Any],
 ) -> TaskWidget:
     """
     Control a process task with a task widget.
@@ -653,6 +654,7 @@ def process_task_control(
         on_start (Callable): Callback function for when the task starts
         on_stopped (Callable): Callback function for when the task stops
         update_interval (float): The interval between syncs in seconds
+        **kwargs: Additional keyword arguments for the task widget
 
     Returns:
         TaskWidget: The task widget
@@ -671,4 +673,5 @@ def process_task_control(
         on_reset=process_task.reset,
         on_sync=_sync_with_task,
         sync_interval=update_interval,
+        **kwargs,
     )
