@@ -11,8 +11,13 @@ widgets=($(cat widget-config.json | jq -r '.widgets[]'))
 
 
 # Create output directory if it doesn't exist
-outputDir="../python/src/widgets/static"
+outputDir="../python/src/numerous/widgets/static"
 mkdir -p "$outputDir"
+
+# Copy styles.css if it exists
+if [ -f "dist/styles.css" ]; then
+    cp dist/styles.css "$outputDir/"
+fi
 
 # Build each widget
 for widget in "${widgets[@]}"; do
