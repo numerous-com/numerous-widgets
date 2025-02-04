@@ -2,6 +2,19 @@
 
 
 
+## v0.1.27 (2025-02-04)
+
+### Fix
+
+* fix(widgets): Add DOMElementMap widget and enhance Button component
+
+- Introduced DOMElementMap widget to the widget configuration
+- Extended Button component with new props: className, icon, variant, and fitToContent
+- Updated ButtonWidget to support new Button component features
+- Refactored CSS styles to improve button and container flexibility
+- Added support for inline and fit-to-content layouts across multiple widgets ([`c2ae60b`](https://github.com/numerous-com/numerous-widgets/commit/c2ae60b3f697816f3e79a149e58bd7c041dce84b))
+
+
 ## v0.1.26 (2025-01-30)
 
 ### Fix
