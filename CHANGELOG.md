@@ -2,6 +2,17 @@
 
 
 
+## v0.1.26 (2025-01-30)
+
+### Fix
+
+* fix(task): Add support for additional keyword arguments in process task control
+
+- Extended `process_task_control` function to accept arbitrary keyword arguments
+- Passed additional kwargs to the TaskWidget for increased flexibility
+- Updated function docstring to reflect the new parameter support ([`9561d35`](https://github.com/numerous-com/numerous-widgets/commit/9561d35ef29ca1902c0f08429a17948db93b21fe))
+
+
 ## v0.1.25 (2025-01-29)
 
 ### Fix
