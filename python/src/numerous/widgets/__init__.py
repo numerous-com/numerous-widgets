@@ -23,6 +23,7 @@ from .base.container import (
 )
 from .base.datetime_picker import DateTimePicker as DateTimePicker
 from .base.datetime_range_picker import DateTimeRangePicker as DateTimeRangePicker
+from .base.dom_element_map import DOMElementMap as DOMElementMap
 from .base.drop_down import DropDown as DropDown
 from .base.html_template import HTMLTemplate as HTMLTemplate
 from .base.map_selector import MapSelector as MapSelector

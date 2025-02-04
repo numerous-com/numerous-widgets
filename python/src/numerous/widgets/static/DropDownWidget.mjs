@@ -5745,7 +5745,7 @@ function _d({
   }, m = () => {
     s(!i);
   };
-  return /* @__PURE__ */ M.createElement("div", { className: `input-container dropdown-input-container ${u ? "fit-to-content" : ""} ${o ? "label-inline" : ""}` }, !o && /* @__PURE__ */ M.createElement("label", { className: "input-label dropdown-label" }, /* @__PURE__ */ M.createElement("span", { className: "string-label-text" }, t), r && /* @__PURE__ */ M.createElement(Ai, { tooltip: r })), /* @__PURE__ */ M.createElement("div", { className: "input-wrapper", ref: c }, o && /* @__PURE__ */ M.createElement("label", { className: "input-label dropdown-label" }, /* @__PURE__ */ M.createElement("span", { className: "string-label-text" }, t), r && /* @__PURE__ */ M.createElement(Ai, { tooltip: r })), /* @__PURE__ */ M.createElement(
+  return /* @__PURE__ */ M.createElement("div", { className: `input-container dropdown-input-container ${u ? "fit-to-content" : ""} ${o ? "label-inline" : ""}` }, !o && /* @__PURE__ */ M.createElement("label", { className: "input-label" }, /* @__PURE__ */ M.createElement("span", { className: "string-label-text" }, t), r && /* @__PURE__ */ M.createElement(Ai, { tooltip: r })), /* @__PURE__ */ M.createElement("div", { className: "input-wrapper", ref: c }, o && /* @__PURE__ */ M.createElement("label", { className: "input-label" }, /* @__PURE__ */ M.createElement("span", { className: "string-label-text" }, t), r && /* @__PURE__ */ M.createElement(Ai, { tooltip: r })), /* @__PURE__ */ M.createElement(
     "div",
     {
       className: "custom-select",

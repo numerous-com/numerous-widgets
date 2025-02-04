@@ -9,7 +9,7 @@
   --ui-widget-secondary-background: #f5f5f5;
   --ui-widget-hover-background: rgba(255, 255, 255, 0.7);
   --ui-widget-hover-background-dark: rgba(244, 244, 244, 1);
-  --ui-widget-focus-border: #333333; /* Changing this to charcoal color */
+  --ui-widget-focus-border: #33333342; /* Changing this to charcoal color */
   --ui-widget-focus-shadow: 0 0 0 2px #1F80F2;
   --ui-widget-dropdown-shadow: 0 0 6px rgba(0, 0, 0, 0.03);
   --ui-widget-secondary-text: #666666;
@@ -343,10 +343,13 @@ input[type=number] {
   border: 1px solid var(--ui-widget-border-color);
   border-radius: 8px;
   overflow: hidden;
+  height: 100%;
+  min-height: 0;
 }
 
 .chat-messages {
-  flex-grow: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
   padding: 16px;
   display: flex;
@@ -487,6 +490,109 @@ input[type=number] {
 }
 .chat-submit-button:not(:disabled):hover {
   opacity: 0.9;
+}
+
+.workflow-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+}
+
+.workflow-nav-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ui-widget-primary-background);
+  border: 1px solid var(--ui-widget-border-color);
+  border-radius: 4px;
+  padding: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.workflow-nav-button:hover:not(:disabled) {
+  background: var(--ui-widget-hover-background);
+}
+.workflow-nav-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.workflow-nav-button:focus {
+  outline: none;
+  border-color: var(--ui-widget-focus-border);
+  box-shadow: var(--ui-widget-focus-shadow);
+}
+
+.workflow-steps {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  position: relative;
+}
+.workflow-steps::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: 24px;
+  right: 24px;
+  height: 1px;
+  background: var(--ui-widget-border-color);
+  z-index: 0;
+}
+
+.workflow-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+}
+.workflow-step .step-number {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--ui-widget-secondary-background);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  border: 1px solid var(--ui-widget-border-color);
+  transition: all 0.2s;
+}
+.workflow-step .step-label {
+  font-size: 14px;
+  color: var(--ui-widget-secondary-text);
+  transition: color 0.2s;
+}
+.workflow-step.active .step-number {
+  background: var(--ui-widget-focus-border);
+  color: var(--ui-widget-primary-background);
+  border-color: var(--ui-widget-focus-border);
+}
+.workflow-step.active .step-label {
+  color: var(--ui-widget-primary-text);
+  font-weight: 500;
+}
+.workflow-step.completed .step-number {
+  background: var(--ui-widget-focus-border);
+  color: var(--ui-widget-primary-background);
+  border-color: var(--ui-widget-focus-border);
+}
+.workflow-step.completed .step-label {
+  color: var(--ui-widget-primary-text);
+}
+.workflow-step.clickable {
+  cursor: pointer;
+}
+.workflow-step.clickable:hover:not(.active) .step-number {
+  border-color: var(--ui-widget-focus-border);
+}
+.workflow-step.clickable:hover:not(.active) .step-label {
+  color: var(--ui-widget-primary-text);
+}
+.workflow-step:not(.clickable) {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .marimo {
@@ -1087,6 +1193,10 @@ select::-ms-expand {
   flex-direction: column;
   gap: 4px;
 }
+.button-container.fit-to-content {
+  width: fit-content;
+  display: inline-flex;
+}
 
 .button-label {
   display: flex;
@@ -1106,8 +1216,12 @@ select::-ms-expand {
   cursor: pointer;
   transition: background-color 0.2s, border-color 0.2s;
   min-width: 100px;
-  width: fit-content;
+  width: 100%;
   white-space: nowrap;
+}
+.widget-button.fit-to-content {
+  width: auto;
+  min-width: 0;
 }
 
 .widget-button:disabled {
@@ -2523,6 +2637,7 @@ select::-ms-expand {
   background-color: var(--ui-widget-primary-background);
   min-height: 200px;
   height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -2614,6 +2729,8 @@ select::-ms-expand {
   color: var(--ui-widget-primary-text);
   font-size: 14px;
   line-height: 1.6;
+  width: 100%;
+  height: 100%;
 }
 
 .html-template h1 {

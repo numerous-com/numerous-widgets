@@ -6,10 +6,6 @@ import pathlib
 
 
 try:
-    from dotenv import load_dotenv
-
-    # Load environment variables from .env file
-    load_dotenv()
     # Only set IS_DEV to True if WIDGET_ENV is explicitly set to "development"
     widget_env = os.getenv("WIDGET_ENV", "production").lower()
     IS_DEV = widget_env == "development"

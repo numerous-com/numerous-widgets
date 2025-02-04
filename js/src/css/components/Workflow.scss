@@ -1,0 +1,122 @@
+.workflow-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+}
+
+.workflow-nav-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--ui-widget-primary-background);
+    border: 1px solid var(--ui-widget-border-color);
+    border-radius: 4px;
+    padding: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    
+    &:hover:not(:disabled) {
+        background: var(--ui-widget-hover-background);
+    }
+    
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    &:focus {
+        outline: none;
+        border-color: var(--ui-widget-focus-border);
+        box-shadow: var(--ui-widget-focus-shadow);
+    }
+}
+
+.workflow-steps {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    position: relative;
+    
+    &::after {
+        content: '';
+        position: absolute;
+        top: 12px;
+        left: 24px;
+        right: 24px;
+        height: 1px;
+        background: var(--ui-widget-border-color);
+        z-index: 0;
+    }
+}
+
+.workflow-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    z-index: 1;
+    
+    .step-number {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--ui-widget-secondary-background);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        border: 1px solid var(--ui-widget-border-color);
+        transition: all 0.2s;
+    }
+    
+    .step-label {
+        font-size: 14px;
+        color: var(--ui-widget-secondary-text);
+        transition: color 0.2s;
+    }
+    
+    &.active {
+        .step-number {
+            background: var(--ui-widget-focus-border);
+            color: var(--ui-widget-primary-background);
+            border-color: var(--ui-widget-focus-border);
+        }
+        
+        .step-label {
+            color: var(--ui-widget-primary-text);
+            font-weight: 500;
+        }
+    }
+    
+    &.completed {
+        .step-number {
+            background: var(--ui-widget-focus-border);
+            color: var(--ui-widget-primary-background);
+            border-color: var(--ui-widget-focus-border);
+        }
+        
+        .step-label {
+            color: var(--ui-widget-primary-text);
+        }
+    }
+    
+    &.clickable {
+        cursor: pointer;
+        
+        &:hover:not(.active) {
+            .step-number {
+                border-color: var(--ui-widget-focus-border);
+            }
+            
+            .step-label {
+                color: var(--ui-widget-primary-text);
+            }
+        }
+    }
+    
+    &:not(.clickable) {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+} 

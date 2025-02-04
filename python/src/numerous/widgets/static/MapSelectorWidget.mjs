@@ -26837,7 +26837,7 @@ function oS({ points: t = {}, value: e, center: n = [0, 0], zoom: i, onChange: r
       Object.entries(t).forEach(([f, m]) => {
         if (Array.isArray(m) && m.length === 2) {
           const y = new cd({
-            geometry: new Ea(au([m[0], m[1]]))
+            geometry: new Ea(au([m[1], m[0]]))
           });
           y.set("id", f), h.addFeature(y);
         }
@@ -26849,7 +26849,7 @@ function oS({ points: t = {}, value: e, center: n = [0, 0], zoom: i, onChange: r
       });
     }
   }, [l, u, t]), Me.useEffect(() => {
-    l && (l.getView().setCenter(au(n)), l.getView().setZoom(i));
+    l && (l.getView().setCenter(au([n[1], n[0]])), l.getView().setZoom(i));
   }, [l, n, i]), Me.useEffect(() => {
     if (!o.current) return;
     const h = new sS(), d = new Fw({
@@ -26873,7 +26873,7 @@ function oS({ points: t = {}, value: e, center: n = [0, 0], zoom: i, onChange: r
       f.getTarget().style.cursor = g ? "pointer" : "";
     }, y = (E) => {
       const p = Wh(E.coordinate, "EPSG:3857", "EPSG:4326");
-      s([p[0], p[1]]);
+      s([p[1], p[0]]);
       const g = f.forEachFeatureAtPixel(E.pixel, (_) => _);
       r(g ? g.get("id") : "");
     };

@@ -9,6 +9,14 @@ function ButtonWidget() {
     const [clicked, setClicked] = useModelState<number>("clicked");
     const [disabled] = useModelState<boolean>("disabled");
     const [value, setValue] = useModelState<boolean>("value");
+    const [className] = useModelState<string>("className");
+    const [variant] = useModelState<'default' | 'process-step'>("variant");
+    const [iconSvg] = useModelState<string>("icon_svg");
+    const [fitToContent] = useModelState<boolean>("fit_to_content");
+
+    const icon = iconSvg ? (
+        <span dangerouslySetInnerHTML={{ __html: iconSvg }} />
+    ) : null;
 
     const handleClick = React.useCallback(() => {
         const newClicked = clicked + 1;
@@ -18,11 +26,15 @@ function ButtonWidget() {
 
     return (
         <Button
-           label={uiLabel}
+            label={uiLabel}
             tooltip={uiTooltip}
             onClick={handleClick}
             disabled={disabled}
             value={value}
+            className={className}
+            variant={variant}
+            icon={icon}
+            fitToContent={fitToContent}
         />
     );
 }

@@ -20,7 +20,11 @@ class Button(anywidget.AnyWidget):  # type: ignore[misc]
     clicked = traitlets.Int().tag(sync=True)
     disabled = traitlets.Bool().tag(sync=True)
     value = traitlets.Bool().tag(sync=True)
+    className = traitlets.Unicode().tag(sync=True)  # noqa: N815
+    variant = traitlets.Unicode().tag(sync=True)
+    icon_svg = traitlets.Unicode().tag(sync=True)
     on_click = None
+    fit_content = traitlets.Bool().tag(sync=True)
 
     # Load the JavaScript and CSS from external files
     _esm = ESM
@@ -32,12 +36,20 @@ class Button(anywidget.AnyWidget):  # type: ignore[misc]
         tooltip: str | None = None,
         on_click: Callable[[traitlets.BaseDescriptor], None] | None = None,
         disabled: bool = False,
+        className: str = "",  # noqa: N803
+        variant: str = "default",
+        icon_svg: str = "",
+        fit_to_content: bool = False,
     ) -> None:
         super().__init__(
             ui_label=label,
             ui_tooltip=tooltip if tooltip is not None else "",
             clicked=0,
             disabled=disabled,
+            className=className,
+            variant=variant,
+            icon_svg=icon_svg,
+            fit_to_content=fit_to_content,
         )
 
         self.on_click = on_click
