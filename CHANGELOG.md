@@ -2,6 +2,13 @@
 
 
 
+## v0.1.28 (2025-02-04)
+
+### Fix
+
+* fix(widgets): Include styles ([`c5a68f8`](https://github.com/numerous-com/numerous-widgets/commit/c5a68f85ba924ede62cc6068e5e63324482999b5))
+
+
 ## v0.1.27 (2025-02-04)
 
 ### Fix
