@@ -2,6 +2,19 @@
 
 
 
+## v0.1.29 (2025-02-05)
+
+### Fix
+
+* fix(widgets): Add strict validation and improved input handling for NumberInput
+
+- Introduced `strictValidation` prop to NumberInput for more controlled input
+- Implemented local value state to improve input editing experience
+- Added input validation and coercion on blur and key events
+- Updated NumberWidget and Number base class to support new prop
+- Enhanced input handling with step coercion and value clamping ([`1ffb8c7`](https://github.com/numerous-com/numerous-widgets/commit/1ffb8c748f8f23095db9320b703881ca7a4049a3))
+
+
 ## v0.1.28 (2025-02-04)
 
 ### Fix
