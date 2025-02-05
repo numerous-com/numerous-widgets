@@ -149,7 +149,8 @@ def _(aw, value, wi):
             label="Counter:",
             fit_to_content=False,
             tooltip="This is the value the counter has reached.",
-            unit="MW"
+            unit="MW",
+            strict_validation=True
         )
     )
     return (counter,)
@@ -390,7 +391,6 @@ def _(aw, wi):
                 {"content": "Hello! How can I help you today?", "type": "system"}
             ],
             placeholder="Type your message here...",
-            max_height="500px",
         )
     )
 
@@ -482,7 +482,6 @@ def _(widget_html):
 @app.cell
 def _(chat):
     chat.set_thinking("system", True)
-
     return
 
 

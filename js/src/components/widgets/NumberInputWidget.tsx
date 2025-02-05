@@ -17,6 +17,7 @@ function NumberWidget() {
     const [fitToContent] = useModelState<boolean>("fit_to_content");
     const [labelInline] = useModelState<boolean>("label_inline");
     const [unit] = useModelState<string>("unit");
+    const [strictValidation] = useModelState<boolean>("strict_validation");
 
     return (
         <NumberInput
@@ -30,6 +31,7 @@ function NumberWidget() {
             labelInline={labelInline}
             unit={unit || undefined}
             onChange={setValue}
+            strictValidation={strictValidation}
         />
     );
 }

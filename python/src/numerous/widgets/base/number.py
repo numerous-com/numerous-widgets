@@ -28,6 +28,7 @@ class Number(anywidget.AnyWidget):  # type: ignore[misc]
         fit_to_content: Whether to fit the width to the content.
         label_inline: Whether to show the label inline.
         unit: Optional unit label to display after the value.
+        strict_validation: Whether to coerce values to limits when focus is lost.
 
     """
 
@@ -42,6 +43,9 @@ class Number(anywidget.AnyWidget):  # type: ignore[misc]
     fit_to_content = traitlets.Bool(default_value=False).tag(sync=True)
     label_inline = traitlets.Bool(default_value=True).tag(sync=True)
     unit = traitlets.Unicode(default_value="").tag(sync=True)  # New traitlet for unit
+    strict_validation = traitlets.Bool(default_value=True).tag(
+        sync=True
+    )  # New traitlet
 
     # Load the JavaScript and CSS from external files
     _esm = ESM
@@ -58,6 +62,7 @@ class Number(anywidget.AnyWidget):  # type: ignore[misc]
         fit_to_content: bool = False,
         label_inline: bool = True,
         unit: str | None = None,  # New parameter
+        strict_validation: bool = True,  # New parameter
     ) -> None:
         # Initialize with keyword arguments
         super().__init__(
@@ -70,6 +75,7 @@ class Number(anywidget.AnyWidget):  # type: ignore[misc]
             fit_to_content=fit_to_content,
             label_inline=label_inline,
             unit=unit if unit is not None else "",  # Initialize unit
+            strict_validation=strict_validation,
         )
 
     @property
