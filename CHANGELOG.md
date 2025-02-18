@@ -2,6 +2,18 @@
 
 
 
+## v0.1.30 (2025-02-18)
+
+### Fix
+
+* fix(widgets): Enhance RadioButtons with layout and styling options
+
+- Added `fitToContent` and `labelInline` props to RadioButtons component
+- Updated RadioButtonsWidget to support new layout configuration
+- Improved CSS styles for more flexible radio button group layouts
+- Implemented inline and content-fitting display options ([`31bf491`](https://github.com/numerous-com/numerous-widgets/commit/31bf491e735033b9f75c31afc69fb3570009508a))
+
+
 ## v0.1.29 (2025-02-05)
 
 ### Fix
