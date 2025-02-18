@@ -1460,6 +1460,40 @@ select::-ms-expand {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  width: 100%;
+
+  &.fit-to-content {
+    width: fit-content;
+    display: inline-flex;
+
+    .radio-buttons-group {
+      flex-direction: row;
+      justify-content: flex-start;
+    }
+  }
+
+  &:not(.fit-to-content) {
+    .input-wrapper {
+      justify-content: flex-end;
+    }
+
+    .radio-buttons-group {
+      flex-direction: row;
+      justify-content: flex-end;
+      margin-right: 8px;
+    }
+  }
+
+  &.label-inline .input-wrapper {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &:not(.label-inline) .input-wrapper {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 .radio-buttons-label {
@@ -1473,8 +1507,8 @@ select::-ms-expand {
 
 .radio-buttons-group {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .radio-button-label {
@@ -1484,6 +1518,7 @@ select::-ms-expand {
   color: var(--ui-widget-primary-text);
   font-size: 14px;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .radio-button-input {

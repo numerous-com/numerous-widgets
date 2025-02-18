@@ -9,6 +9,8 @@ function RadioButtonsWidget() {
     const [options] = useModelState<string[]>("options");
     const [uiLabel] = useModelState<string>("ui_label");
     const [uiTooltip] = useModelState<string>("ui_tooltip");
+    const [fitToContent] = useModelState<boolean>("fit_to_content");
+    const [labelInline] = useModelState<boolean>("label_inline");
 
     return (
         <RadioButtons
@@ -16,6 +18,8 @@ function RadioButtonsWidget() {
             options={options}
             uiLabel={uiLabel}
             uiTooltip={uiTooltip}
+            fitToContent={fitToContent}
+            labelInline={labelInline}
             onChange={setValue}
         />
     );

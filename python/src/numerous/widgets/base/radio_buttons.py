@@ -21,6 +21,8 @@ class RadioButtons(anywidget.AnyWidget):  # type: ignore[misc]
         label: The label of the radio button group.
         tooltip: The tooltip of the radio button group.
         default: The default selected option.
+        fit_to_content: Whether to fit the width to the content.
+        label_inline: Whether to show the label inline.
 
     """
 
@@ -29,6 +31,8 @@ class RadioButtons(anywidget.AnyWidget):  # type: ignore[misc]
     ui_tooltip = traitlets.Unicode().tag(sync=True)
     options = traitlets.List(traitlets.Unicode()).tag(sync=True)
     value = traitlets.Unicode().tag(sync=True)
+    fit_to_content = traitlets.Bool(default_value=False).tag(sync=True)
+    label_inline = traitlets.Bool(default_value=True).tag(sync=True)
 
     # Load the JavaScript and CSS from external files
     _esm = ESM
@@ -40,6 +44,8 @@ class RadioButtons(anywidget.AnyWidget):  # type: ignore[misc]
         label: str,
         tooltip: str | None = None,
         default: str | None = None,
+        fit_to_content: bool = False,
+        label_inline: bool = True,
     ) -> None:
         if not options:
             raise ValueError("Options list cannot be empty")
@@ -56,6 +62,8 @@ class RadioButtons(anywidget.AnyWidget):  # type: ignore[misc]
             ui_tooltip=tooltip if tooltip is not None else "",
             options=options,
             value=default,
+            fit_to_content=fit_to_content,
+            label_inline=label_inline,
         )
 
     @property
