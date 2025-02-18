@@ -2,6 +2,19 @@
 
 
 
+## v0.1.31 (2025-02-18)
+
+### Fix
+
+* fix(styles): Enhance chat message and radio button styling
+
+- Improved chat message design with speech/thought bubble effects
+- Added drop shadow and refined padding for chat messages
+- Updated thinking indicator styling with background and rounded corners
+- Enhanced radio button layout with flexible display options
+- Implemented inline and content-fitting radio button group styles ([`66a3cad`](https://github.com/numerous-com/numerous-widgets/commit/66a3cad2f4aa8c44f1ff386c86fb983fa85c789e))
+
+
 ## v0.1.30 (2025-02-18)
 
 ### Fix
