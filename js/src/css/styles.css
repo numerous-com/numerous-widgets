@@ -361,56 +361,102 @@ input[type=number] {
   display: flex;
   flex-direction: column;
   max-width: 80%;
-  padding: 8px 12px;
-  border-radius: 12px;
+  padding: 12px 16px;
+  border-radius: 18px;
   position: relative;
-}
-.chat-message.user {
-  align-self: flex-start;
-  background-color: var(--ui-widget-secondary-background);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+  margin-bottom: 16px;
   color: var(--ui-widget-primary-text);
-  border-bottom-left-radius: 4px;
+  /* Speech bubble tips for regular messages.
+     These apply when the chat message is NOT marked as "thinking". */
+  /* Thought bubble tips for thinking messages.
+     To use these, update the TSX so that any chat-message showing
+     a thinking indicator also includes the "thinking" class.
+     Two pseudo-elements are used to create a dotted "tail." */
 }
-.chat-message.user .message-timestamp {
-  align-self: flex-start;
+.chat-message.user:not(.thinking)::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 16px;
+  width: 0;
+  height: 0;
+  border: 8px solid transparent;
+  border-top-color: var(--ui-widget-secondary-background);
 }
-.chat-message.user .message-content {
+.chat-message.system:not(.thinking)::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: 16px;
+  width: 0;
+  height: 0;
+  border: 8px solid transparent;
+  border-top-color: var(--ui-widget-focus-border);
+}
+.chat-message.thinking.user::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 20px;
+  width: 8px;
+  height: 8px;
+  background-color: var(--ui-widget-secondary-background);
+  border-radius: 50%;
+}
+.chat-message.thinking.user::before {
+  content: "";
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 28px;
+  width: 4px;
+  height: 4px;
+  background-color: var(--ui-widget-secondary-background);
+  border-radius: 50%;
+}
+.chat-message.thinking.system::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: 20px;
+  width: 8px;
+  height: 8px;
+  background-color: var(--ui-widget-focus-border);
+  border-radius: 50%;
+}
+.chat-message.thinking.system::before {
+  content: "";
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 28px;
+  width: 4px;
+  height: 4px;
+  background-color: var(--ui-widget-focus-border);
+  border-radius: 50%;
+}
+.chat-message .message-content {
   font-weight: 400;
 }
-.chat-message.user::before {
-  left: -4px;
-  border-right: 8px solid var(--ui-widget-secondary-background);
-  border-bottom-left-radius: 8px;
+.chat-message .message-timestamp {
+  font-size: 11px;
+  opacity: 0.7;
+  margin-top: 4px;
+  align-self: flex-end;
 }
 .chat-message.system {
   align-self: flex-end;
   background-color: var(--ui-widget-focus-border);
-  color: white;
-  border-bottom-right-radius: 4px;
-}
-.chat-message.system .message-timestamp {
-  align-self: flex-end;
-}
-.chat-message.system .message-content {
-  font-weight: 500;
-}
-.chat-message.system::before {
-  right: -4px;
-  border-left: 8px solid var(--ui-widget-focus-border);
-  border-bottom-right-radius: 8px;
-}
-.chat-message::before {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  width: 8px;
-  height: 8px;
+  color: var(--ui-widget-primary-text);
 }
 
 .thinking-indicator {
   padding: 12px;
   display: flex;
   gap: 4px;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  width: fit-content;
+  margin: 4px 0;
 }
 .thinking-indicator span {
   display: inline-block;
@@ -2040,6 +2086,32 @@ select::-ms-expand {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  width: 100%;
+}
+.radio-buttons-container.fit-to-content {
+  width: fit-content;
+  display: inline-flex;
+}
+.radio-buttons-container.fit-to-content .radio-buttons-group {
+  flex-direction: row;
+  justify-content: flex-start;
+}
+.radio-buttons-container:not(.fit-to-content) .input-wrapper {
+  justify-content: flex-end;
+}
+.radio-buttons-container:not(.fit-to-content) .radio-buttons-group {
+  flex-direction: row;
+  justify-content: flex-end;
+  margin-right: 8px;
+}
+.radio-buttons-container.label-inline .input-wrapper {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+.radio-buttons-container:not(.label-inline) .input-wrapper {
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .radio-buttons-label {
@@ -2053,8 +2125,8 @@ select::-ms-expand {
 
 .radio-buttons-group {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .radio-button-label {
@@ -2064,6 +2136,7 @@ select::-ms-expand {
   color: var(--ui-widget-primary-text);
   font-size: 14px;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .radio-button-input {
