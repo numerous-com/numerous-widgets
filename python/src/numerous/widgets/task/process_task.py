@@ -424,7 +424,7 @@ class ProcessTask:
         """
 
 
-def run_in_subprocess(  # noqa: PLR0915, C901, PLR0912
+def run_in_subprocess(  # noqa: PLR0915, C901
     task: ProcessTask,
     cmd: str | list[str],
     shell: bool = False,
@@ -459,9 +459,6 @@ def run_in_subprocess(  # noqa: PLR0915, C901, PLR0912
     # Validate input
     if not cmd:
         raise ValueError("Command cannot be empty or None")
-
-    if isinstance(cmd, list):
-        cmd = " ".join(cmd)
 
     if shell and isinstance(cmd, str):
         msg = "Using shell=True with string commands may pose security risks"
