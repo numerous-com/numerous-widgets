@@ -2,6 +2,16 @@
 
 
 
+## v0.1.33 (2025-02-24)
+
+### Fix
+
+* fix(task): Improve subprocess command handling
+
+- Removed unnecessary list to string conversion for subprocess commands
+- Added security warning for shell commands with string inputs ([`a8424b3`](https://github.com/numerous-com/numerous-widgets/commit/a8424b3592eb22a1580879ce6390f492e85506eb))
+
+
 ## v0.1.32 (2025-02-24)
 
 ### Fix
