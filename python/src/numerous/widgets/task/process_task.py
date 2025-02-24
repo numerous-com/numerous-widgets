@@ -39,7 +39,7 @@ class ProcessTask:
     def __init__(
         self,
         stop_message: str = "Process was forcefully terminated.",
-        capture_stdout: bool = False,
+        capture_stdout: bool = True,
         run_in_process: bool = True,
     ) -> None:
         self._process: multiprocessing.Process | None = None
@@ -243,8 +243,7 @@ class ProcessTask:
             return False
         if self._process is None:
             return False
-
-        return bool(self._exit_flag.value == 0)
+        return self._process.is_alive() and self._exit_flag.value == 0
 
     @property
     def started(self) -> bool:
@@ -272,7 +271,6 @@ class ProcessTask:
 
         if self._process is None:
             return False
-
         # Process has exited if it was started, has an exitcode, and exit is pending
         return (
             not self.alive
@@ -326,13 +324,12 @@ class ProcessTask:
             RuntimeError: If an exception occurred during task execution.
 
         """
-        self._cleanup()
-
         while not self._result_fetched:
             if not self.started:
                 raise RuntimeError("Task has not been started")
 
             if self._exception is not None:
+                self._result_fetched = True
                 raise self._exception
 
             if not self._result_queue.empty():
@@ -343,8 +340,12 @@ class ProcessTask:
                 timestamp, exc, tb = (
                     self._exception_queue.get()
                 )  # Unpack all three values
+                self._result_fetched = True
                 raise RuntimeError(f"Exception in process:\n{tb}") from exc
 
+            if self.exited and not self._result_fetched:
+                self._result_fetched = True
+                raise RuntimeError("Process exited")
             time.sleep(0.1)
 
         return self._return_value
@@ -593,18 +594,7 @@ def sync_with_task(
     process_task: ProcessTask,
     on_stopped: Callable[[ProcessTask], None] | None = None,
 ) -> bool:
-    """
-    Synchronize the task widget with the process task.
-
-    This function synchronizes the task widget with the process task by updating the\
-         progress, logs, and error state.
-
-    Args:
-        task_widget (TaskWidget): The task widget to synchronize
-        process_task (ProcessTask): The process task to synchronize with
-        on_stopped (Callable): Callback function for when the task stops
-
-    """
+    """Synchronize the task widget with the process task."""
     task_widget.progress = process_task.progress
     log_entries = process_task.log_entries
 
@@ -624,6 +614,8 @@ def sync_with_task(
 
     if process_task.completed and process_task.exception is None:
         task_widget.complete()
+        # Disable sync after completion to prevent restart
+        task_widget.disable_sync()
 
     if process_task.exited:
         if on_stopped is not None:
@@ -631,6 +623,8 @@ def sync_with_task(
                 on_stopped(process_task)
             except Exception:  # noqa: BLE001
                 traceback.print_exc()
+        # Disable sync after exit
+        task_widget.disable_sync()
         return False
 
     return True
@@ -640,6 +634,7 @@ def process_task_control(
     process_task: ProcessTask,
     on_start: Callable[[], None] | None = None,
     on_stopped: Callable[[ProcessTask], None] | None = None,
+    on_reset: Callable[[], None] | None = None,
     update_interval: float = 1.0,
     **kwargs: dict[str, Any],
 ) -> TaskWidget:
@@ -653,6 +648,7 @@ def process_task_control(
         process_task (ProcessTask): The process task to control
         on_start (Callable): Callback function for when the task starts
         on_stopped (Callable): Callback function for when the task stops
+        on_reset (Callable): Callback function for when the task is reset
         update_interval (float): The interval between syncs in seconds
         **kwargs: Additional keyword arguments for the task widget
 
@@ -667,10 +663,19 @@ def process_task_control(
     def _on_stop() -> None:
         process_task.stop()
 
+    def _on_start_wrapper() -> None:
+        if on_start is not None:
+            on_start()
+
+    def _on_reset() -> None:
+        process_task.reset()
+        if on_reset is not None:
+            on_reset()
+
     return TaskWidget(
-        on_start=on_start,
+        on_start=_on_start_wrapper,
         on_stop=_on_stop,
-        on_reset=process_task.reset,
+        on_reset=_on_reset,
         on_sync=_sync_with_task,
         sync_interval=update_interval,
         **kwargs,

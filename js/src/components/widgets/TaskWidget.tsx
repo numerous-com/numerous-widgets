@@ -19,6 +19,8 @@ function TaskWidget() {
     const [lastSync, setLastSync] = useModelState<number>("last_sync");
     const [syncEnabled] = useModelState<boolean>("sync_enabled");
     const [syncInterval] = useModelState<number>("sync_interval");
+    const [resetFlag, setResetFlag] = useModelState<boolean>("reset_flag");
+    const [stopped, setStopped] = useModelState<boolean>("stopped");
 
     React.useEffect(() => {
         if (syncEnabled) {
@@ -30,20 +32,21 @@ function TaskWidget() {
         }
     }, [syncEnabled, setLastSync]);
 
+    
     const handleReset = async () => {
-        setProgress(0);
-        setIsRunning(false);
-        setIsCompleted(false);
-        setIsFailed(false);
-        setStarted(false);
-        setLogs([]);
+        console.log("Resetting task");
+        console.log(resetFlag);
+        setResetFlag(true);
     };
 
     const handleStart = () => {
-        if (!isRunning && !isCompleted && !isFailed) {
-            setIsRunning(true);
+        if (!isRunning && !isDisabled) {
             setStarted(true);
         }
+    };
+
+    const handleStop = () => {
+        setStopped(true);
     };
 
     return (
@@ -55,10 +58,7 @@ function TaskWidget() {
             started={started}
             progress={progress}
             onStart={handleStart}
-            onStop={() => {
-                setIsRunning(false);
-                setProgress(0);
-            }}
+            onStop={handleStop}
             onReset={handleReset}
             taskName="Task"
             error={error ?? undefined}
