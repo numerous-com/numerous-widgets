@@ -2,6 +2,19 @@
 
 
 
+## v0.1.32 (2025-02-24)
+
+### Fix
+
+* fix(task): Improve task widget state management and synchronization
+
+- Added reset flag and stopped state to TaskWidget
+- Enhanced task state handling in base Task class
+- Updated ProcessTask synchronization and control methods
+- Implemented more robust state transitions and event handling
+- Improved process task lifecycle management ([`59d93c1`](https://github.com/numerous-com/numerous-widgets/commit/59d93c1aceecce7b939a5d53a5207e12265ffbd4))
+
+
 ## v0.1.31 (2025-02-18)
 
 ### Fix
