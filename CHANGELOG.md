@@ -2,6 +2,18 @@
 
 
 
+## v0.1.36 (2025-02-25)
+
+### Fix
+
+* fix(task): Improve subprocess process group and termination handling
+
+- Added process group creation for better subprocess management on Unix-like systems
+- Enhanced subprocess termination with more robust kill and signal handling
+- Implemented graceful process group termination with fallback for non-Unix systems
+- Added error handling for process termination edge cases ([`8799f70`](https://github.com/numerous-com/numerous-widgets/commit/8799f706b9bfea0a772211e210ef8a881dc044c9))
+
+
 ## v0.1.35 (2025-02-25)
 
 ### Fix
