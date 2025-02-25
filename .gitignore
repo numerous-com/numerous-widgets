@@ -8,7 +8,6 @@ dist
 __pycache__
 .ipynb_checkpoints
 
-src/widget/static
 python/src/collections
 node_modules
 
@@ -20,3 +19,5 @@ node_modules
 
 *.ruff_cache
 *.mypy_cache
+
+python/src/numerous/widgets/static
