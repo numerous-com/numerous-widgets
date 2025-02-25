@@ -2,6 +2,15 @@
 
 
 
+## v0.1.34 (2025-02-25)
+
+### Fix
+
+* fix(static): Remove static widget files from repository
+
+Cleaned up numerous widget static files by removing compiled JavaScript modules and CSS files. This includes removing generated files for various widgets such as AccordionWidget, ButtonWidget, ChartWidget, and others. ([`437a7d7`](https://github.com/numerous-com/numerous-widgets/commit/437a7d7c83c23ed822b37c9dcda112308cc80e42))
+
+
 ## v0.1.33 (2025-02-24)
 
 ### Fix
