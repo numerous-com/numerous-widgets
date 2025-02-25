@@ -93,6 +93,10 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           cache: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: widgets
+          path: ./python/src/numerous/widgets/static
       - run: python3 -m pip install python-semantic-release==9.6.0 build>=1.2.1
       - run: semantic-release version --no-commit --no-tag --no-push --no-changelog  # update version locally to build new version
       - run: python -m build
