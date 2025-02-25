@@ -2,6 +2,13 @@
 
 
 
+## v0.1.35 (2025-02-25)
+
+### Fix
+
+* fix(ci): Include built widgets ([`72bfe84`](https://github.com/numerous-com/numerous-widgets/commit/72bfe84ead84e3104f35346d7f558108015782df))
+
+
 ## v0.1.34 (2025-02-25)
 
 ### Fix
