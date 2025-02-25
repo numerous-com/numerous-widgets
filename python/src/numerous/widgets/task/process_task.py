@@ -1,6 +1,8 @@
 """ProcessTask is for long-running tasks in a separate process."""
 
 import multiprocessing
+import os
+import signal
 import subprocess
 import sys
 import time
@@ -424,7 +426,7 @@ class ProcessTask:
         """
 
 
-def run_in_subprocess(  # noqa: PLR0915, C901
+def run_in_subprocess(  # noqa: PLR0915, C901, PLR0912
     task: ProcessTask,
     cmd: str | list[str],
     shell: bool = False,
@@ -466,6 +468,14 @@ def run_in_subprocess(  # noqa: PLR0915, C901
 
     process = None
     try:
+        # Create a new process group
+        if hasattr(os, "setsid"):  # Unix-like systems only
+
+            def preexec_fn() -> None:
+                os.setsid()  # type: ignore[attr-defined]
+        else:
+            preexec_fn = None  # type: ignore[assignment]
+
         # Start process
         process = subprocess.Popen(  # noqa: S603
             cmd,
@@ -476,6 +486,7 @@ def run_in_subprocess(  # noqa: PLR0915, C901
             text=True,
             bufsize=1,
             universal_newlines=True,
+            preexec_fn=preexec_fn,  # noqa: PLW1509
         )
 
         stdout_queue: multiprocessing.Queue = multiprocessing.Queue()  # type: ignore[type-arg]
@@ -503,7 +514,22 @@ def run_in_subprocess(  # noqa: PLR0915, C901
         # Handle output while process runs
         while True:
             if task._stop_flag.value == 1:  # noqa: SLF001
-                process.terminate()
+                try:
+                    if hasattr(os, "killpg"):  # Unix-like systems
+                        # Kill the entire process group
+                        os.killpg(process.pid, signal.SIGTERM)
+                        # Give processes a chance to terminate gracefully
+                        try:
+                            process.wait(timeout=3)
+                        except subprocess.TimeoutExpired:
+                            # If still running after timeout, force kill
+                            os.killpg(process.pid, signal.SIGKILL)  # type: ignore[attr-defined]
+                    else:
+                        # Fallback for non-Unix systems
+                        process.terminate()
+                except ProcessLookupError:
+                    # Process might already be gone
+                    pass
                 break
 
             # Process all available stdout
@@ -557,8 +583,14 @@ def run_in_subprocess(  # noqa: PLR0915, C901
 
     except Exception as e:
         task._log("error", "process", f"Error: {e!s}")  # noqa: SLF001
-        if process and process.poll() is None:
-            process.kill()
+        if process:
+            try:
+                if hasattr(os, "killpg"):
+                    os.killpg(process.pid, signal.SIGTERM)
+                else:
+                    process.kill()
+            except ProcessLookupError:
+                pass
         raise
 
 
