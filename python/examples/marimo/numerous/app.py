@@ -485,5 +485,16 @@ def _(chat):
     return
 
 
+@app.cell
+def _(aw):
+    from numerous.widgets.advanced.weighted_assessment_survey import WeightedAssessmentSurvey
+    assement_survey = aw(WeightedAssessmentSurvey())
+    def print_results(results):
+        print(results)
+    assement_survey.on_submit(print_results)
+    assement_survey
+    return WeightedAssessmentSurvey, assement_survey, print_results
+
+
 if __name__ == "__main__":
     app.run()

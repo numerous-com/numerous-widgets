@@ -21,3 +21,5 @@ node_modules
 *.mypy_cache
 
 python/src/numerous/widgets/static
+
+*.mdc
