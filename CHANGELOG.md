@@ -2,6 +2,15 @@
 
 
 
+## v0.1.38 (2025-03-01)
+
+### Fix
+
+* fix(widgets): Missing widget ending ([`02daf29`](https://github.com/numerous-com/numerous-widgets/commit/02daf29f64af9c452438a41a7e5418adef29881f))
+
+* fix(widgets): Add WeightedAssessmentSurvey to widget configuration ([`7c23998`](https://github.com/numerous-com/numerous-widgets/commit/7c239987cf7ce91eb56a9c237f2b688886cfe18d))
+
+
 ## v0.1.37 (2025-03-01)
 
 ### Fix
