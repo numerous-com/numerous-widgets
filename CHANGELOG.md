@@ -2,6 +2,17 @@
 
 
 
+## v0.1.37 (2025-03-01)
+
+### Fix
+
+* fix(widgets): Add Weighted Assessment Survey widget
+
+- Imported WeightedAssessmentSurvey widget in Marimo app example
+- Added corresponding SCSS import for WeightedAssessmentSurvey component
+- Demonstrated basic widget usage with submit event handler ([`0ee2f2b`](https://github.com/numerous-com/numerous-widgets/commit/0ee2f2b926a7e99eb8573d1dcb65e7a97ff44988))
+
+
 ## v0.1.36 (2025-02-25)
 
 ### Fix
