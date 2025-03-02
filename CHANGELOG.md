@@ -2,6 +2,19 @@
 
 
 
+## v0.1.39 (2025-03-02)
+
+### Fix
+
+* fix(widget): Enhance WeightedAssessmentSurvey with intro and final slides
+
+- Added intro and final slide states to improve survey navigation
+- Implemented dynamic progress dots to reflect survey stages
+- Updated navigation controls to handle intro and final slides
+- Improved responsive design and layout for better user experience
+- Added completion and submission confirmation screens ([`4df322b`](https://github.com/numerous-com/numerous-widgets/commit/4df322b2a32980015255ba64af97efd9591238be))
+
+
 ## v0.1.38 (2025-03-01)
 
 ### Fix
