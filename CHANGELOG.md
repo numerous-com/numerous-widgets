@@ -2,6 +2,17 @@
 
 
 
+## v0.1.40 (2025-03-02)
+
+### Fix
+
+* fix(widget): Refactor survey navigation layout and positioning
+
+- Moved survey navigation controls to the top of the component
+- Removed duplicate navigation section at the bottom of the widget
+- Maintained existing navigation functionality and styling ([`3b9f0d4`](https://github.com/numerous-com/numerous-widgets/commit/3b9f0d474dc17e981a55d1e0d8e8a7a3ca184ffb))
+
+
 ## v0.1.39 (2025-03-02)
 
 ### Fix
