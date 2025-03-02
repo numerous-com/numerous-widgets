@@ -93,6 +93,12 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   // Add state for saved status
   const [isSaved, setIsSaved] = React.useState<boolean>(props.saved);
   
+  // Add state for showing intro slide
+  const [showIntro, setShowIntro] = React.useState(true);
+  
+  // Add state for showing final slide
+  const [showFinalSlide, setShowFinalSlide] = React.useState(false);
+  
   // Force edit_mode to false when disable_editing is true
   React.useEffect(() => {
     if (props.disable_editing && editMode) {
@@ -160,14 +166,28 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
     };
   };
   
-  // Navigation functions
+  // Modify navigation functions to handle intro slide and final slide
   const goToNextGroup = () => {
+    if (showIntro) {
+      setShowIntro(false);
+      return;
+    }
     if (currentGroupIndex < surveyData.groups.length - 1) {
       setCurrentGroupIndex(currentGroupIndex + 1);
+    } else if (currentGroupIndex === surveyData.groups.length - 1) {
+      setShowFinalSlide(true);
     }
   };
   
   const goToPreviousGroup = () => {
+    if (showFinalSlide) {
+      setShowFinalSlide(false);
+      return;
+    }
+    if (currentGroupIndex === 0) {
+      setShowIntro(true);
+      return;
+    }
     if (currentGroupIndex > 0) {
       setCurrentGroupIndex(currentGroupIndex - 1);
     }
@@ -429,24 +449,61 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
     return markers;
   };
   
-  // Generate progress dots
+  // Modify progress dots to include intro and final slide
   const renderProgressDots = () => {
-    return surveyData?.groups?.map((_, index) => {
+    const dots = [];
+    
+    // Add intro dot
+    dots.push(
+      <div 
+        key="intro"
+        className={`progress-dot ${showIntro ? 'active' : 'completed'}`}
+        onClick={() => {
+          setShowIntro(true);
+          setShowFinalSlide(false);
+        }}
+        style={{ cursor: 'pointer' }}
+      />
+    );
+    
+    // Add dots for groups
+    surveyData?.groups?.forEach((_, index) => {
       let dotClass = "progress-dot";
-      if (index === currentGroupIndex) {
+      if (!showIntro && !showFinalSlide && index === currentGroupIndex) {
         dotClass += " active";
-      } else if (index < currentGroupIndex) {
+      } else if (!showIntro && (index < currentGroupIndex || showFinalSlide)) {
         dotClass += " completed";
       }
-      return (
+      dots.push(
         <div 
-          key={index} 
+          key={index + 1}
           className={dotClass}
-          onClick={() => setCurrentGroupIndex(index)}
+          onClick={() => {
+            setShowIntro(false);
+            setShowFinalSlide(false);
+            setCurrentGroupIndex(index);
+          }}
           style={{ cursor: 'pointer' }}
         />
       );
-    }) || []; // Return empty array if groups is undefined
+    });
+
+    // Add final slide dot
+    dots.push(
+      <div 
+        key="final"
+        className={`progress-dot ${showFinalSlide ? 'active' : ''}`}
+        onClick={() => {
+          if (allQuestionsAnswered) {
+            setShowIntro(false);
+            setShowFinalSlide(true);
+          }
+        }}
+        style={{ cursor: allQuestionsAnswered ? 'pointer' : 'not-allowed' }}
+      />
+    );
+    
+    return dots;
   };
   
   // In the render function, update the progress indicator
@@ -463,7 +520,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
     }
     
     // Update local UI state
-    setIsSubmitted(true);
+    setIsSaved(true);
   };
   
   // In the render function, add the submit button section
@@ -485,445 +542,468 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   
   return (
     <div className={`weighted-assessment-survey ${props.class_name || ''} ${readOnly ? 'read-only' : ''}`}>
-      <div className="survey-header">
-        {editMode ? (
-          <>
-            <input
-              type="text"
-              className="text-input"
-              value={surveyData?.title || ''}
-              onChange={(e) => setSurveyData({ ...surveyData, title: e.target.value })}
-              placeholder="Survey Title"
-            />
-            <textarea
-              className="textarea-input"
-              value={surveyData?.description || ''}
-              onChange={(e) => setSurveyData({ ...surveyData, description: e.target.value })}
-              placeholder="Survey Description"
-              style={{ marginTop: '8px' }}
-            />
-          </>
+      <div className="survey-content">
+        {showFinalSlide ? (
+          <div className="final-slide">
+            <h2>🎉 Thank you for completing the survey!</h2>
+            <div className="completion-message">
+              <p>You've thoughtfully answered all {progress.totalQuestions} questions in this assessment.</p>
+              <p>Your responses will help provide valuable insights and feedback.</p>
+            </div>
+            {!editMode && !readOnly && !submitted && (
+              <button 
+                className={`submit-button large ${submitted ? 'submitted' : ''}`}
+                onClick={handleSubmit}
+                disabled={submitted}
+              >
+                {submitted ? "Submitted" : (props.submit_text || "Submit")}
+              </button>
+            )}
+            {submitted && (
+              <div className="submission-confirmation">
+                <p>✅ Your responses have been submitted successfully!</p>
+                <p>Thank you for your valuable input.</p>
+              </div>
+            )}
+          </div>
         ) : (
           <>
-            <div className="survey-title">{surveyData?.title || ''}</div>
-            <div className="survey-description">{surveyData?.description || ''}</div>
+            {showIntro ? (
+              <div className="survey-intro">
+                {editMode ? (
+                  <>
+                    <input
+                      type="text"
+                      className="text-input"
+                      value={surveyData?.title || ''}
+                      onChange={(e) => setSurveyData({ ...surveyData, title: e.target.value })}
+                      placeholder="Survey Title"
+                    />
+                    <textarea
+                      className="textarea-input"
+                      value={surveyData?.description || ''}
+                      onChange={(e) => setSurveyData({ ...surveyData, description: e.target.value })}
+                      placeholder="Survey Description"
+                      style={{ marginTop: '8px' }}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <h1 className="survey-title">{surveyData?.title || ''}</h1>
+                    <div className="survey-description">{surveyData?.description || ''}</div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <>
+                {editMode && (
+                  <div className="edit-tabs">
+                    <button 
+                      className={`edit-tab ${activeEditTab === 'content' ? 'active' : ''}`}
+                      onClick={() => setActiveEditTab('content')}
+                    >
+                      Survey Content
+                    </button>
+                    <button 
+                      className={`edit-tab ${activeEditTab === 'categories' ? 'active' : ''}`}
+                      onClick={() => setActiveEditTab('categories')}
+                    >
+                      Categories
+                    </button>
+                  </div>
+                )}
+                
+                {editMode && activeEditTab === 'categories' ? (
+                  <div className="categories-editor">
+                    <div className="categories-header">
+                      <h3>Categories</h3>
+                      <p className="categories-description">
+                        Define categories to classify and weight questions. Each question can be weighted differently across categories.
+                      </p>
+                    </div>
+                    
+                    {surveyData.categories?.map((category, index) => (
+                      <div key={category.id} className="category-item">
+                        <div className="category-header">
+                          <input
+                            type="text"
+                            className="text-input"
+                            value={category.name}
+                            onChange={(e) => updateCategoryName(index, e.target.value)}
+                            placeholder="Category name"
+                          />
+                          <div className="category-id-container">
+                            <label className="category-id-label">ID:</label>
+                            <input
+                              type="text"
+                              className="text-input category-id-input"
+                              value={category.id}
+                              onChange={(e) => updateCategoryId(index, e.target.value)}
+                              maxLength={8}
+                              style={{ width: '80px' }}
+                            />
+                          </div>
+                          <button
+                            className="delete-button"
+                            onClick={() => deleteCategory(index)}
+                            aria-label="Delete category"
+                          >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/>
+                            </svg>
+                          </button>
+                        </div>
+                        <textarea
+                          className="textarea-input"
+                          value={category.description}
+                          onChange={(e) => updateCategoryDescription(index, e.target.value)}
+                          placeholder="Category description"
+                        />
+                      </div>
+                    ))}
+                    
+                    <button className="add-button" onClick={addCategory}>
+                      <svg className="add-button-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+                      </svg>
+                      Add Category
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    {surveyData?.groups?.length > 0 ? (
+                      surveyData.groups.map((group, groupIndex) => (
+                        <div 
+                          key={group.id || groupIndex} 
+                          className={`survey-group ${groupIndex === currentGroupIndex ? 'active' : ''}`}
+                          style={{ display: groupIndex === currentGroupIndex ? 'block' : 'none' }}
+                        >
+                          <div className="group-header">
+                            {editMode ? (
+                              <input
+                                type="text"
+                                className="text-input"
+                                value={group.title}
+                                onChange={(e) => updateGroupTitle(groupIndex, e.target.value)}
+                                style={{ width: 'calc(100% - 40px)' }}
+                              />
+                            ) : (
+                              <div className="group-title">{group.title}</div>
+                            )}
+                            
+                            {editMode && (
+                              <button 
+                                className="delete-button" 
+                                onClick={() => deleteGroup(groupIndex)}
+                                aria-label="Delete group"
+                              >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/>
+                                </svg>
+                              </button>
+                            )}
+                          </div>
+                          
+                          <div className="group-content">
+                            {editMode ? (
+                              <textarea
+                                className="textarea-input"
+                                value={group.description}
+                                onChange={(e) => updateGroupDescription(groupIndex, e.target.value)}
+                                placeholder="Group Description"
+                              />
+                            ) : (
+                              <div className="group-description">{group.description}</div>
+                            )}
+                            
+                            <div className="group-divider"></div>
+                            
+                            {group.questions.length > 0 ? (
+                              group.questions.map((question, questionIndex) => (
+                                <div key={question.id} className="question-container">
+                                  {editMode ? (
+                                    <div className="question-header">
+                                      <input
+                                        type="text"
+                                        className="text-input"
+                                        value={question.text}
+                                        onChange={(e) => updateQuestionText(groupIndex, questionIndex, e.target.value)}
+                                        style={{ width: 'calc(100% - 120px)' }}
+                                      />
+                                      <div className="question-id-container">
+                                        <label className="question-id-label">ID:</label>
+                                        <input
+                                          type="text"
+                                          className="text-input question-id-input"
+                                          value={question.id}
+                                          onChange={(e) => updateQuestionId(groupIndex, questionIndex, e.target.value)}
+                                          maxLength={8}
+                                          style={{ width: '80px' }}
+                                        />
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="question-content">
+                                      <div className="question-text-container">
+                                        <div className="question-text">{question.text}</div>
+                                      </div>
+                                      
+                                      <div className="controls-row">
+                                        <div className="slider-container">
+                                          <input
+                                            type="range"
+                                            className={`assessment-slider ${question.value === null ? 'unselected' : ''}`}
+                                            value={question.value !== null ? question.value : question.min}
+                                            min={question.min}
+                                            max={question.max}
+                                            step={1}
+                                            onChange={(e) => updateQuestionValue(groupIndex, questionIndex, Number(e.target.value))}
+                                            disabled={readOnly}
+                                          />
+                                          <div className="slider-markers">
+                                            {renderSliderMarkers(question.min, question.max)}
+                                          </div>
+                                        </div>
+                                        
+                                        {!readOnly && (
+                                          <div className="comment-button-container">
+                                            <button 
+                                              className={`comment-button ${question.comment ? 'has-comment' : ''}`}
+                                              onClick={() => toggleComment(question.id)}
+                                              aria-label={question.comment ? "Edit comment" : "Add comment"}
+                                              title={question.comment ? "Edit comment" : "Add comment"}
+                                            >
+                                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z" fill="currentColor"/>
+                                              </svg>
+                                            </button>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
+                                  
+                                  {editMode && (
+                                    <div className="question-content">
+                                      <div className="slider-container">
+                                        <input
+                                          type="range"
+                                          className={`assessment-slider ${question.value === null ? 'unselected' : ''}`}
+                                          value={question.value !== null ? question.value : question.min}
+                                          min={question.min}
+                                          max={question.max}
+                                          step={1}
+                                          onChange={(e) => updateQuestionRange(
+                                            groupIndex, 
+                                            questionIndex, 
+                                            Number(e.target.value), 
+                                            question.max
+                                          )}
+                                          min={0}
+                                          placeholder="Min"
+                                        />
+                                        <input
+                                          type="range"
+                                          className={`assessment-slider ${question.value === null ? 'unselected' : ''}`}
+                                          value={question.value !== null ? question.value : question.min}
+                                          min={question.min}
+                                          max={question.max}
+                                          step={1}
+                                          onChange={(e) => updateQuestionRange(
+                                            groupIndex, 
+                                            questionIndex, 
+                                            question.min, 
+                                            Number(e.target.value)
+                                          )}
+                                          min={1}
+                                          placeholder="Max"
+                                        />
+                                      </div>
+                                      
+                                      <div className="question-edit-controls">
+                                        <div className="range-inputs">
+                                          <input
+                                            type="number"
+                                            className="text-input range-input"
+                                            value={question.min}
+                                            onChange={(e) => updateQuestionRange(
+                                              groupIndex, 
+                                              questionIndex, 
+                                              Number(e.target.value), 
+                                              question.max
+                                            )}
+                                            min={0}
+                                            placeholder="Min"
+                                          />
+                                          <input
+                                            type="number"
+                                            className="text-input range-input"
+                                            value={question.max}
+                                            onChange={(e) => updateQuestionRange(
+                                              groupIndex, 
+                                              questionIndex, 
+                                              question.min, 
+                                              Number(e.target.value)
+                                            )}
+                                            min={1}
+                                            placeholder="Max"
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+                                  
+                                  {editMode && (
+                                    <div className="question-controls">
+                                      {surveyData.categories && surveyData.categories.length > 0 && (
+                                        <button 
+                                          className="category-weights-button" 
+                                          onClick={() => toggleCategoryWeights(question.id)}
+                                          aria-label="Toggle category weights"
+                                          title="Category weights"
+                                        >
+                                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z" fill="currentColor"/>
+                                          </svg>
+                                        </button>
+                                      )}
+                                      <button 
+                                        className="delete-button" 
+                                        onClick={() => deleteQuestion(groupIndex, questionIndex)}
+                                        aria-label="Delete question"
+                                      >
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                          <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/>
+                                        </svg>
+                                      </button>
+                                    </div>
+                                  )}
+                                  
+                                  {showCategoryWeights[question.id] && editMode && surveyData.categories && (
+                                    <div className="category-weights-container">
+                                      <div className="category-weights-title">Category Weights</div>
+                                      {surveyData.categories.map((category) => (
+                                        <div key={category.id} className="category-weight-item">
+                                          <div className="category-weight-label">{category.name}</div>
+                                          <input
+                                            type="number"
+                                            className="text-input weight-input"
+                                            value={question.categoryWeights?.[category.id] || 0}
+                                            onChange={(e) => updateCategoryWeight(
+                                              groupIndex,
+                                              questionIndex,
+                                              category.id,
+                                              Number(e.target.value)
+                                            )}
+                                            min={0}
+                                            max={100}
+                                          />
+                                          <span className="weight-percentage">%</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                  
+                                  {visibleComments[question.id] && !readOnly && (
+                                    <div className="comment-container">
+                                      <textarea
+                                        className="comment-textarea"
+                                        placeholder="Add your comment here..."
+                                        value={question.comment}
+                                        onChange={(e) => updateQuestionComment(groupIndex, questionIndex, e.target.value)}
+                                        disabled={readOnly}
+                                      />
+                                    </div>
+                                  )}
+                                  
+                                  {readOnly && question.comment && (
+                                    <div className="comment-container read-only">
+                                      <div className="comment-text">{question.comment}</div>
+                                    </div>
+                                  )}
+                                </div>
+                              ))
+                            ) : (
+                              <div className="no-questions-message">
+                                {editMode ? 
+                                  "No questions added yet. Use the 'Add Question' button below to create questions." : 
+                                  "No questions to answer in this section."}
+                              </div>
+                            )}
+                            
+                            {editMode && (
+                              <button 
+                                className="add-button" 
+                                onClick={() => addQuestion(groupIndex)}
+                              >
+                                <svg className="add-button-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+                                </svg>
+                                Add Question
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="no-groups-message">
+                        {editMode ? 
+                          "No groups added yet. Use the 'Add Group' button below to create a group." : 
+                          "No survey content available."}
+                      </div>
+                    )}
+                  </>
+                )}
+              </>
+            )}
           </>
         )}
       </div>
       
-      {editMode && (
-        <div className="edit-tabs">
-          <button 
-            className={`edit-tab ${activeEditTab === 'content' ? 'active' : ''}`}
-            onClick={() => setActiveEditTab('content')}
-          >
-            Survey Content
-          </button>
-          <button 
-            className={`edit-tab ${activeEditTab === 'categories' ? 'active' : ''}`}
-            onClick={() => setActiveEditTab('categories')}
-          >
-            Categories
-          </button>
-        </div>
-      )}
-      
-      {editMode && activeEditTab === 'categories' ? (
-        <div className="categories-editor">
-          <div className="categories-header">
-            <h3>Categories</h3>
-            <p className="categories-description">
-              Define categories to classify and weight questions. Each question can be weighted differently across categories.
-            </p>
-          </div>
-          
-          {surveyData.categories?.map((category, index) => (
-            <div key={category.id} className="category-item">
-              <div className="category-header">
-                <input
-                  type="text"
-                  className="text-input"
-                  value={category.name}
-                  onChange={(e) => updateCategoryName(index, e.target.value)}
-                  placeholder="Category name"
-                />
-                <div className="category-id-container">
-                  <label className="category-id-label">ID:</label>
-                  <input
-                    type="text"
-                    className="text-input category-id-input"
-                    value={category.id}
-                    onChange={(e) => updateCategoryId(index, e.target.value)}
-                    maxLength={8}
-                    style={{ width: '80px' }}
-                  />
-                </div>
-                <button
-                  className="delete-button"
-                  onClick={() => deleteCategory(index)}
-                  aria-label="Delete category"
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/>
-                  </svg>
-                </button>
-              </div>
-              <textarea
-                className="textarea-input"
-                value={category.description}
-                onChange={(e) => updateCategoryDescription(index, e.target.value)}
-                placeholder="Category description"
-              />
-            </div>
-          ))}
-          
-          <button className="add-button" onClick={addCategory}>
-            <svg className="add-button-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
-            </svg>
-            Add Category
-          </button>
-        </div>
-      ) : (
-        <div className="survey-content">
-          {surveyData?.groups?.length > 0 ? (
-            surveyData.groups.map((group, groupIndex) => (
-              <div 
-                key={group.id || groupIndex} 
-                className={`survey-group ${groupIndex === currentGroupIndex ? 'active' : ''}`}
-                style={{ display: groupIndex === currentGroupIndex ? 'block' : 'none' }}
-              >
-                <div className="group-header">
-                  {editMode ? (
-                    <input
-                      type="text"
-                      className="text-input"
-                      value={group.title}
-                      onChange={(e) => updateGroupTitle(groupIndex, e.target.value)}
-                      style={{ width: 'calc(100% - 40px)' }}
-                    />
-                  ) : (
-                    <div className="group-title">{group.title}</div>
-                  )}
-                  
-                  {editMode && (
-                    <button 
-                      className="delete-button" 
-                      onClick={() => deleteGroup(groupIndex)}
-                      aria-label="Delete group"
-                    >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/>
-                      </svg>
-                    </button>
-                  )}
-                </div>
-                
-                <div className="group-content">
-                  {editMode ? (
-                    <textarea
-                      className="textarea-input"
-                      value={group.description}
-                      onChange={(e) => updateGroupDescription(groupIndex, e.target.value)}
-                      placeholder="Group Description"
-                    />
-                  ) : (
-                    <div className="group-description">{group.description}</div>
-                  )}
-                  
-                  <div className="group-divider"></div>
-                  
-                  {group.questions.length > 0 ? (
-                    group.questions.map((question, questionIndex) => (
-                      <div key={question.id} className="question-container">
-                        {editMode ? (
-                          <div className="question-header">
-                            <input
-                              type="text"
-                              className="text-input"
-                              value={question.text}
-                              onChange={(e) => updateQuestionText(groupIndex, questionIndex, e.target.value)}
-                              style={{ width: 'calc(100% - 120px)' }}
-                            />
-                            <div className="question-id-container">
-                              <label className="question-id-label">ID:</label>
-                              <input
-                                type="text"
-                                className="text-input question-id-input"
-                                value={question.id}
-                                onChange={(e) => updateQuestionId(groupIndex, questionIndex, e.target.value)}
-                                maxLength={8}
-                                style={{ width: '80px' }}
-                              />
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="question-content">
-                            <div className="question-text-container">
-                              <div className="question-text">{question.text}</div>
-                            </div>
-                            
-                            <div className="slider-container">
-                              <input
-                                type="range"
-                                className={`assessment-slider ${question.value === null ? 'unselected' : ''}`}
-                                value={question.value !== null ? question.value : question.min}
-                                min={question.min}
-                                max={question.max}
-                                step={1}
-                                onChange={(e) => updateQuestionValue(groupIndex, questionIndex, Number(e.target.value))}
-                                disabled={readOnly}
-                              />
-                              <div className="slider-markers">
-                                {renderSliderMarkers(question.min, question.max)}
-                              </div>
-                            </div>
-                            
-                            {!readOnly && (
-                              <div className="comment-button-container">
-                                <button 
-                                  className={`comment-button ${question.comment ? 'has-comment' : ''}`}
-                                  onClick={() => toggleComment(question.id)}
-                                  aria-label={question.comment ? "Edit comment" : "Add comment"}
-                                  title={question.comment ? "Edit comment" : "Add comment"}
-                                >
-                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z" fill="currentColor"/>
-                                  </svg>
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                        
-                        {editMode && (
-                          <div className="question-content">
-                            <div className="slider-container">
-                              <input
-                                type="range"
-                                className={`assessment-slider ${question.value === null ? 'unselected' : ''}`}
-                                value={question.value !== null ? question.value : question.min}
-                                min={question.min}
-                                max={question.max}
-                                step={1}
-                                onChange={(e) => updateQuestionRange(
-                                  groupIndex, 
-                                  questionIndex, 
-                                  Number(e.target.value), 
-                                  question.max
-                                )}
-                                min={0}
-                                placeholder="Min"
-                              />
-                              <input
-                                type="range"
-                                className={`assessment-slider ${question.value === null ? 'unselected' : ''}`}
-                                value={question.value !== null ? question.value : question.min}
-                                min={question.min}
-                                max={question.max}
-                                step={1}
-                                onChange={(e) => updateQuestionRange(
-                                  groupIndex, 
-                                  questionIndex, 
-                                  question.min, 
-                                  Number(e.target.value)
-                                )}
-                                min={1}
-                                placeholder="Max"
-                              />
-                            </div>
-                            
-                            <div className="question-edit-controls">
-                              <div className="range-inputs">
-                                <input
-                                  type="number"
-                                  className="text-input range-input"
-                                  value={question.min}
-                                  onChange={(e) => updateQuestionRange(
-                                    groupIndex, 
-                                    questionIndex, 
-                                    Number(e.target.value), 
-                                    question.max
-                                  )}
-                                  min={0}
-                                  placeholder="Min"
-                                />
-                                <input
-                                  type="number"
-                                  className="text-input range-input"
-                                  value={question.max}
-                                  onChange={(e) => updateQuestionRange(
-                                    groupIndex, 
-                                    questionIndex, 
-                                    question.min, 
-                                    Number(e.target.value)
-                                  )}
-                                  min={1}
-                                  placeholder="Max"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                        
-                        {editMode && (
-                          <div className="question-controls">
-                            {surveyData.categories && surveyData.categories.length > 0 && (
-                              <button 
-                                className="category-weights-button" 
-                                onClick={() => toggleCategoryWeights(question.id)}
-                                aria-label="Toggle category weights"
-                                title="Category weights"
-                              >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z" fill="currentColor"/>
-                                </svg>
-                              </button>
-                            )}
-                            <button 
-                              className="delete-button" 
-                              onClick={() => deleteQuestion(groupIndex, questionIndex)}
-                              aria-label="Delete question"
-                            >
-                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/>
-                              </svg>
-                            </button>
-                          </div>
-                        )}
-                        
-                        {showCategoryWeights[question.id] && editMode && surveyData.categories && (
-                          <div className="category-weights-container">
-                            <div className="category-weights-title">Category Weights</div>
-                            {surveyData.categories.map((category) => (
-                              <div key={category.id} className="category-weight-item">
-                                <div className="category-weight-label">{category.name}</div>
-                                <input
-                                  type="number"
-                                  className="text-input weight-input"
-                                  value={question.categoryWeights?.[category.id] || 0}
-                                  onChange={(e) => updateCategoryWeight(
-                                    groupIndex,
-                                    questionIndex,
-                                    category.id,
-                                    Number(e.target.value)
-                                  )}
-                                  min={0}
-                                  max={100}
-                                />
-                                <span className="weight-percentage">%</span>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                        
-                        {visibleComments[question.id] && !readOnly && (
-                          <div className="comment-container">
-                            <textarea
-                              className="comment-textarea"
-                              placeholder="Add your comment here..."
-                              value={question.comment}
-                              onChange={(e) => updateQuestionComment(groupIndex, questionIndex, e.target.value)}
-                              disabled={readOnly}
-                            />
-                          </div>
-                        )}
-                        
-                        {readOnly && question.comment && (
-                          <div className="comment-container read-only">
-                            <div className="comment-text">{question.comment}</div>
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  ) : (
-                    <div className="no-questions-message">
-                      {editMode ? 
-                        "No questions added yet. Use the 'Add Question' button below to create questions." : 
-                        "No questions to answer in this section."}
-                    </div>
-                  )}
-                  
-                  {editMode && (
-                    <button 
-                      className="add-button" 
-                      onClick={() => addQuestion(groupIndex)}
-                    >
-                      <svg className="add-button-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
-                      </svg>
-                      Add Question
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="no-groups-message">
-              {editMode ? 
-                "No groups added yet. Use the 'Add Group' button below to create a group." : 
-                "No survey content available."}
-            </div>
-          )}
-        </div>
-      )}
-      
       <div className="survey-navigation">
-        <div className="nav-buttons">
+        <div className="nav-controls">
           <button 
-            className="nav-button"
+            className="nav-button icon-only"
             onClick={goToPreviousGroup}
-            disabled={!surveyData?.groups?.length || currentGroupIndex === 0}
+            disabled={showIntro}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/>
             </svg>
-            Previous
           </button>
           
+          <div className="progress-indicator">
+            <div className="progress-dots">
+              {renderProgressDots()}
+            </div>
+            <span>{progress.answeredQuestions} of {progress.totalQuestions} questions answered ({progress.percentage}%)</span>
+          </div>
+          
           <button 
-            className="nav-button"
+            className="nav-button icon-only"
             onClick={goToNextGroup}
-            disabled={!surveyData?.groups?.length || currentGroupIndex === (surveyData?.groups?.length - 1)}
+            disabled={(!showIntro && currentGroupIndex >= (surveyData?.groups?.length - 1) && !allQuestionsAnswered) || showFinalSlide}
           >
-            Next
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/>
             </svg>
           </button>
         </div>
-        
-        {!editMode && !readOnly && allQuestionsAnswered && (
-          <button 
-            className={`submit-button ${submitted ? 'submitted' : ''}`}
-            onClick={handleSubmit}
-            disabled={submitted}
-          >
-            {submitted ? "Submitted" : (props.submit_text || "Submit")}
-          </button>
-        )}
-        
-        <div className="progress-indicator">
-          <div className="progress-dots">
-            {renderProgressDots()}
-          </div>
-          <span>{progress.answeredQuestions} of {progress.totalQuestions} questions answered ({progress.percentage}%)</span>
-        </div>
       </div>
       
-      <div className="survey-footer">
-        {editMode ? (
-          <button
-            className="save-button"
-            onClick={handleSave}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" fill="currentColor"/>
-            </svg>
-            Save Changes
-          </button>
-        ) : (
-          !disableEditing && (
+      {!disableEditing && (
+        <div className="survey-footer">
+          {editMode ? (
+            <button
+              className="save-button"
+              onClick={handleSave}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" fill="currentColor"/>
+              </svg>
+              Save Changes
+            </button>
+          ) : (
             <button
               className="edit-button"
               onClick={() => setEditMode(true)}
@@ -933,21 +1013,21 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
               </svg>
               Edit Survey
             </button>
-          )
-        )}
-        
-        {editMode && !disableEditing && (
-          <button 
-            className="add-button" 
-            onClick={addGroup}
-          >
-            <svg className="add-button-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
-            </svg>
-            Add Group
-          </button>
-        )}
-      </div>
+          )}
+          
+          {editMode && (
+            <button 
+              className="add-button" 
+              onClick={addGroup}
+            >
+              <svg className="add-button-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+              </svg>
+              Add Group
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -4,6 +4,9 @@
 .weighted-assessment-survey {
   display: flex;
   flex-direction: column;
+  height: 95vh;
+  max-height: 95vh;
+  overflow: hidden;
   gap: 16px;
   width: 100%;
   font-family: inherit;
@@ -20,6 +23,109 @@
       border-radius: 4px;
       margin-top: 8px;
     }
+  }
+
+  .survey-content {
+    flex: 1;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+    background-color: var(--ui-widget-primary-background);
+    
+    // Custom scrollbar styling
+    &::-webkit-scrollbar {
+      width: 8px;
+      display: block; // Always show scrollbar
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--ui-widget-border-color);
+      border-radius: 4px;
+      
+      &:hover {
+        background-color: var(--ui-widget-hover-background-dark);
+      }
+    }
+
+    // Firefox scrollbar styling
+    scrollbar-width: thin;
+    scrollbar-color: var(--ui-widget-border-color) transparent;
+
+    .survey-intro {
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+      text-align: left;
+      max-width: 800px;
+      margin: 0 auto;
+
+      .survey-title {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+      }
+
+      .survey-description {
+        font-size: 1rem;
+        line-height: 1.5;
+        color: var(--text-secondary);
+        white-space: pre-wrap;
+        padding: 0;
+      }
+
+      .text-input {
+        font-size: 1.5rem;
+        text-align: left;
+        width: 100%;
+      }
+
+      .textarea-input {
+        font-size: 1rem;
+        text-align: left;
+        width: 100%;
+        min-height: 150px;
+        resize: vertical;
+        margin-top: 1rem;
+      }
+    }
+
+    .survey-group {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      
+      .group-content {
+        flex: 1;
+        overflow-y: auto;
+      }
+    }
+  }
+
+  .survey-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0rem;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .survey-footer {
+    flex-shrink: 0;
+    padding: 1rem;
+    border-top: 1px solid var(--border-color, #ddd);
+    background: var(--background-color, #fff);
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
   }
 }
 
@@ -46,32 +152,44 @@
 
 .survey-group {
   background-color: var(--ui-widget-primary-background);
-  border: 1px solid var(--ui-widget-border-color);
   border-radius: 4px;
   margin-bottom: 16px;
-  box-shadow: var(--ui-widget-dropdown-shadow);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
 }
 
 .group-header {
-  padding: 12px 16px;
+  padding: 1rem;
   border-bottom: 1px solid var(--ui-widget-border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-sizing: border-box;
+  
+  .text-input {
+    font-size: 1.5rem;
+    font-weight: 500;
+  }
 }
 
 .group-title {
-  font-size: 16px;
+  font-size: 1.5rem;
   font-weight: 500;
   color: var(--ui-widget-primary-text);
+  margin-bottom: 1rem;
 }
 
 .group-content {
   padding: 16px;
+  box-sizing: border-box;
 }
 
 .group-description {
-  font-size: 14px;
+  font-size: 1.25rem;
+  font-weight: 400;
   color: var(--ui-widget-secondary-text);
   margin-bottom: 16px;
   line-height: 1.5;
@@ -89,6 +207,8 @@
   border-radius: 4px;
   padding: 16px;
   background-color: var(--ui-widget-primary-background);
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .question-header {
@@ -99,10 +219,14 @@
 }
 
 .question-text {
-  font-size: 14px;
+  font-size: 1rem;
+  font-weight: 400 !important;
   color: var(--ui-widget-primary-text);
   line-height: 1.5;
   margin: 0;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
 }
 
 .question-controls {
@@ -169,7 +293,9 @@
 }
 
 .slider-container {
-  width: 100%;
+  flex: 3;
+  padding: 0 8px;
+  min-width: 150px;
   position: relative;
 }
 
@@ -235,9 +361,9 @@
 }
 
 .edit-button, .save-button {
-  padding: 8px 16px;
+  padding: min(2vw, 0.75rem) min(3vw, 1.5rem);
   border-radius: 4px;
-  font-size: 14px;
+  font-size: min(2vw, 1rem);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -539,6 +665,8 @@
   flex-direction: column;
   align-items: center;
   gap: 8px;
+  flex: 1;
+  min-width: 0; // Prevents flex item from overflowing
 }
 
 .progress-indicator span {
@@ -549,6 +677,8 @@
 .progress-dots {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .progress-dot {
@@ -601,102 +731,87 @@
 /* Navigation and submit button styling */
 .survey-navigation {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-top: 16px;
-  flex-wrap: wrap;
+  justify-content: center;
+  padding: 1rem;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.nav-controls {
+  display: flex;
+  align-items: center;
   gap: 16px;
+  width: 100%;
+  justify-content: space-between;
+  max-width: 600px;
 }
 
 .nav-buttons {
   display: flex;
   gap: 12px;
   align-items: center;
-  order: 1;
-}
-
-.nav-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background-color: var(--ui-widget-primary-background);
-  border: 1px solid var(--ui-widget-border-color);
-  border-radius: 4px;
-  color: var(--ui-widget-primary-text);
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s;
-  min-width: 100px;
-  justify-content: center;
-}
-
-.nav-button:hover:not(:disabled) {
-  background-color: var(--ui-widget-hover-background-dark);
-}
-
-.nav-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.nav-button svg {
-  width: 16px;
-  height: 16px;
 }
 
 .submit-button {
+  min-width: 120px;
+  padding: min(2vw, 0.75rem) min(3vw, 1.5rem);
+  font-size: min(2vw, 1rem);
   background-color: #10b981;
   color: white;
   border: none;
   border-radius: 4px;
-  padding: 10px 24px;
-  font-size: 15px;
-  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s;
-  min-width: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  order: 2;
-  margin: 0 auto; /* Center the button */
+  
+  &:hover {
+    background-color: #059669;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.final-slide {
+    min-width: 160px;
+    padding: 0.75rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
 }
 
-.submit-button:hover {
-  background-color: #059669;
-}
-
-.submit-button:active {
-  transform: translateY(1px);
-}
-
-.progress-indicator {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  order: 3;
+.nav-button.icon-only {
+  min-width: unset;
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+  flex-shrink: 0; // Prevents button from shrinking
+  
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
 }
 
 /* For smaller screens, stack the elements */
-@media (max-width: 768px) {
-  .survey-navigation {
-    flex-direction: column;
-    align-items: center;
+@media (max-width: 480px) {
+  .nav-controls {
+    gap: 8px;
   }
-  
-  .nav-buttons {
-    width: 100%;
-    justify-content: space-between;
+
+  .progress-indicator span {
+    font-size: 12px;
   }
-  
-  .submit-button {
-    margin: 16px 0;
+
+  .progress-dots {
+    gap: 4px;
   }
-  
-  .progress-indicator {
-    width: 100%;
+
+  .progress-dot {
+    width: 6px;
+    height: 6px;
   }
 }
 
@@ -735,47 +850,52 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  align-items: flex-start;
+  width: 100%;
 }
 
 .question-text-container {
-  flex: 1;
   width: 100%;
+  min-height: 24px;
+  margin-bottom: 12px;
+}
+
+.question-text {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--ui-widget-primary-text);
+  line-height: 1.5;
+  margin: 0;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.controls-row {
   display: flex;
   align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.slider-container {
+  flex: 1;
+  min-width: 150px;
 }
 
 .comment-button-container {
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
-  margin-top: 8px;
+  flex-shrink: 0;
 }
 
 /* Responsive layout for wider screens */
 @media (min-width: 768px) {
   .question-content {
-    flex-direction: row;
-    align-items: center;
-    flex-wrap: nowrap;
+    flex-direction: column;
+    gap: 16px;
   }
   
   .question-text-container {
-    flex: 1;
-    padding-right: 24px;
-    min-width: 0;
-  }
-  
-  .slider-container {
-    width: 60%;
-    flex-shrink: 0;
-  }
-  
-  .comment-button-container {
-    width: auto;
-    margin-top: 0;
-    margin-left: 16px;
-    flex-shrink: 0;
+    width: 100%;
+    padding-right: 0;
   }
 }
 
@@ -855,4 +975,102 @@
   font-family: monospace;
   font-size: 12px;
   padding: 4px 8px;
+}
+
+.survey-intro {
+  padding: 2rem;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+
+  .survey-title {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+  }
+
+  .survey-description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+  }
+
+  .text-input {
+    font-size: 2rem;
+    text-align: center;
+    width: 100%;
+  }
+
+  .textarea-input {
+    font-size: 1.1rem;
+    text-align: center;
+    width: 100%;
+    min-height: 150px;
+  }
+}
+
+.nav-button.icon-only {
+  min-width: unset;
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+  
+  &:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}
+
+.submit-button {
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.final-slide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+  gap: 2rem;
+
+  .final-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+  }
+
+  .final-description {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+  }
+
+  .submit-button {
+    min-width: 200px;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    background-color: #10b981;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #059669;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
 }
