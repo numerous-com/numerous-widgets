@@ -2,6 +2,17 @@
 
 
 
+## v0.1.42 (2025-03-03)
+
+### Fix
+
+* fix(widget): Remove fixed height constraints on survey container
+
+- Removed fixed height and max-height properties from survey container
+- Allows more flexible layout and responsive sizing
+- Improves adaptability across different screen sizes ([`4a084a9`](https://github.com/numerous-com/numerous-widgets/commit/4a084a95fff6f0946a61d0a0b3d6235b73668916))
+
+
 ## v0.1.41 (2025-03-03)
 
 ### Fix
