@@ -7,9 +7,10 @@
   height: 95vh;
   max-height: 95vh;
   overflow: hidden;
-  gap: 16px;
+  gap: 0;
   width: 100%;
   font-family: inherit;
+  position: relative;
 
   &.read-only {
     .assessment-slider {
@@ -32,7 +33,23 @@
     max-width: 800px;
     width: 100%;
     margin: 0 auto;
+    padding: 0 0rem;
     background-color: var(--ui-widget-primary-background);
+    position: relative;
+    
+    .back-button {
+      position: absolute;
+      left: 1rem;
+      top: 1rem;
+      z-index: 10;
+    }
+    
+    .next-button {
+      position: relative;
+      right: 1rem;
+      bottom: 1rem;
+      z-index: 10;
+    }
     
     // Custom scrollbar styling
     &::-webkit-scrollbar {
@@ -64,6 +81,10 @@
       text-align: left;
       max-width: 800px;
       margin: 0 auto;
+      padding-top: 3rem;
+      padding-bottom: 3rem;
+      position: relative;
+      min-height: 400px;
 
       .survey-title {
         font-size: 1.5rem;
@@ -93,6 +114,11 @@
         resize: vertical;
         margin-top: 1rem;
       }
+
+      .next-button {
+        position: relative;
+        width: 25%;
+      }
     }
 
     .survey-group {
@@ -100,6 +126,8 @@
       display: flex;
       flex-direction: column;
       padding: 0;
+      padding-top: 3rem;
+      padding-bottom: 1rem;
       
       .group-content {
         flex: 1;
@@ -109,24 +137,41 @@
   }
 
   .survey-navigation {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0rem;
+    position: relative;
     width: 100%;
     max-width: 800px;
-    margin: 0 auto;
+    margin: 0 0;
+    padding: 0;
+    
+    .progress-indicator {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      flex: 1;
+      max-width: 800px;
+      width: 100%;
+    }
   }
 
   .survey-footer {
-    flex-shrink: 0;
-    padding: 1rem;
-    border-top: 1px solid var(--border-color, #ddd);
-    background: var(--background-color, #fff);
-    max-width: 800px;
+    position: relative;
     width: 100%;
+    max-width: 800px;
     margin: 0 auto;
+    padding: 1rem;
+    
+    .next-button {
+      right: 1rem;
+      bottom: 0;
+    }
   }
+}
+
+.nav-buttons-intro {
+  display: flex;
+  justify-content: right;
+  width: 100%;
+  margin-top: 1rem;
 }
 
 .survey-header {
@@ -159,10 +204,25 @@
   max-width: 800px;
   margin: 0 auto;
   padding: 1rem;
+  position: relative;
+  min-height: 400px;
+  
+  .back-button {
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+  }
+  
+  .next-button {
+    position: relative;
+    right: 1rem;
+    bottom: 1rem;
+  }
 }
 
 .group-header {
   padding: 1rem;
+  padding-top: 3rem;
   border-bottom: 1px solid var(--ui-widget-border-color);
   display: flex;
   justify-content: space-between;
@@ -184,6 +244,7 @@
 
 .group-content {
   padding: 16px;
+  padding-bottom: 1rem;
   box-sizing: border-box;
 }
 
@@ -659,43 +720,27 @@
   color: var(--ui-widget-secondary-text);
 }
 
-/* Progress indicator */
-.progress-indicator {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  min-width: 0; // Prevents flex item from overflowing
-}
-
-.progress-indicator span {
-  font-size: 14px;
-  color: var(--ui-widget-secondary-text);
-}
-
-.progress-dots {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.progress-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+.progress-bar-container {
+  width: 100%;
+  max-width: 832px;
+  height: 6px;
   background-color: var(--ui-widget-border-color);
-  transition: background-color 0.2s;
-  cursor: pointer;
+  border-radius: 3px;
+  overflow: hidden;
+  justify-self: center;
 }
 
-.progress-dot.active {
+.progress-bar-fill {
+  height: 100%;
   background-color: var(--ui-widget-focus-border);
+  border-radius: 3px;
+  transition: width 0.3s ease;
 }
 
-.progress-dot.completed {
-  background-color: #10b981;
+/* Remove old progress dots related styles */
+.progress-dots,
+.progress-dot {
+  display: none;
 }
 
 /* Question ID styling */
@@ -782,12 +827,25 @@
   }
 }
 
-.nav-button.icon-only {
-  min-width: unset;
-  width: 36px;
+.nav-button {
+  min-width: 80px;
   height: 36px;
-  padding: 8px;
-  flex-shrink: 0; // Prevents button from shrinking
+  padding: 8px 16px;
+  background-color: var(--ui-widget-primary-background);
+  border: 1px solid var(--ui-widget-border-color);
+  border-radius: 4px;
+  color: var(--ui-widget-primary-text);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:hover:not(:disabled) {
+    background-color: var(--ui-widget-hover-background-dark);
+  }
   
   &:disabled {
     opacity: 0.3;
@@ -801,17 +859,34 @@
     gap: 8px;
   }
 
-  .progress-indicator span {
-    font-size: 12px;
+  .progress-indicator {
+    padding: 0 8px;
   }
 
-  .progress-dots {
-    gap: 4px;
+  .progress-bar-container {
+    height: 4px;
   }
 
-  .progress-dot {
-    width: 6px;
-    height: 6px;
+  .survey-content {
+    .back-button {
+      left: 0.5rem;
+      top: 0.5rem;
+    }
+    
+    .next-button {
+      right: 0.5rem;
+      bottom: 0.5rem;
+    }
+  }
+  
+  .progress-indicator {
+    width: 100%;
+    padding: 0;
+  }
+  
+  .survey-intro {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
   }
 }
 
