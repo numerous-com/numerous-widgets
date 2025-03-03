@@ -2,6 +2,20 @@
 
 
 
+## v0.1.43 (2025-03-03)
+
+### Fix
+
+* fix(widget): Add undo changes functionality to WeightedAssessmentSurvey
+
+- Implemented undo changes feature with original data preservation
+- Added new state for tracking original survey data
+- Created handleEditMode and handleUndoChanges methods
+- Updated footer buttons to include undo button
+- Styled undo button with red color scheme
+- Improved edit mode workflow with data restoration ([`ea33b69`](https://github.com/numerous-com/numerous-widgets/commit/ea33b69c87adf2c2b57f5858a281ed6757540803))
+
+
 ## v0.1.42 (2025-03-03)
 
 ### Fix
