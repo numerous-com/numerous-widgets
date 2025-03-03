@@ -2,6 +2,19 @@
 
 
 
+## v0.1.41 (2025-03-03)
+
+### Fix
+
+* fix(widget): Simplify survey navigation and remove final slide
+
+- Removed final slide state and logic
+- Replaced progress dots with a progress bar
+- Simplified navigation flow by submitting survey on last group
+- Updated styling to improve layout and responsiveness
+- Removed redundant navigation controls ([`bcb24dc`](https://github.com/numerous-com/numerous-widgets/commit/bcb24dccecd5d39fae5619a187dd9811f44ae24c))
+
+
 ## v0.1.40 (2025-03-02)
 
 ### Fix
