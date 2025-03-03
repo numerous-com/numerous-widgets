@@ -55,6 +55,9 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   const [disableEditing] = useModelState<boolean>("disable_editing");
   const [readOnly] = useModelState<boolean>("read_only");
   
+  // Add state for original data near the top with other state declarations
+  const [originalData, setOriginalData] = React.useState<SurveyData | null>(null);
+  
   // Initialize categories if they don't exist
   React.useEffect(() => {
     if (!surveyData) {
@@ -487,7 +490,24 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
       await props.model.save_changes();
     }
     
-    // Switch out of edit mode after saving
+    setOriginalData(null); // Clear the original data
+    setEditMode(false);
+  };
+  
+  // Update the edit mode handler
+  const handleEditMode = () => {
+    if (!editMode) {
+      setOriginalData(JSON.parse(JSON.stringify(surveyData))); // Deep copy the current state
+      setEditMode(true);
+    }
+  };
+  
+  // Update the undo changes handler
+  const handleUndoChanges = () => {
+    if (originalData) {
+      setSurveyData(originalData);
+    }
+    setOriginalData(null);
     setEditMode(false);
   };
   
@@ -694,79 +714,44 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                                   <div className="question-text-container">
                                     <div className="question-text">{question.text}</div>
                                   </div>
-                                  
-                                  <div className="controls-row">
-                                    <div className="slider-container">
-                                      <input
-                                        type="range"
-                                        className={`assessment-slider ${question.value === null ? 'unselected' : ''}`}
-                                        value={question.value !== null ? question.value : question.min}
-                                        min={question.min}
-                                        max={question.max}
-                                        step={1}
-                                        onChange={(e) => updateQuestionValue(groupIndex, questionIndex, Number(e.target.value))}
-                                        disabled={readOnly}
-                                      />
-                                      <div className="slider-markers">
-                                        {renderSliderMarkers(question.min, question.max)}
-                                      </div>
-                                    </div>
-                                    
-                                    {!readOnly && (
-                                      <div className="comment-button-container">
-                                        <button 
-                                          className={`comment-button ${question.comment ? 'has-comment' : ''}`}
-                                          onClick={() => toggleComment(question.id)}
-                                          aria-label={question.comment ? "Edit comment" : "Add comment"}
-                                          title={question.comment ? "Edit comment" : "Add comment"}
-                                        >
-                                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z" fill="currentColor"/>
-                                          </svg>
-                                        </button>
-                                      </div>
-                                    )}
-                                  </div>
                                 </div>
                               )}
                               
+                              <div className="controls-row">
+                                <div className="slider-container">
+                                  <input
+                                    type="range"
+                                    className={`assessment-slider ${question.value === null ? 'unselected' : ''}`}
+                                    value={question.value !== null ? question.value : question.min}
+                                    min={question.min}
+                                    max={question.max}
+                                    step={1}
+                                    onChange={(e) => updateQuestionValue(groupIndex, questionIndex, Number(e.target.value))}
+                                    disabled={readOnly}
+                                  />
+                                  <div className="slider-markers">
+                                    {renderSliderMarkers(question.min, question.max)}
+                                  </div>
+                                </div>
+                                
+                                {!readOnly && (
+                                  <div className="comment-button-container">
+                                    <button 
+                                      className={`comment-button ${question.comment ? 'has-comment' : ''}`}
+                                      onClick={() => toggleComment(question.id)}
+                                      aria-label={question.comment ? "Edit comment" : "Add comment"}
+                                      title={question.comment ? "Edit comment" : "Add comment"}
+                                    >
+                                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z" fill="currentColor"/>
+                                      </svg>
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                              
                               {editMode && (
                                 <div className="question-content">
-                                  <div className="slider-container">
-                                    <input
-                                      type="range"
-                                      className={`assessment-slider ${question.value === null ? 'unselected' : ''}`}
-                                      value={question.value !== null ? question.value : question.min}
-                                      min={question.min}
-                                      max={question.max}
-                                      step={1}
-                                      onChange={(e) => updateQuestionRange(
-                                        groupIndex, 
-                                        questionIndex, 
-                                        Number(e.target.value), 
-                                        question.max
-                                      )}
-                                      min={0}
-                                      placeholder="Min"
-                                    />
-                                    <input
-                                      type="range"
-                                      className={`assessment-slider ${question.value === null ? 'unselected' : ''}`}
-                                      value={question.value !== null ? question.value : question.min}
-                                      min={question.min}
-                                      max={question.max}
-                                      step={1}
-                                      onChange={(e) => updateQuestionRange(
-                                        groupIndex, 
-                                        questionIndex, 
-                                        question.min, 
-                                        Number(e.target.value)
-                                      )}
-                                      min={1}
-                                      placeholder="Max"
-                                    />
-                                  </div>
-                                  
                                   <div className="question-edit-controls">
                                     <div className="range-inputs">
                                       <input
@@ -920,7 +905,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
       {!disableEditing && (
         <div className="survey-footer">
           {editMode ? (
-            <>
+            <div className="footer-buttons">
               <button
                 className="save-button"
                 onClick={handleSave}
@@ -929,6 +914,15 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                   <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" fill="currentColor"/>
                 </svg>
                 Save Changes
+              </button>
+              <button
+                className="undo-button"
+                onClick={handleUndoChanges}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z" fill="currentColor"/>
+                </svg>
+                Undo Changes
               </button>
               <button 
                 className="add-button" 
@@ -939,11 +933,11 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                 </svg>
                 Add Group
               </button>
-            </>
+            </div>
           ) : (
             <button
               className="edit-button"
-              onClick={() => setEditMode(true)}
+              onClick={handleEditMode}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"/>
