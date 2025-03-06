@@ -2,6 +2,15 @@
 
 
 
+## v0.1.45 (2025-03-06)
+
+### Fix
+
+* fix(spelling): Fix spelling of url widget ([`05c3266`](https://github.com/numerous-com/numerous-widgets/commit/05c3266ddf77b31893729d5a7f5b2a82ff263edf))
+
+* fix(url_params): Add URLParams widget to project ([`6ba6dfb`](https://github.com/numerous-com/numerous-widgets/commit/6ba6dfb8cdb22370516d506ff6280f6edc3de34b))
+
+
 ## v0.1.44 (2025-03-06)
 
 ### Fix
