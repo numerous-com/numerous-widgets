@@ -27,7 +27,7 @@
     "TimerWidget",
     "ToggleButtonWidget",
     "TreeBrowserWidget",
-    "UrlParamsWidget",
+    "URLParamsWidget",
     "WeightedAssessmentSurveyWidget"
   ]
 } 
