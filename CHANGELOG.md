@@ -2,6 +2,24 @@
 
 
 
+## v0.1.44 (2025-03-06)
+
+### Fix
+
+* fix(lint): fix linting ([`744bf8f`](https://github.com/numerous-com/numerous-widgets/commit/744bf8f01f7709318cb277cc1d8b9d798f5ecafa))
+
+* fix(widget): Add advanced features to WeightedAssessmentSurvey
+
+- Implemented Markdown rendering for descriptions and questions
+- Added qualitative scale option for slider inputs
+- Introduced weights matrix for category and question weighting
+- Added scoring ranges for groups and categories
+- Implemented JSON import/export functionality
+- Added random answer generation and clear answers features
+- Enhanced UI with modal-based weights editing
+- Improved overall component flexibility and user experience ([`6b97117`](https://github.com/numerous-com/numerous-widgets/commit/6b971178ca52e13849e8671dd427f9945ff59a88))
+
+
 ## v0.1.43 (2025-03-03)
 
 ### Fix
