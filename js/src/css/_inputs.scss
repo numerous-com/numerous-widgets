@@ -33,6 +33,18 @@
   width: auto;
   height: 32px;
 
+  /* Remove border and shadow when in inline mode */
+  .string-input-container.label-inline & {
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+
+    &:focus-within {
+      border: none;
+      box-shadow: none;
+    }
+  }
+
   &:focus-within {
     border-color: var(--ui-widget-focus-border);
     box-shadow: var(--ui-widget-focus-shadow);
@@ -61,6 +73,19 @@
   input[type="number"] {
     text-align: right;
     width: 80px;
+  }
+
+  /* Add border around text input in inline mode */
+  .string-input-container.label-inline & input[type="text"],
+  .string-input-container.label-inline & input[type="password"] {
+    border: 1px solid var(--ui-widget-border-color);
+    border-radius: 4px;
+    margin: 4px;
+    
+    &:focus {
+      border-color: var(--ui-widget-focus-border);
+      box-shadow: var(--ui-widget-focus-shadow);
+    }
   }
 }
 

@@ -2,6 +2,13 @@ import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import '../../css/styles.scss';
 import '../../css/components/WeightedAssessmentSurvey.scss';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import rehypeHighlight from 'rehype-highlight';
+import 'katex/dist/katex.min.css';
+import 'highlight.js/styles/github.css';
 
 // Define types for our survey structure
 interface Question {
@@ -19,6 +26,14 @@ interface Category {
   id: string;
   name: string;
   description: string;
+  scoringRanges: ScoringRange[];  // Add scoring ranges to categories
+}
+
+interface ScoringRange {
+  min: number;
+  max: number;
+  title: string;  // Label for the range
+  text: string;   // Descriptive text for the range
 }
 
 interface Group {
@@ -26,6 +41,7 @@ interface Group {
   title: string;
   description: string;
   questions: Question[];
+  scoringRanges: ScoringRange[];  // Add scoring ranges to groups
 }
 
 interface SurveyData {
@@ -33,6 +49,8 @@ interface SurveyData {
   description: string;
   groups: Group[];
   categories: Category[];
+  useQualitativeScale?: boolean; // Option to display qualitative labels (strongly disagree, etc) instead of numbers
+  conclusion?: string; // Markdown conclusion text that will be stored but not shown in the flow
 }
 
 // Update the interface to include submit_text, disable_editing, and read_only
@@ -46,6 +64,34 @@ interface WeightedAssessmentSurveyWidgetProps {
   disable_editing: boolean;  // Add new prop
   read_only: boolean;  // Add read_only to props
 }
+
+// Create a reusable Markdown component to maintain consistent styling
+interface MarkdownRenderProps {
+  content: string;
+  className?: string;
+}
+
+const MarkdownRender: React.FC<MarkdownRenderProps> = ({ content, className = "" }) => {
+  return (
+    <div className={`markdown-content ${className}`}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm, remarkMath]}
+        rehypePlugins={[rehypeKatex, rehypeHighlight]}
+        components={{
+          // Custom component rendering
+          a: ({node, ...props}) => (
+            <a {...props} target="_blank" rel="noopener noreferrer" />
+          ),
+          img: ({node, ...props}) => (
+            <img {...props} loading="lazy" />
+          ),
+        }}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
+  );
+};
 
 function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetProps) {
   const [surveyData, setSurveyData] = useModelState<SurveyData>("survey_data");
@@ -82,7 +128,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   const [currentGroupIndex, setCurrentGroupIndex] = React.useState(0);
   
   // State for edit mode tabs
-  const [activeEditTab, setActiveEditTab] = React.useState<'content' | 'categories'>('content');
+  const [activeEditTab, setActiveEditTab] = React.useState<'content' | 'categories' | 'weights' | 'conclusion'>('content');
   
   // State for showing category weights
   const [showCategoryWeights, setShowCategoryWeights] = React.useState<Record<string, boolean>>({});
@@ -98,6 +144,21 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   
   // Add state for showing intro slide
   const [showIntro, setShowIntro] = React.useState(true);
+  
+  // Add state for modal visibility
+  const [isWeightsModalOpen, setIsWeightsModalOpen] = React.useState(false);
+  
+  // Add state for expanded question comments
+  const [expandedQuestionComments, setExpandedQuestionComments] = React.useState<string[]>([]);
+  
+  // Add state for expanded category weights
+  const [expandedCategoryWeights, setExpandedCategoryWeights] = React.useState<string[]>([]);
+  
+  // Add state for showing weights modal
+  const [showWeightsModal, setShowWeightsModal] = React.useState(false);
+  
+  // Add state for showing final slide
+  const [showFinalSlide, setShowFinalSlide] = React.useState(false);
   
   // Force edit_mode to false when disable_editing is true
   React.useEffect(() => {
@@ -116,7 +177,106 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
     return result;
   };
   
-  // Add missing addGroup function
+  // Add function to validate ranges
+  const validateRanges = (ranges: ScoringRange[]): boolean => {
+    if (ranges.length === 0) return false;
+    
+    // Sort ranges by min value
+    const sortedRanges = [...ranges].sort((a, b) => a.min - b.min);
+    
+    // Check if ranges start at 0 and end at 100
+    if (sortedRanges[0].min !== 0 || sortedRanges[sortedRanges.length - 1].max !== 100) {
+      return false;
+    }
+    
+    // Check for gaps or overlaps
+    for (let i = 0; i < sortedRanges.length - 1; i++) {
+      if (sortedRanges[i].max !== sortedRanges[i + 1].min) {
+        return false;
+      }
+    }
+    
+    return true;
+  };
+
+  // Add function to add a scoring range
+  const addScoringRange = (groupIndex: number) => {
+    const newData = { ...surveyData };
+    const group = newData.groups[groupIndex];
+    
+    if (!group.scoringRanges) {
+      group.scoringRanges = [];
+    }
+    
+    // Find the gap or extend the range
+    let newRange: ScoringRange | undefined;
+    if (group.scoringRanges.length === 0) {
+      newRange = { min: 0, max: 100, title: "Default Range", text: "Default range description" };
+    } else {
+      const sortedRanges = [...group.scoringRanges].sort((a, b) => a.min - b.min);
+      // Find first gap or extend last range
+      let start = 0;
+      for (const range of sortedRanges) {
+        if (range.min > start) {
+          newRange = { min: start, max: range.min, title: "New Range", text: "New range description" };
+          break;
+        }
+        start = range.max;
+      }
+      if (!newRange && start < 100) {
+        newRange = { min: start, max: 100, title: "New Range", text: "New range description" };
+      }
+    }
+    
+    if (newRange) {
+      group.scoringRanges.push(newRange);
+      setSurveyData(newData);
+    }
+  };
+
+  // Add function to update a scoring range
+  const updateScoringRange = (
+    groupIndex: number,
+    rangeIndex: number,
+    updates: Partial<ScoringRange>
+  ) => {
+    const newData = { ...surveyData };
+    const group = newData.groups[groupIndex];
+    const range = group.scoringRanges[rangeIndex];
+    
+    // Update the range
+    group.scoringRanges[rangeIndex] = {
+      ...range,
+      ...updates
+    };
+    
+    // Sort ranges by min value
+    group.scoringRanges.sort((a, b) => a.min - b.min);
+    
+    setSurveyData(newData);
+  };
+
+  // Add function to delete a scoring range
+  const deleteScoringRange = (groupIndex: number, rangeIndex: number) => {
+    const newData = { ...surveyData };
+    const group = newData.groups[groupIndex];
+    
+    group.scoringRanges.splice(rangeIndex, 1);
+    
+    // If no ranges left, add default range
+    if (group.scoringRanges.length === 0) {
+      group.scoringRanges.push({ min: 0, max: 100, title: "Default Range", text: "Default range description" });
+    }
+    
+    setSurveyData(newData);
+  };
+
+  // Add helper to get range validation class
+  const getRangeValidationClass = (ranges: ScoringRange[]): string => {
+    return validateRanges(ranges) ? 'valid-ranges' : 'invalid-ranges';
+  };
+
+  // Update the addGroup function to initialize scoring ranges
   const addGroup = () => {
     const newData = { ...surveyData };
     const groupId = `group${newData.groups.length + 1}`;
@@ -125,11 +285,11 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
       id: groupId,
       title: "New Group",
       description: "Group description",
-      questions: []
+      questions: [],
+      scoringRanges: [{ min: 0, max: 100, title: "Default Range", text: "Default range description" }]  // Initialize with default range
     });
     
     setSurveyData(newData);
-    // Navigate to the new group
     setCurrentGroupIndex(newData.groups.length - 1);
   };
   
@@ -170,10 +330,18 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   const goToNextGroup = () => {
     if (showIntro) {
       setShowIntro(false);
+      const surveyContent = document.querySelector('.survey-content');
+      if (surveyContent) {
+        surveyContent.scrollTo({ top: 0, behavior: 'smooth' });
+      }
       return;
     }
     if (currentGroupIndex < surveyData.groups.length - 1) {
       setCurrentGroupIndex(currentGroupIndex + 1);
+      const surveyContent = document.querySelector('.survey-content');
+      if (surveyContent) {
+        surveyContent.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     } else if (currentGroupIndex === surveyData.groups.length - 1 && !submitted) {
       // Submit the survey when clicking next on last group
       handleSubmit();
@@ -183,10 +351,18 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   const goToPreviousGroup = () => {
     if (currentGroupIndex === 0) {
       setShowIntro(true);
+      const surveyContent = document.querySelector('.survey-content');
+      if (surveyContent) {
+        surveyContent.scrollTo({ top: 0, behavior: 'smooth' });
+      }
       return;
     }
     if (currentGroupIndex > 0) {
       setCurrentGroupIndex(currentGroupIndex - 1);
+      const surveyContent = document.querySelector('.survey-content');
+      if (surveyContent) {
+        surveyContent.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
   };
   
@@ -277,7 +453,8 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
     const newCategory = {
       id: categoryId,
       name: `Category ${surveyData.categories?.length + 1 || 1}`,
-      description: ""
+      description: "",
+      scoringRanges: [{ min: 0, max: 100, title: "Default Range", text: "Default range description" }]  // Initialize with default range
     };
     
     const updatedSurveyData = { ...surveyData };
@@ -437,13 +614,65 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   
   // Generate slider markers
   const renderSliderMarkers = (min: number, max: number) => {
+    // Calculate appropriate step size to ensure we have at most 6 markers
+    const range = max - min;
+    const maxMarkers = 6;
+    let step = Math.ceil(range / (maxMarkers - 1));
+    
+    // Create array of marker values
     const markers = [];
-    for (let i = min; i <= max; i++) {
-      markers.push(
-        <span key={i} className="slider-marker">{i}</span>
+    for (let value = min; value <= max; value += step) {
+      markers.push(value);
+    }
+    
+    // Ensure the max value is always included
+    if (markers[markers.length - 1] !== max) {
+      markers[markers.length - 1] = max;
+    }
+    
+    // When using qualitative scale, always show exactly 5 labels
+    if (surveyData.useQualitativeScale) {
+      const qualitativeValues = [0, 1, 2, 3, 4]; // These will be normalized to the min-max range
+      
+      return (
+        <div className="slider-markers qualitative-scale">
+          {qualitativeValues.map((value) => {
+            // Calculate the actual value in the min-max range
+            const actualValue = min + (value * (max - min) / 4);
+            // Calculate the position as a percentage along the slider
+            const percentage = (value / 4) * 100;
+            return (
+              <div 
+                key={value} 
+                className="slider-marker"
+                style={{ left: `${percentage}%` }}
+              >
+                {getQualitativeLabel(value, 0, 4)} {/* Always use standard 0-4 range for labels */}
+              </div>
+            );
+          })}
+        </div>
       );
     }
-    return markers;
+    
+    // Default numeric display
+    return (
+      <div className="slider-markers">
+        {markers.map((value) => {
+          // Calculate the position as a percentage along the slider
+          const percentage = ((value - min) / (max - min)) * 100;
+          return (
+            <div 
+              key={value} 
+              className="slider-marker"
+              style={{ left: `${percentage}%` }}
+            >
+              {value}
+            </div>
+          );
+        })}
+      </div>
+    );
   };
   
   // Replace renderProgressDots with renderProgressBar
@@ -511,6 +740,641 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
     setEditMode(false);
   };
   
+  // Add helper function to get all questions across groups
+  const getAllQuestions = () => {
+    return surveyData.groups.flatMap((group, groupIndex) => 
+      group.questions.map((question, questionIndex) => ({
+        ...question,
+        groupIndex,
+        questionIndex,
+        groupTitle: group.title
+      }))
+    );
+  };
+
+  // Add function to update weight in matrix view
+  const updateWeightInMatrix = (
+    groupIndex: number,
+    questionIndex: number,
+    categoryId: string,
+    value: number
+  ) => {
+    const newData = { ...surveyData };
+    const question = newData.groups[groupIndex].questions[questionIndex];
+    
+    if (!question.categoryWeights) {
+      question.categoryWeights = {};
+    }
+    
+    question.categoryWeights[categoryId] = value;
+    setSurveyData(newData);
+  };
+
+  // Add WeightsMatrix component
+  const WeightsMatrix = () => {
+    const allQuestions = getAllQuestions();
+    const categories = surveyData.categories || [];
+    
+    // Add state for input values
+    const [inputValues, setInputValues] = React.useState<Record<string, string>>({});
+    
+    // Calculate column totals
+    const calculateColumnTotals = () => {
+      const totals: Record<string, number> = {};
+      categories.forEach(category => {
+        totals[category.id] = allQuestions.reduce((sum, question) => 
+          sum + (question.categoryWeights?.[category.id] || 0), 0
+        );
+      });
+      return totals;
+    };
+
+    // Calculate row total for a question
+    const calculateRowTotal = (question: Question) => {
+      return categories.reduce((sum, category) => 
+        sum + (question.categoryWeights?.[category.id] || 0), 0
+      );
+    };
+
+    const columnTotals = calculateColumnTotals();
+    
+    // Handle input change
+    const handleInputChange = (
+      questionId: string,
+      categoryId: string,
+      value: string,
+      groupIndex: number,
+      questionIndex: number
+    ) => {
+      // Update the local input state
+      const inputKey = `${questionId}-${categoryId}`;
+      setInputValues(prev => ({
+        ...prev,
+        [inputKey]: value
+      }));
+    };
+    
+    // Handle input blur
+    const handleInputBlur = (
+      questionId: string,
+      categoryId: string,
+      groupIndex: number,
+      questionIndex: number
+    ) => {
+      const inputKey = `${questionId}-${categoryId}`;
+      const value = inputValues[inputKey] || '0';
+      
+      // Validate and update the main state
+      let numValue = Math.min(100, Math.max(0, Number(value)));
+      if (isNaN(numValue)) {
+        numValue = 0;
+      }
+      
+      updateWeightInMatrix(
+        groupIndex,
+        questionIndex,
+        categoryId,
+        numValue
+      );
+      
+      // Clear the input value
+      setInputValues(prev => ({
+        ...prev,
+        [inputKey]: String(numValue)
+      }));
+    };
+
+    return (
+      <div className="weights-matrix">
+        <div className="weights-matrix-header">
+          <h3>Category Weights Matrix</h3>
+          <p className="weights-matrix-description">
+            Set the weight percentage for each question across different categories. Each column represents a category, and each row represents a question.
+          </p>
+        </div>
+        
+        <div className="matrix-table-container">
+          <table className="matrix-table">
+            <thead>
+              <tr>
+                <th className="matrix-group-col">Group</th>
+                <th className="matrix-question-col">Question</th>
+                {categories.map(category => (
+                  <th key={category.id} className="matrix-category-col">
+                    <div>{category.name}</div>
+                  </th>
+                ))}
+                <th className="matrix-total-col">
+                  <div className="rotated-header">Row Total</div>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {allQuestions.map((question) => {
+                const rowTotal = calculateRowTotal(question);
+                return (
+                  <tr key={question.id}>
+                    <td className="matrix-group-cell">{question.groupTitle}</td>
+                    <td className="matrix-question-cell">{question.text}</td>
+                    {categories.map(category => {
+                      const inputKey = `${question.id}-${category.id}`;
+                      const inputValue = inputValues[inputKey];
+                      const displayValue = inputValue !== undefined 
+                        ? inputValue 
+                        : question.categoryWeights?.[category.id] || 0;
+                      
+                      return (
+                        <td key={category.id} className="matrix-weight-cell">
+                          <input
+                            type="number"
+                            className="matrix-weight-input"
+                            value={displayValue}
+                            onChange={(e) => handleInputChange(
+                              question.id,
+                              category.id,
+                              e.target.value,
+                              question.groupIndex,
+                              question.questionIndex
+                            )}
+                            onBlur={() => handleInputBlur(
+                              question.id,
+                              category.id,
+                              question.groupIndex,
+                              question.questionIndex
+                            )}
+                            min={0}
+                            max={100}
+                            style={{ '--weight-percentage': `${question.categoryWeights?.[category.id] || 0}%` } as React.CSSProperties}
+                          />
+                        </td>
+                      );
+                    })}
+                    <td className="matrix-weight-cell matrix-total-cell">
+                      <span 
+                        className="matrix-total-value"
+                        style={{ '--weight-percentage': `${rowTotal}%` } as React.CSSProperties}
+                      >
+                        {rowTotal}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+              <tr className="matrix-totals-row">
+                <td colSpan={2} className="matrix-totals-label">Column Totals</td>
+                {categories.map(category => (
+                  <td key={category.id} className="matrix-weight-cell matrix-total-cell">
+                    <span 
+                      className="matrix-total-value"
+                      style={{ '--weight-percentage': `${columnTotals[category.id]}%` } as React.CSSProperties}
+                    >
+                      {columnTotals[category.id]}
+                    </span>
+                  </td>
+                ))}
+                <td className="matrix-weight-cell matrix-total-cell">
+                  <span 
+                    className="matrix-total-value"
+                    style={{ '--weight-percentage': `${Object.values(columnTotals).reduce((a, b) => a + b, 0)}%` } as React.CSSProperties}
+                  >
+                    {Object.values(columnTotals).reduce((a, b) => a + b, 0)}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  };
+
+  // Update the render section where the weights tab content is shown
+  const renderWeightsSection = () => {
+    return (
+      <div>
+        <button 
+          className="edit-weights-button"
+          onClick={() => setIsWeightsModalOpen(true)}
+        >
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-7-2h2V7h-4v2h2z" fill="currentColor"/>
+          </svg>
+          Edit Weights Matrix
+        </button>
+        {isWeightsModalOpen && (
+          <div className="weights-modal-overlay" onClick={() => setIsWeightsModalOpen(false)}>
+            <div className="weights-modal" onClick={e => e.stopPropagation()}>
+              <div className="weights-modal-header">
+                <h2>Category Weights Matrix</h2>
+                <button 
+                  className="weights-modal-close"
+                  onClick={() => setIsWeightsModalOpen(false)}
+                >
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="currentColor"/>
+                  </svg>
+                </button>
+              </div>
+              <div className="weights-modal-content">
+                <WeightsMatrix />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Update the scoring ranges editor component
+  const renderScoringRanges = (group: Group, groupIndex: number) => {
+    return (
+      <div className={`scoring-ranges-editor ${getRangeValidationClass(group.scoringRanges || [])}`}>
+        <div className="scoring-ranges-header">
+          <h4>Scoring Ranges</h4>
+          <button 
+            className="add-button"
+            onClick={() => addScoringRange(groupIndex)}
+          >
+            <svg className="add-button-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+            </svg>
+            Add Range
+          </button>
+        </div>
+        
+        <div className="scoring-ranges-list">
+          {(group.scoringRanges || []).map((range, rangeIndex) => (
+            <div key={rangeIndex} className="scoring-range-item">
+              <div className="range-inputs">
+                <input
+                  type="number"
+                  className="text-input range-min"
+                  value={range.min}
+                  onChange={(e) => updateScoringRange(
+                    groupIndex,
+                    rangeIndex,
+                    { min: Math.max(0, Math.min(100, Number(e.target.value))) }
+                  )}
+                  min={0}
+                  max={100}
+                />
+                <span>to</span>
+                <input
+                  type="number"
+                  className="text-input range-max"
+                  value={range.max}
+                  onChange={(e) => updateScoringRange(
+                    groupIndex,
+                    rangeIndex,
+                    { max: Math.max(0, Math.min(100, Number(e.target.value))) }
+                  )}
+                  min={0}
+                  max={100}
+                />
+              </div>
+              <div className="range-text-inputs">
+                <input
+                  type="text"
+                  className="text-input range-title"
+                  value={range.title}
+                  onChange={(e) => updateScoringRange(
+                    groupIndex,
+                    rangeIndex,
+                    { title: e.target.value }
+                  )}
+                  placeholder="Range title"
+                />
+                <textarea
+                  className="text-input range-text"
+                  value={range.text}
+                  onChange={(e) => updateScoringRange(
+                    groupIndex,
+                    rangeIndex,
+                    { text: e.target.value }
+                  )}
+                  placeholder="Range description"
+                />
+              </div>
+              <button
+                className="delete-button"
+                onClick={() => deleteScoringRange(groupIndex, rangeIndex)}
+                aria-label="Delete range"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/>
+                </svg>
+              </button>
+            </div>
+          ))}
+        </div>
+        {!validateRanges(group.scoringRanges || []) && (
+          <div className="ranges-error">
+            Ranges must cover 0-100 without gaps or overlaps
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Add function to add a scoring range to a category
+  const addCategoryRange = (categoryIndex: number) => {
+    const updatedSurveyData = { ...surveyData };
+    const category = updatedSurveyData.categories[categoryIndex];
+    
+    if (!category.scoringRanges) {
+      category.scoringRanges = [];
+    }
+    
+    // Find the gap or extend the range
+    let newRange: ScoringRange | undefined;
+    if (category.scoringRanges.length === 0) {
+      newRange = { min: 0, max: 100, title: "Default Range", text: "Default range description" };
+    } else {
+      const sortedRanges = [...category.scoringRanges].sort((a, b) => a.min - b.min);
+      let start = 0;
+      for (const range of sortedRanges) {
+        if (range.min > start) {
+          newRange = { min: start, max: range.min, title: "New Range", text: "New range description" };
+          break;
+        }
+        start = range.max;
+      }
+      if (!newRange && start < 100) {
+        newRange = { min: start, max: 100, title: "New Range", text: "New range description" };
+      }
+    }
+    
+    if (newRange) {
+      category.scoringRanges.push(newRange);
+      setSurveyData(updatedSurveyData);
+    }
+  };
+
+  // Add function to update a category range
+  const updateCategoryRange = (
+    categoryIndex: number,
+    rangeIndex: number,
+    updates: Partial<ScoringRange>
+  ) => {
+    const updatedSurveyData = { ...surveyData };
+    const category = updatedSurveyData.categories[categoryIndex];
+    const range = category.scoringRanges[rangeIndex];
+    
+    // Update the range
+    category.scoringRanges[rangeIndex] = {
+      ...range,
+      ...updates
+    };
+    
+    // Sort ranges by min value
+    category.scoringRanges.sort((a, b) => a.min - b.min);
+    
+    setSurveyData(updatedSurveyData);
+  };
+
+  // Add function to delete a category range
+  const deleteCategoryRange = (categoryIndex: number, rangeIndex: number) => {
+    const updatedSurveyData = { ...surveyData };
+    const category = updatedSurveyData.categories[categoryIndex];
+    
+    category.scoringRanges.splice(rangeIndex, 1);
+    
+    // If no ranges left, add default range
+    if (category.scoringRanges.length === 0) {
+      category.scoringRanges.push({ min: 0, max: 100, title: "Default Range", text: "Default range description" });
+    }
+    
+    setSurveyData(updatedSurveyData);
+  };
+
+  // Add clearQuestionAnswer function after updateQuestionValue
+  const clearQuestionAnswer = (groupIndex: number, questionIndex: number) => {
+    const newData = { ...surveyData };
+    const question = newData.groups[groupIndex].questions[questionIndex];
+    
+    // Clear the value
+    question.value = null;
+    
+    // Reset submitted state
+    setSubmitted(false);
+    
+    setSurveyData(newData);
+  };
+
+  // Add function to clear all answers
+  const clearAllAnswers = () => {
+    const newData = { ...surveyData };
+    
+    // Clear all question values
+    newData.groups.forEach(group => {
+      group.questions.forEach(question => {
+        question.value = null;
+      });
+    });
+    
+    // Reset submitted state
+    setSubmitted(false);
+    
+    setSurveyData(newData);
+  };
+
+  // Add generateRandomAnswers function after clearAllAnswers
+  const generateRandomAnswers = async () => {
+    const newData = { ...surveyData };
+    
+    // Sample comments in plain text (without markdown formatting)
+    const commentTemplates = [
+      "This score seems appropriate based on the current circumstances.",
+      "I'd like to note that this area needs improvement.",
+      "Additional Notes: This rating reflects recent changes we've observed.",
+      "Score is based on the following factors: Recent performance, Historical data, Team feedback",
+      "This is a provisional rating that may change with more information.",
+      "Rating justification: Value represents current assessment based on available data",
+      "I'm confident in this score based on multiple observations.",
+      "Previous rating was lower but recent improvements justify this score.",
+      "Reasoning: This score aligns with our expectations for this category.",
+      "Rating is influenced by: Primary factors, Secondary considerations, External variables",
+      "Note: This assessment is preliminary and subject to review.",
+      "The score reflects a balanced consideration of strengths and weaknesses."
+    ];
+    
+    // Generate random answers for all questions
+    newData.groups.forEach(group => {
+      group.questions.forEach(question => {
+        // Ensure min and max are valid numbers
+        const min = typeof question.min === 'number' ? question.min : 0;
+        const max = typeof question.max === 'number' ? question.max : 5;
+        
+        // Generate a random value between min and max (inclusive)
+        const range = max - min;
+        const randomValue = Math.floor(Math.random() * (range + 1)) + min;
+        question.value = randomValue;
+        
+        // Generate a random comment for approximately 40% of questions
+        if (Math.random() < 0.4) {
+          // Select a random comment template
+          const commentTemplate = commentTemplates[Math.floor(Math.random() * commentTemplates.length)];
+          
+          // Create value-specific comment content
+          let valueSpecificComment = "";
+          if (randomValue <= min + (range * 0.25)) {
+            valueSpecificComment = "\n\nThis low score indicates significant concerns.";
+          } else if (randomValue <= min + (range * 0.5)) {
+            valueSpecificComment = "\n\nThis score indicates some areas for improvement.";
+          } else if (randomValue <= min + (range * 0.75)) {
+            valueSpecificComment = "\n\nThis above-average score shows good progress.";
+          } else {
+            valueSpecificComment = "\n\nThis high score reflects excellent performance.";
+          }
+          
+          // Combine template and value-specific comment
+          question.comment = commentTemplate + valueSpecificComment;
+        } else {
+          // Clear any existing comment
+          question.comment = "";
+        }
+      });
+    });
+    
+    // Update survey data
+    setSurveyData(newData);
+    
+    // Set submitted to true to trigger Python callback
+    await setSubmitted(true);
+  };
+
+  // Add downloadSurveyJson function after generateRandomAnswers
+  const downloadSurveyJson = () => {
+    // Create a Blob containing the survey data
+    const jsonString = JSON.stringify(surveyData, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    
+    // Create a temporary URL for the Blob
+    const url = URL.createObjectURL(blob);
+    
+    // Create a temporary link element and trigger the download
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'survey_data.json';
+    document.body.appendChild(link);
+    link.click();
+    
+    // Clean up
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  // Add uploadSurveyJson function after downloadSurveyJson
+  const uploadSurveyJson = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const fileInput = event.target;
+    if (!fileInput.files || fileInput.files.length === 0) {
+      return;
+    }
+
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      try {
+        const uploadedData = JSON.parse(e.target?.result as string);
+        
+        // Validate the uploaded data to ensure it has the required structure
+        if (!uploadedData.groups || !Array.isArray(uploadedData.groups)) {
+          alert('Invalid survey JSON file: Missing groups array');
+          return;
+        }
+        
+        // Process the uploaded data to ensure it has all required properties
+        const processedData: SurveyData = {
+          title: uploadedData.title || 'Imported Survey',
+          description: uploadedData.description || '',
+          groups: uploadedData.groups.map((group: any) => ({
+            id: group.id || generateRandomId(),
+            title: group.title || 'Imported Group',
+            description: group.description || '',
+            questions: Array.isArray(group.questions) ? group.questions.map((q: any) => ({
+              id: q.id || generateRandomId(),
+              text: q.text || 'Imported Question',
+              value: q.value !== undefined ? q.value : null,
+              min: q.min !== undefined ? q.min : 0,
+              max: q.max !== undefined ? q.max : 5,
+              comment: q.comment || '',
+              categoryWeights: q.categoryWeights || {},
+              timestamps: q.timestamps || {}
+            })) : [],
+            scoringRanges: Array.isArray(group.scoringRanges) ? group.scoringRanges : []
+          })),
+          categories: Array.isArray(uploadedData.categories) ? uploadedData.categories.map((cat: any) => ({
+            id: cat.id || generateRandomId(),
+            name: cat.name || 'Imported Category',
+            description: cat.description || '',
+            scoringRanges: Array.isArray(cat.scoringRanges) ? cat.scoringRanges : []
+          })) : [],
+          useQualitativeScale: uploadedData.useQualitativeScale,
+          conclusion: uploadedData.conclusion || ''
+        };
+        
+        // Update the survey data
+        setSurveyData(processedData);
+        
+        // Reset the file input so the same file can be loaded again if needed
+        fileInput.value = '';
+        
+        alert('Survey data loaded successfully');
+      } catch (error) {
+        console.error('Error parsing JSON file:', error);
+        alert('Error loading survey data. Please check the file format.');
+      }
+    };
+
+    reader.onerror = () => {
+      alert('Error reading file');
+    };
+
+    reader.readAsText(file);
+  };
+
+  // Create a reference for the file input
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  // Function to trigger the file input click
+  const triggerFileUpload = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  // Get the qualitative labels for a numeric value
+  const getQualitativeLabel = (value: number, min: number, max: number) => {
+    // If min and max don't match the standard 0-4 range, adjust accordingly
+    const normalizedValue = min === 0 && max === 4 
+      ? value 
+      : Math.round((value - min) / (max - min) * 4);
+    
+    switch (normalizedValue) {
+      case 0: return "Strongly Disagree";
+      case 1: return "Disagree";
+      case 2: return "Neutral";
+      case 3: return "Agree";
+      case 4: return "Strongly Agree";
+      default: return value.toString(); // Fallback to numeric value
+    }
+  };
+  
+  // Function to toggle qualitative scale option
+  const toggleQualitativeScale = () => {
+    const updatedSurveyData = { ...surveyData };
+    updatedSurveyData.useQualitativeScale = !updatedSurveyData.useQualitativeScale;
+    setSurveyData(updatedSurveyData);
+  };
+
+  // Function to update the conclusion text
+  const updateConclusion = (text: string) => {
+    const newData = { ...surveyData };
+    newData.conclusion = text;
+    setSurveyData(newData);
+  };
+
   return (
     <div className={`weighted-assessment-survey ${props.class_name || ''} ${readOnly ? 'read-only' : ''}`}>
       <div className="progress-indicator">
@@ -519,7 +1383,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
       
       <div className="survey-content">
         {showIntro ? (
-          <div className="survey-intro">
+          <div className={`survey-intro ${showIntro ? 'active' : ''}`}>
             {editMode ? (
               <>
                 <input
@@ -537,11 +1401,25 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                   style={{ marginTop: '8px' }}
                 />
                 
+                <div className="option-checkbox-container" style={{ marginTop: '16px' }}>
+                  <label className="option-checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={surveyData?.useQualitativeScale || false}
+                      onChange={toggleQualitativeScale}
+                      className="option-checkbox"
+                    />
+                    <span>Use qualitative scale (Strongly Disagree - Strongly Agree)</span>
+                  </label>
+                </div>
               </>
             ) : (
               <>
                 <h1 className="survey-title">{surveyData?.title || ''}</h1>
-                <div className="survey-description">{surveyData?.description || ''}</div>
+                <MarkdownRender 
+                  content={surveyData?.description || ''} 
+                  className="survey-description"
+                />
                 
               </>
             )}
@@ -570,10 +1448,24 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                 >
                   Categories
                 </button>
+                <button 
+                  className={`edit-tab ${activeEditTab === 'weights' ? 'active' : ''}`}
+                  onClick={() => setActiveEditTab('weights')}
+                >
+                  Weights Matrix
+                </button>
+                <button 
+                  className={`edit-tab ${activeEditTab === 'conclusion' ? 'active' : ''}`}
+                  onClick={() => setActiveEditTab('conclusion')}
+                >
+                  Conclusion
+                </button>
               </div>
             )}
             
-            {editMode && activeEditTab === 'categories' ? (
+            {editMode && activeEditTab === 'weights' ? (
+              renderWeightsSection()
+            ) : editMode && activeEditTab === 'categories' ? (
               <div className="categories-editor">
                 <div className="categories-header">
                   <h3>Categories</h3>
@@ -619,6 +1511,92 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                       onChange={(e) => updateCategoryDescription(index, e.target.value)}
                       placeholder="Category description"
                     />
+                    
+                    <div className={`scoring-ranges-editor ${getRangeValidationClass(category.scoringRanges || [])}`}>
+                      <div className="scoring-ranges-header">
+                        <h4>Scoring Ranges</h4>
+                        <button 
+                          className="add-button"
+                          onClick={() => addCategoryRange(index)}
+                        >
+                          <svg className="add-button-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+                          </svg>
+                          Add Range
+                        </button>
+                      </div>
+                      
+                      <div className="scoring-ranges-list">
+                        {(category.scoringRanges || []).map((range, rangeIndex) => (
+                          <div key={rangeIndex} className="scoring-range-item">
+                            <div className="range-inputs">
+                              <input
+                                type="number"
+                                className="text-input range-min"
+                                value={range.min}
+                                onChange={(e) => updateCategoryRange(
+                                  index,
+                                  rangeIndex,
+                                  { min: Math.max(0, Math.min(100, Number(e.target.value))) }
+                                )}
+                                min={0}
+                                max={100}
+                              />
+                              <span>to</span>
+                              <input
+                                type="number"
+                                className="text-input range-max"
+                                value={range.max}
+                                onChange={(e) => updateCategoryRange(
+                                  index,
+                                  rangeIndex,
+                                  { max: Math.max(0, Math.min(100, Number(e.target.value))) }
+                                )}
+                                min={0}
+                                max={100}
+                              />
+                            </div>
+                            <div className="range-text-inputs">
+                              <input
+                                type="text"
+                                className="text-input range-title"
+                                value={range.title}
+                                onChange={(e) => updateCategoryRange(
+                                  index,
+                                  rangeIndex,
+                                  { title: e.target.value }
+                                )}
+                                placeholder="Range title"
+                              />
+                              <textarea
+                                className="text-input range-text"
+                                value={range.text}
+                                onChange={(e) => updateCategoryRange(
+                                  index,
+                                  rangeIndex,
+                                  { text: e.target.value }
+                                )}
+                                placeholder="Range description"
+                              />
+                            </div>
+                            <button
+                              className="delete-button"
+                              onClick={() => deleteCategoryRange(index, rangeIndex)}
+                              aria-label="Delete range"
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/>
+                              </svg>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      {!validateRanges(category.scoringRanges || []) && (
+                        <div className="ranges-error">
+                          Ranges must cover 0-100 without gaps or overlaps
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ))}
                 
@@ -628,6 +1606,34 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                   </svg>
                   Add Category
                 </button>
+              </div>
+            ) : editMode && activeEditTab === 'conclusion' ? (
+              <div className="conclusion-editor">
+                <div className="conclusion-header">
+                  <h3>Survey Conclusion</h3>
+                  <p className="conclusion-description">
+                    Add a conclusion text in markdown format. This will be stored with the survey data but not shown to users taking the survey.
+                  </p>
+                </div>
+                <div className="conclusion-content">
+                  <div className="conclusion-edit-area">
+                    <textarea
+                      className="textarea-input conclusion-textarea"
+                      value={surveyData?.conclusion || ''}
+                      onChange={(e) => updateConclusion(e.target.value)}
+                      placeholder="Enter conclusion text in markdown format..."
+                    />
+                  </div>
+                  <div className="conclusion-preview">
+                    <h4>Preview</h4>
+                    <div className="markdown-preview">
+                      <MarkdownRender 
+                        content={surveyData?.conclusion || ''} 
+                        className="markdown-content"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             ) : (
               <>
@@ -673,14 +1679,19 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                       
                       <div className="group-content">
                         {editMode ? (
-                          <textarea
-                            className="textarea-input"
-                            value={group.description}
-                            onChange={(e) => updateGroupDescription(groupIndex, e.target.value)}
-                            placeholder="Group Description"
-                          />
+                          <>
+                            <textarea
+                              className="textarea-input"
+                              value={group.description}
+                              onChange={(e) => updateGroupDescription(groupIndex, e.target.value)}
+                              placeholder="Group Description"
+                            />
+                            {renderScoringRanges(group, groupIndex)}
+                          </>
                         ) : (
-                          <div className="group-description">{group.description}</div>
+                          <div className="group-description">
+                            <MarkdownRender content={group.description} />
+                          </div>
                         )}
                         
                         <div className="group-divider"></div>
@@ -712,7 +1723,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                               ) : (
                                 <div className="question-content">
                                   <div className="question-text-container">
-                                    <div className="question-text">{question.text}</div>
+                                    <MarkdownRender content={question.text} className="question-text" />
                                   </div>
                                 </div>
                               )}
@@ -742,9 +1753,22 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                                       aria-label={question.comment ? "Edit comment" : "Add comment"}
                                       title={question.comment ? "Edit comment" : "Add comment"}
                                     >
-                                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z" fill="currentColor"/>
-                                      </svg>
+                                      <div className="comment-button-icons">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="comment-bubble-icon">
+                                          {question.comment ? (
+                                            <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z" fill="currentColor"/>
+                                          ) : (
+                                            <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2z" fill="currentColor"/>
+                                          )}
+                                        </svg>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="plus-minus-icon">
+                                          {visibleComments[question.id] ? (
+                                            <path d="M19 13H5v-2h14v2z" fill="currentColor"/>
+                                          ) : (
+                                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+                                          )}
+                                        </svg>
+                                      </div>
                                     </button>
                                   </div>
                                 )}
@@ -800,6 +1824,17 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                                     </button>
                                   )}
                                   <button 
+                                    className="clear-button" 
+                                    onClick={() => clearQuestionAnswer(groupIndex, questionIndex)}
+                                    aria-label="Clear answer"
+                                    title="Clear answer"
+                                    disabled={question.value === null}
+                                  >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                      <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="currentColor"/>
+                                    </svg>
+                                  </button>
+                                  <button 
                                     className="delete-button" 
                                     onClick={() => deleteQuestion(groupIndex, questionIndex)}
                                     aria-label="Delete question"
@@ -830,7 +1865,6 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                                         min={0}
                                         max={100}
                                       />
-                                      <span className="weight-percentage">%</span>
                                     </div>
                                   ))}
                                 </div>
@@ -850,7 +1884,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                               
                               {readOnly && question.comment && (
                                 <div className="comment-container read-only">
-                                  <div className="comment-text">{question.comment}</div>
+                                  <MarkdownRender content={question.comment} className="comment-text" />
                                 </div>
                               )}
                             </div>
@@ -911,7 +1945,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                 onClick={handleSave}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" fill="currentColor"/>
+                  <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z" fill="currentColor"/>
                 </svg>
                 Save Changes
               </button>
@@ -925,6 +1959,26 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                 Undo Changes
               </button>
               <button 
+                className="clear-all-button" 
+                onClick={clearAllAnswers}
+                title="Clear all answers"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="currentColor"/>
+                </svg>
+                Clear All Answers
+              </button>
+              <button 
+                className="upload-button" 
+                onClick={triggerFileUpload}
+                title="Upload survey data from JSON"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5 20h14v-2H5v2zm0-10h4v6h6v-6h4l-7-7-7 7z" fill="currentColor"/>
+                </svg>
+                Upload JSON
+              </button>
+              <button 
                 className="add-button" 
                 onClick={addGroup}
               >
@@ -935,18 +1989,56 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
               </button>
             </div>
           ) : (
-            <button
-              className="edit-button"
-              onClick={handleEditMode}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"/>
-              </svg>
-              Edit Survey
-            </button>
+            <>
+              {!disableEditing && (
+                <button
+                  className="edit-button"
+                  onClick={handleEditMode}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" fill="currentColor"/>
+                  </svg>
+                  Edit Survey
+                </button>
+              )}
+              {!readOnly && !editMode && !disableEditing && (
+                <>
+                  <button 
+                    className="generate-answers-button" 
+                    onClick={generateRandomAnswers}
+                    title="Generate random answers"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z" fill="currentColor"/>
+                      <path d="M7 12h2v5h2v-5h2V7H7v5zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z" fill="currentColor"/>
+                    </svg>
+                    Generate Random
+                  </button>
+                  <button 
+                    className="download-button" 
+                    onClick={downloadSurveyJson}
+                    title="Download survey data as JSON"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" fill="currentColor"/>
+                    </svg>
+                    Download JSON
+                  </button>
+                </>
+              )}
+            </>
           )}
         </div>
       )}
+      
+      {/* Add a hidden file input for JSON upload */}
+      <input
+        type="file"
+        accept=".json"
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+        onChange={uploadSurveyJson}
+      />
     </div>
   );
 }

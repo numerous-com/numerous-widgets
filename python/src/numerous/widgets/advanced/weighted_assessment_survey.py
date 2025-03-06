@@ -28,6 +28,10 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
 
     The survey consists of question groups, each containing multiple questions.
     Each question has a slider (0-5 by default) and an optional comment field.
+    
+    The survey can also include a markdown conclusion that is stored with the 
+    survey data but not displayed in the survey flow. This can be used for 
+    storing analysis, summary information, or additional context.
 
     Args:
         survey_data: Dictionary containing the survey structure and data
@@ -61,6 +65,9 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
         >>> # Add some questions
         >>> survey.add_question("How would you rate the overall experience?")
         >>> survey.add_question("How likely are you to recommend this to others?")
+        >>>
+        >>> # Add a conclusion for later analysis
+        >>> survey.set_conclusion("## Analysis\nThis survey's results show...")
         >>>
         >>> # Display the survey
         >>> nu.display(survey)
@@ -227,3 +234,25 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
         """
         # Set the saved flag to True to trigger the callback
         self.saved = True
+
+    def set_conclusion(self, text: str) -> None:
+        """
+        Set the survey conclusion text in markdown format.
+
+        This text will be stored with the survey data but won't be shown in the survey flow.
+
+        Args:
+            text: Markdown text for the conclusion
+        """
+        data = dict(self.survey_data)  # Create a copy to avoid reference issues
+        data["conclusion"] = text
+        self.survey_data = data
+        
+    def get_conclusion(self) -> str:
+        """
+        Get the survey conclusion text.
+
+        Returns:
+            The markdown conclusion text or an empty string if not set
+        """
+        return self.survey_data.get("conclusion", "")
