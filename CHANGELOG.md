@@ -2,6 +2,20 @@
 
 
 
+## v0.1.46 (2025-03-09)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Enhance weights matrix with inline editing and improved navigation
+
+- Replaced modal-based weights matrix with inline editing
+- Added custom tab key navigation for matrix inputs
+- Implemented scroll position preservation during matrix interactions
+- Improved matrix UI with sticky headers and columns
+- Added utility functions for finding question group and index
+- Enhanced matrix input handling and state management ([`4d8c851`](https://github.com/numerous-com/numerous-widgets/commit/4d8c851c1454132c994c93b171e010b38ecca373))
+
+
 ## v0.1.45 (2025-03-06)
 
 ### Fix
