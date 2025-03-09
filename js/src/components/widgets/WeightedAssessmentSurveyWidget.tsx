@@ -53,6 +53,12 @@ interface SurveyData {
   conclusion?: string; // Markdown conclusion text that will be stored but not shown in the flow
 }
 
+// Define interface for storing scroll positions
+interface ScrollPosition {
+  element: Element | null;
+  position: number;
+}
+
 // Update the interface to include submit_text, disable_editing, and read_only
 interface WeightedAssessmentSurveyWidgetProps {
   survey_data: SurveyData;
@@ -104,6 +110,9 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   // Add state for original data near the top with other state declarations
   const [originalData, setOriginalData] = React.useState<SurveyData | null>(null);
   
+  // Add ref for modal content scroll position
+  const modalContentRef = React.useRef<HTMLDivElement>(null);
+  
   // Initialize categories if they don't exist
   React.useEffect(() => {
     if (!surveyData) {
@@ -145,8 +154,8 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   // Add state for showing intro slide
   const [showIntro, setShowIntro] = React.useState(true);
   
-  // Add state for modal visibility
-  const [isWeightsModalOpen, setIsWeightsModalOpen] = React.useState(false);
+  // Change modal state to a simple toggle state
+  const [showWeightsMatrix, setShowWeightsMatrix] = React.useState(false);
   
   // Add state for expanded question comments
   const [expandedQuestionComments, setExpandedQuestionComments] = React.useState<string[]>([]);
@@ -777,6 +786,19 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
     
     // Add state for input values
     const [inputValues, setInputValues] = React.useState<Record<string, string>>({});
+    // Add scroll position ref
+    const scrollPositionsRef = React.useRef<ScrollPosition[]>([]);
+    
+    // Add a ref to track the modal content scroll position
+    const modalContentRef = React.useRef<HTMLDivElement>(null);
+    const scrollPositionRef = React.useRef<number>(0);
+    
+    // Use layout effect to restore scroll position immediately after any re-render
+    React.useLayoutEffect(() => {
+      if (modalContentRef.current && scrollPositionRef.current > 0) {
+        modalContentRef.current.scrollTop = scrollPositionRef.current;
+      }
+    });
     
     // Calculate column totals
     const calculateColumnTotals = () => {
@@ -806,7 +828,11 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
       groupIndex: number,
       questionIndex: number
     ) => {
-      // Update the local input state
+      // Save the current scroll position when input changes
+      if (modalContentRef.current) {
+        scrollPositionRef.current = modalContentRef.current.scrollTop;
+      }
+      
       const inputKey = `${questionId}-${categoryId}`;
       setInputValues(prev => ({
         ...prev,
@@ -821,6 +847,9 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
       groupIndex: number,
       questionIndex: number
     ) => {
+      // Get the current scroll position
+      const scrollTop = modalContentRef.current?.scrollTop || 0;
+      
       const inputKey = `${questionId}-${categoryId}`;
       const value = inputValues[inputKey] || '0';
       
@@ -830,6 +859,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
         numValue = 0;
       }
       
+      // Update state with the new value
       updateWeightInMatrix(
         groupIndex,
         questionIndex,
@@ -842,14 +872,72 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
         ...prev,
         [inputKey]: String(numValue)
       }));
+      
+      // Restore scroll position after state update
+      requestAnimationFrame(() => {
+        if (modalContentRef.current) {
+          modalContentRef.current.scrollTop = scrollTop;
+        }
+      });
     };
 
+    // Add custom tab key handler for matrix navigation
+    const handleKeyDown = (
+      e: React.KeyboardEvent<HTMLInputElement>,
+      questionId: string,
+      categoryId: string,
+      groupIndex: number,
+      questionIndex: number,
+      categoryIndex: number
+    ) => {
+      // Handle tab key to navigate vertically
+      if (e.key === 'Tab' && !e.shiftKey) {
+        e.preventDefault(); // Prevent default tab behavior
+        
+        const allGroups = surveyData?.groups || [];
+        const allCategories = surveyData?.categories || [];
+        const questions = getAllQuestions();
+        
+        // Get next row index
+        const nextQuestionIndex = questionIndex + 1;
+        
+        // If there's a question below in the same column
+        if (nextQuestionIndex < questions.length) {
+          // Focus the input below
+          const nextQuestion = questions[nextQuestionIndex];
+          const nextInputId = `matrix-input-${nextQuestion.id}-${categoryId}`;
+          
+          setTimeout(() => {
+            const nextInput = document.getElementById(nextInputId) as HTMLInputElement;
+            if (nextInput) {
+              nextInput.focus();
+              nextInput.select();
+            }
+          }, 0);
+        } 
+        // Otherwise, move to the top of the next column
+        else if (categoryIndex < allCategories.length - 1) {
+          const nextCategoryId = allCategories[categoryIndex + 1].id;
+          const firstQuestion = questions[0];
+          const nextInputId = `matrix-input-${firstQuestion.id}-${nextCategoryId}`;
+          
+          setTimeout(() => {
+            const nextInput = document.getElementById(nextInputId) as HTMLInputElement;
+            if (nextInput) {
+              nextInput.focus();
+              nextInput.select();
+            }
+          }, 0);
+        }
+      }
+    };
+    
     return (
       <div className="weights-matrix">
         <div className="weights-matrix-header">
           <h3>Category Weights Matrix</h3>
           <p className="weights-matrix-description">
-            Set the weight percentage for each question across different categories. Each column represents a category, and each row represents a question.
+            View and edit the weights of each question across categories.
           </p>
         </div>
         
@@ -865,46 +953,57 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                   </th>
                 ))}
                 <th className="matrix-total-col">
-                  <div className="rotated-header">Row Total</div>
+                  <div>Row Total</div>
                 </th>
               </tr>
             </thead>
             <tbody>
-              {allQuestions.map((question) => {
-                const rowTotal = calculateRowTotal(question);
+              {getAllQuestions().map((question, questionIndex) => {
+                const groupIndex = getGroupIndexByQuestionId(question.id);
+                const group = surveyData?.groups?.[groupIndex];
+                
                 return (
                   <tr key={question.id}>
-                    <td className="matrix-group-cell">{question.groupTitle}</td>
+                    <td className="matrix-group-cell">{group?.title}</td>
                     <td className="matrix-question-cell">{question.text}</td>
-                    {categories.map(category => {
+                    {categories.map((category, categoryIndex) => {
+                      const value = question.categoryWeights?.[category.id] || 0;
                       const inputKey = `${question.id}-${category.id}`;
-                      const inputValue = inputValues[inputKey];
-                      const displayValue = inputValue !== undefined 
-                        ? inputValue 
-                        : question.categoryWeights?.[category.id] || 0;
+                      const inputValue = inputValues[inputKey] !== undefined 
+                        ? inputValues[inputKey] 
+                        : String(value);
                       
                       return (
                         <td key={category.id} className="matrix-weight-cell">
                           <input
+                            id={`matrix-input-${question.id}-${category.id}`}
                             type="number"
                             className="matrix-weight-input"
-                            value={displayValue}
+                            value={inputValue}
                             onChange={(e) => handleInputChange(
                               question.id,
                               category.id,
                               e.target.value,
-                              question.groupIndex,
-                              question.questionIndex
+                              groupIndex,
+                              findQuestionIndexInGroup(groupIndex, question.id)
                             )}
                             onBlur={() => handleInputBlur(
                               question.id,
                               category.id,
-                              question.groupIndex,
-                              question.questionIndex
+                              groupIndex,
+                              findQuestionIndexInGroup(groupIndex, question.id)
                             )}
-                            min={0}
-                            max={100}
-                            style={{ '--weight-percentage': `${question.categoryWeights?.[category.id] || 0}%` } as React.CSSProperties}
+                            onKeyDown={(e) => handleKeyDown(
+                              e,
+                              question.id,
+                              category.id,
+                              groupIndex,
+                              questionIndex,
+                              categoryIndex
+                            )}
+                            min="0"
+                            max="100"
+                            style={{ '--weight-percentage': `${value}%` } as React.CSSProperties}
                           />
                         </td>
                       );
@@ -912,9 +1011,9 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                     <td className="matrix-weight-cell matrix-total-cell">
                       <span 
                         className="matrix-total-value"
-                        style={{ '--weight-percentage': `${rowTotal}%` } as React.CSSProperties}
+                        style={{ '--weight-percentage': `${calculateRowTotal(question)}%` } as React.CSSProperties}
                       >
-                        {rowTotal}
+                        {calculateRowTotal(question)}
                       </span>
                     </td>
                   </tr>
@@ -951,34 +1050,27 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   // Update the render section where the weights tab content is shown
   const renderWeightsSection = () => {
     return (
-      <div>
+      <div className="weights-matrix-container">
+        <div className="weights-matrix-header">
+          <h3>Category Weights Matrix</h3>
+          <p className="weights-matrix-description">
+            View and edit the weights of each question across categories.
+          </p>
+        </div>
+        
         <button 
           className="edit-weights-button"
-          onClick={() => setIsWeightsModalOpen(true)}
+          onClick={() => setShowWeightsMatrix(!showWeightsMatrix)}
         >
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-7-2h2V7h-4v2h2z" fill="currentColor"/>
           </svg>
-          Edit Weights Matrix
+          {showWeightsMatrix ? 'Hide Weights Matrix' : 'Show Weights Matrix'}
         </button>
-        {isWeightsModalOpen && (
-          <div className="weights-modal-overlay" onClick={() => setIsWeightsModalOpen(false)}>
-            <div className="weights-modal" onClick={e => e.stopPropagation()}>
-              <div className="weights-modal-header">
-                <h2>Category Weights Matrix</h2>
-                <button 
-                  className="weights-modal-close"
-                  onClick={() => setIsWeightsModalOpen(false)}
-                >
-                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="currentColor"/>
-                  </svg>
-                </button>
-              </div>
-              <div className="weights-modal-content">
-                <WeightsMatrix />
-              </div>
-            </div>
+        
+        {showWeightsMatrix && (
+          <div className="inline-weights-matrix">
+            <WeightsMatrix />
           </div>
         )}
       </div>
@@ -1373,6 +1465,30 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
     const newData = { ...surveyData };
     newData.conclusion = text;
     setSurveyData(newData);
+  };
+
+  // Add a utility function to find a question's group index
+  const getGroupIndexByQuestionId = (questionId: string): number => {
+    if (!surveyData?.groups) return -1;
+    
+    for (let i = 0; i < surveyData.groups.length; i++) {
+      const group = surveyData.groups[i];
+      if (group.questions?.some(q => q.id === questionId)) {
+        return i;
+      }
+    }
+    return -1;
+  };
+  
+  // Add a utility function to find a question's index within its group
+  const findQuestionIndexInGroup = (groupIndex: number, questionId: string): number => {
+    if (!surveyData?.groups || groupIndex < 0 || groupIndex >= surveyData.groups.length) {
+      return -1;
+    }
+    
+    const group = surveyData.groups[groupIndex];
+    const index = group.questions?.findIndex(q => q.id === questionId);
+    return index !== undefined ? index : -1;
   };
 
   return (
