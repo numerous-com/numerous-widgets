@@ -2,6 +2,18 @@
 
 
 
+## v0.1.48 (2025-03-10)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Refine weights modal scrolling and layout styles
+
+- Simplified scrollbar and overflow handling for weights modal
+- Cleaned up redundant CSS rules for matrix table
+- Improved scrolling behavior and layout consistency
+- Removed duplicate styling for sticky headers and columns ([`496cae7`](https://github.com/numerous-com/numerous-widgets/commit/496cae71f841c3721e0a98c3be705f8e469c46fa))
+
+
 ## v0.1.47 (2025-03-10)
 
 ### Fix
