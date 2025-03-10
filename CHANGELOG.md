@@ -2,6 +2,18 @@
 
 
 
+## v0.1.49 (2025-03-10)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Extract Markdown rendering to separate component
+
+- Moved MarkdownRender component to a new file
+- Replaced direct ReactMarkdown usage with SimpleMarkdownRender
+- Simplified imports and reduced complexity in WeightedAssessmentSurveyWidget
+- Improved code modularity by separating rendering concerns ([`1208cad`](https://github.com/numerous-com/numerous-widgets/commit/1208cadf9baeff3a1d325c65fee767d3700c8923))
+
+
 ## v0.1.48 (2025-03-10)
 
 ### Fix
