@@ -940,7 +940,6 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
             View and edit the weights of each question across categories.
           </p>
         </div>
-        
         <div className="matrix-table-container">
           <table className="matrix-table">
             <thead>
@@ -949,11 +948,13 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                 <th className="matrix-question-col">Question</th>
                 {categories.map(category => (
                   <th key={category.id} className="matrix-category-col">
-                    <div>{category.name}</div>
+                    <div className="matrix-category-header" title={category.name}>
+                      {category.name}
+                    </div>
                   </th>
                 ))}
                 <th className="matrix-total-col">
-                  <div>Row Total</div>
+                  <div className="matrix-total-header">Row Total</div>
                 </th>
               </tr>
             </thead>
@@ -964,8 +965,12 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                 
                 return (
                   <tr key={question.id}>
-                    <td className="matrix-group-cell">{group?.title}</td>
-                    <td className="matrix-question-cell">{question.text}</td>
+                    <td className="matrix-group-cell matrix-group-col" data-title={group?.title}>
+                      {group?.title}
+                    </td>
+                    <td className="matrix-question-cell matrix-question-col" data-title={question.text}>
+                      {question.text}
+                    </td>
                     {categories.map((category, categoryIndex) => {
                       const value = question.categoryWeights?.[category.id] || 0;
                       const inputKey = `${question.id}-${category.id}`;
@@ -1005,7 +1010,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                             max="100"
                             style={{ '--weight-percentage': `${value}%` } as React.CSSProperties}
                           />
-                        </td>
+                    </td>
                       );
                     })}
                     <td className="matrix-weight-cell matrix-total-cell">
@@ -1060,17 +1065,34 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
         
         <button 
           className="edit-weights-button"
-          onClick={() => setShowWeightsMatrix(!showWeightsMatrix)}
+          onClick={() => setShowWeightsMatrix(true)}
         >
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-7-2h2V7h-4v2h2z" fill="currentColor"/>
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z" fill="currentColor"/>
+            <path d="M11 7h2v10h-2z" fill="currentColor"/>
+            <path d="M7 11h10v2H7z" fill="currentColor"/>
           </svg>
-          {showWeightsMatrix ? 'Hide Weights Matrix' : 'Show Weights Matrix'}
+          Open Full-Screen Matrix
         </button>
         
         {showWeightsMatrix && (
-          <div className="inline-weights-matrix">
-            <WeightsMatrix />
+          <div className="weights-modal-overlay" onClick={() => setShowWeightsMatrix(false)}>
+            <div className="weights-modal-fullscreen" onClick={e => e.stopPropagation()}>
+              <div className="weights-modal-header">
+                <h2>Category Weights Matrix</h2>
+                <button 
+                  className="weights-modal-close"
+                  onClick={() => setShowWeightsMatrix(false)}
+                >
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="currentColor"/>
+                  </svg>
+                </button>
+              </div>
+              <div className="weights-modal-content">
+                <WeightsMatrix />
+              </div>
+            </div>
           </div>
         )}
       </div>

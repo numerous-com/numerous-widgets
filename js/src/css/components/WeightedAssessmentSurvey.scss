@@ -1761,27 +1761,25 @@
   color: var(--ui-widget-primary-text);
 }
 
-/* Modal styles */
+/* Modal styles for full-screen matrix */
 .weights-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.7);
   z-index: 9999;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 0;
 }
 
-.weights-modal {
+.weights-modal-fullscreen {
   background-color: var(--ui-widget-primary-background);
-  width: 95vw;
-  height: 95vh;
-  border-radius: 8px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -1790,15 +1788,15 @@
 }
 
 .weights-modal-header {
-  padding: 16px 24px;
-  border-bottom: 1px solid var(--ui-widget-border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 16px 24px;
   background-color: var(--ui-widget-primary-background);
+  border-bottom: 1px solid var(--ui-widget-border-color);
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 100;
 }
 
 .weights-modal-header h2 {
@@ -1812,577 +1810,279 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 8px;
-  color: var(--ui-widget-secondary-text);
-  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  
-  &:hover {
-    background-color: var(--ui-widget-hover-background);
-  }
-  
-  svg {
-    width: 24px;
-    height: 24px;
-  }
+  padding: 8px;
+  color: var(--ui-widget-secondary-text);
+  border-radius: 50%;
+}
+
+.weights-modal-close:hover {
+  background-color: var(--ui-widget-hover-background);
+}
+
+.weights-modal-close svg {
+  width: 24px;
+  height: 24px;
 }
 
 .weights-modal-content {
-  flex: 1;
+  position: relative;
+  height: calc(100vh - 60px);
   overflow: auto;
-  padding: 24px;
-  background-color: var(--ui-widget-primary-background);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
-.edit-weights-button {
-  background-color: var(--ui-widget-primary-background);
-  border: 1px solid var(--ui-widget-border-color);
-  border-radius: 4px;
-  padding: 8px 16px;
-  font-size: 14px;
-  color: var(--ui-widget-primary-text);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
+/* Make the weights matrix fill the container properly */
+.weights-modal-content .weights-matrix {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+
+/* Ensure the table container has the correct scrolling behavior */
+.weights-modal-content .matrix-table-container {
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+  position: relative;
+  scroll-behavior: smooth;
   
-  &:hover {
+  /* Scrollbar styling for WebKit browsers */
+  &::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
     background-color: var(--ui-widget-hover-background);
   }
   
-  svg {
-    width: 16px;
-    height: 16px;
-  }
-}
-
-/* Update matrix styles for modal context */
-.weights-modal .weights-matrix {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  background: none;
-  border: none;
-  box-shadow: none;
-  padding: 0;
-}
-
-.weights-modal .matrix-table-container {
-  flex: 1;
-  overflow: auto;
-  margin: 0;
-  padding: 0;
-  border: 1px solid var(--ui-widget-border-color);
-  border-radius: 4px;
-}
-
-.weights-modal .matrix-table {
-  margin: 0;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.weights-modal .matrix-table th {
-  background-color: var(--ui-widget-hover-background);
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  padding: 8px;
-  text-align: center;
-  
-  &.matrix-category-col {
-    height: 160px;
-    padding: 0;
-    vertical-align: bottom;
-    position: relative;
-    
-    > div {
-      position: absolute;
-      bottom: 50%;
-      left: 50%;
-      transform-origin: center;
-      transform: translate(-50%, 50%) rotate(-90deg);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 160px;
-      padding: 8px;
-      transition: all 0.2s ease;
-      background-color: var(--ui-widget-hover-background);
-      
-      &:hover {
-        z-index: 2;
-        background-color: var(--ui-widget-hover-background);
-        border-radius: 4px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        max-width: none;
-        overflow: visible;
-      }
-    }
-  }
-}
-
-.weights-modal .matrix-table td {
-  padding: 12px;
-  border-bottom: 1px solid var(--ui-widget-border-color);
-  background-color: var(--ui-widget-primary-background);
-}
-
-/* Adjust column widths for full-screen context */
-.weights-modal .matrix-group-col {
-  width: 180px;
-  white-space: normal;
-  word-wrap: break-word;
-}
-
-.weights-modal .matrix-question-col {
-  width: 300px;
-  white-space: normal;
-  word-wrap: break-word;
-}
-
-.weights-modal .matrix-category-col {
-  width: 60px !important;
-  min-width: 60px !important;
-}
-
-.scoring-ranges-editor {
-  margin: 20px 0;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  
-  &.invalid-ranges {
-    border-color: #ff4d4f;
-  }
-  
-  .scoring-ranges-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    
-    h4 {
-      margin: 0;
-    }
-  }
-  
-  .scoring-ranges-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .scoring-range-item {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 15px;
-    border: 1px solid #eee;
-    border-radius: 4px;
-    background: #fafafa;
-    
-    .range-inputs {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      
-      input {
-        width: 80px;
-      }
-    }
-    
-    .range-text-inputs {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      
-      .range-title {
-        font-weight: 500;
-      }
-      
-      .range-text {
-        min-height: 60px;
-        resize: vertical;
-      }
-    }
-  }
-  
-  .ranges-error {
-    margin-top: 10px;
-    color: #ff4d4f;
-    font-size: 0.9em;
-  }
-  
-  .delete-button {
-    align-self: flex-end;
-  }
-}
-
-.clear-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #6b7280;
-  padding: 4px;
-  border-radius: 4px;
-  height: 32px;
-  width: 32px;
-  transition: background-color 0.2s, color 0.2s;
-  
-  &:hover:not(:disabled) {
-    background-color: rgba(107, 114, 128, 0.1);
-    color: #4b5563;
-  }
-  
-  &:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-  }
-}
-
-.generate-answers-button {
-  background-color: #6366f1;
-  border: 1px solid #6366f1;
-  color: white;
-  padding: min(2vw, 0.75rem) min(3vw, 1.5rem);
-  border-radius: 4px;
-  font-size: min(2vw, 1rem);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: background-color 0.2s;
-  min-width: 140px;
-  justify-content: center;
-  
-  &:hover {
-    background-color: #4f46e5;
-  }
-}
-
-.markdown-content {
-  width: 100%;
-  
-  /* Basic text styles */
-  p {
-    margin: 0.5em 0;
-    line-height: 1.5;
-  }
-  
-  /* Heading styles */
-  h1, h2, h3, h4, h5, h6 {
-    margin-top: 1em;
-    margin-bottom: 0.5em;
-    font-weight: 500;
-  }
-  
-  h1 { font-size: 1.8em; }
-  h2 { font-size: 1.5em; }
-  h3 { font-size: 1.3em; }
-  h4 { font-size: 1.2em; }
-  h5 { font-size: 1.1em; }
-  h6 { font-size: 1em; }
-  
-  /* List styles */
-  ul, ol {
-    padding-left: 1.5em;
-    margin: 0.5em 0;
-  }
-  
-  li {
-    margin-bottom: 0.25em;
-  }
-  
-  /* Link styles */
-  a {
-    color: #4f46e5;
-    text-decoration: none;
+  &::-webkit-scrollbar-thumb {
+    background-color: #9ca3af;
+    border-radius: 6px;
+    border: 2px solid var(--ui-widget-hover-background);
     
     &:hover {
-      text-decoration: underline;
+      background-color: #6b7280;
     }
   }
   
-  /* Code blocks */
-  pre {
-    background-color: #f3f4f6;
-    padding: 0.75em;
-    border-radius: 4px;
-    overflow-x: auto;
-    margin: 0.75em 0;
-  }
-  
-  code {
-    font-family: monospace;
-    background-color: #f3f4f6;
-    padding: 0.2em 0.4em;
-    border-radius: 3px;
-    font-size: 0.9em;
-  }
-  
-  /* Blockquote styles */
-  blockquote {
-    border-left: 4px solid #e5e7eb;
-    padding-left: 1em;
-    margin: 1em 0;
-    color: #6b7280;
-  }
-  
-  /* Table styles */
-  table {
-    border-collapse: collapse;
-    width: 100%;
-    margin: 1em 0;
-    
-    th, td {
-      border: 1px solid #e5e7eb;
-      padding: 0.5em;
-      text-align: left;
-    }
-    
-    th {
-      background-color: #f9fafb;
-      font-weight: 500;
-    }
-    
-    tr:nth-child(even) {
-      background-color: #f9fafb;
-    }
-  }
-  
-  /* Image styles */
-  img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 4px;
-    margin: 0.5em 0;
-  }
-  
-  /* Horizontal rule */
-  hr {
-    border: 0;
-    border-top: 1px solid #e5e7eb;
-    margin: 1.5em 0;
-  }
-  
-  /* Specific context styling */
-  &.question-text {
-    margin-bottom: 1em;
-    font-size: 1rem;
-    font-weight: 400;
-    
-    p, ul, ol, blockquote {
-      margin: 0.25em 0;
-    }
-    
-    h1, h2, h3, h4, h5, h6 {
-      margin: 0.5em 0 0.25em;
-    }
-  }
-  
-  &.comment-text {
-    font-size: 0.9em;
-    
-    p, ul, ol {
-      margin: 0.25em 0;
-    }
-  }
+  /* Scrollbar styling for Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: #9ca3af var(--ui-widget-hover-background);
 }
 
-/* Responsive adjustments for smaller screens */
-@media (max-width: 480px) {
-  .slider-markers.qualitative-scale {
-    padding: 0 30px;
-    width: calc(100% - 60px);
-  }
-  
-  .slider-markers.qualitative-scale .slider-marker {
-    font-size: 10px;
-  }
-}
-
-/* Add a class to container when using qualitative scale */
-.slider-container.has-qualitative-scale {
-  margin-bottom: 35px;
-}
-
-/* Conclusion editor styles */
-.conclusion-editor {
+/* Fix styles for the edit button */
+.edit-weights-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
   background-color: var(--ui-widget-primary-background);
   border: 1px solid var(--ui-widget-border-color);
   border-radius: 4px;
-  padding: 16px;
-  box-shadow: var(--ui-widget-dropdown-shadow);
-  margin-bottom: 16px;
-}
-
-.conclusion-header {
-  margin-bottom: 16px;
-}
-
-.conclusion-header h3 {
-  font-size: 16px;
-  font-weight: 500;
-  margin: 0 0 8px 0;
   color: var(--ui-widget-primary-text);
+  cursor: pointer;
 }
 
-.conclusion-description {
-  font-size: 14px;
-  color: var(--ui-widget-secondary-text);
-  line-height: 1.5;
-  margin: 0;
+.edit-weights-button:hover {
+  background-color: var(--ui-widget-hover-background);
 }
 
-.conclusion-content {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.edit-weights-button svg {
+  width: 16px;
+  height: 16px;
 }
 
-.conclusion-edit-area {
-  flex: 1;
+/* Modal column headers - fix alignment */
+.weights-modal-content .matrix-table th.matrix-category-col {
+  position: relative;
+  padding: 8px 0;
+  height: 160px;
+  vertical-align: bottom;
+  z-index: 2;
+  width: 80px !important;
+  min-width: 80px !important;
+  max-width: 80px !important;
 }
 
-.conclusion-textarea {
-  width: 100%;
-  min-height: 200px;
-  font-family: monospace;
-  line-height: 1.5;
-  resize: vertical;
-  white-space: pre-wrap;
-}
-
-.conclusion-preview {
-  flex: 1;
-  background-color: #f9fafb;
-  border: 1px solid var(--ui-widget-border-color);
-  border-radius: 4px;
-  padding: 16px;
-}
-
-.conclusion-preview h4 {
-  font-size: 14px;
-  font-weight: 500;
-  margin: 0 0 12px 0;
-  color: var(--ui-widget-secondary-text);
-  border-bottom: 1px solid var(--ui-widget-border-color);
-  padding-bottom: 8px;
-}
-
-.markdown-preview {
-  overflow-y: auto;
-  max-height: 500px;
+.weights-modal-content .matrix-table th.matrix-category-col .matrix-category-header {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  transform: translate(-50%, 50%) rotate(-90deg);
+  transform-origin: center;
+  white-space: nowrap;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
   padding: 8px;
-}
-
-/* Responsive layout for wider screens */
-@media (min-width: 768px) {
-  .conclusion-content {
-    flex-direction: row;
-  }
-  
-  .conclusion-edit-area,
-  .conclusion-preview {
-    width: 50%;
-  }
-}
-
-/* Inline Weights Matrix styles */
-.weights-matrix-container {
-  margin-bottom: 24px;
-  padding: 16px;
-  border: 1px solid var(--ui-widget-border-color);
-  border-radius: 4px;
-  background-color: var(--ui-widget-primary-background);
-}
-
-.weights-matrix-header {
-  margin-bottom: 16px;
-}
-
-.weights-matrix-header h3 {
-  font-size: 18px;
-  font-weight: 500;
-  margin: 0 0 8px 0;
-  color: var(--ui-widget-primary-text);
-}
-
-.weights-matrix-description {
-  font-size: 14px;
-  color: var(--ui-widget-secondary-text);
-  line-height: 1.5;
-  margin: 0;
-}
-
-.inline-weights-matrix {
-  margin-top: 16px;
-  max-height: 600px;
-  overflow: auto;
-  border: 1px solid var(--ui-widget-border-color);
+  background-color: var(--ui-widget-hover-background);
   border-radius: 4px;
 }
 
-.inline-weights-matrix .matrix-table-container {
-  margin: 0;
-  padding: 0;
+/* Width for category value cells in the modal */
+.weights-modal-content .matrix-table td.matrix-weight-cell {
+  width: 80px !important;
+  min-width: 80px !important;
+  max-width: 80px !important;
+  text-align: center;
 }
 
-.inline-weights-matrix .matrix-table {
+/* Fix the sticky columns in the modal */
+.weights-modal-content .matrix-table th.matrix-group-col,
+.weights-modal-content .matrix-table td.matrix-group-col {
+  position: sticky !important;
+  left: 0 !important;
+  z-index: 3;
+}
+
+.weights-modal-content .matrix-table th.matrix-question-col,
+.weights-modal-content .matrix-table td.matrix-question-col {
+  position: sticky !important;
+  left: 150px !important;
+  z-index: 2;
+}
+
+/* Make sure the table is using fixed layout */
+.weights-modal-content .matrix-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0;
 }
 
-.inline-weights-matrix .matrix-table th {
+/* Style for the total column header */
+.weights-modal-content .matrix-table th.matrix-total-col {
+  width: 100px !important;
+  min-width: 100px !important;
+  max-width: 100px !important;
+  background-color: var(--ui-widget-hover-background);
+  font-weight: 500;
+  position: relative;
+}
+
+.weights-modal-content .matrix-table th.matrix-total-col .matrix-total-header {
+  text-align: center;
+  padding: 8px;
+}
+
+/* Make sure column cells align with their headers */
+.weights-modal-content .matrix-table tr > * {
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+
+/* Make entire header row sticky */
+.weights-modal-content .matrix-table thead {
   position: sticky;
   top: 0;
+  z-index: 10;
+}
+
+/* Ensure all header cells have the correct background */
+.weights-modal-content .matrix-table th {
+  position: sticky; 
+  top: 0;
   background-color: var(--ui-widget-hover-background);
-  z-index: 2;
+  z-index: 10;
   padding: 12px 8px;
+  border-bottom: 2px solid var(--ui-widget-border-color);
 }
 
-/* Make sure horizontal scroll works properly */
-.inline-weights-matrix .matrix-table-container {
-  overflow-x: auto;
+/* Special z-index for sticky column headers to appear above other headers */
+.weights-modal-content .matrix-table th.matrix-group-col {
+  z-index: 12 !important;
 }
 
-/* Prevent text selection while dragging in the matrix */
-.inline-weights-matrix {
-  user-select: none;
+.weights-modal-content .matrix-table th.matrix-question-col {
+  z-index: 11 !important;
 }
 
-/* Create sticky first column */
-.inline-weights-matrix .matrix-table .matrix-group-col,
-.inline-weights-matrix .matrix-table .matrix-question-col {
-  position: sticky;
+/* Add a subtle shadow to the bottom of the header row to indicate it's floating */
+.weights-modal-content .matrix-table thead::after {
+  content: '';
+  position: absolute;
   left: 0;
-  background-color: var(--ui-widget-primary-background);
-  z-index: 1;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.1), transparent);
+  pointer-events: none;
 }
 
-.inline-weights-matrix .matrix-table .matrix-question-col {
-  left: 150px; /* Width of the group column */
+/* Make sure the sticky headers work properly */
+.weights-modal-content {
+  /* Keep existing styles */
+  overflow: auto;
+  
+  /* Ensure the table takes up the full height and width */
+  .matrix-table-container {
+    height: 100%;
+    width: 100%;
+    position: relative;
+  }
+  
+  .matrix-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  
+  /* Make header cells truly sticky */
+  .matrix-table thead tr {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+  
+  /* Base styles for all header cells */
+  .matrix-table th {
+    position: sticky;
+    top: 0;
+    background-color: var(--ui-widget-hover-background);
+    z-index: 20;
+    border-bottom: 2px solid var(--ui-widget-border-color);
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Higher z-index for sticky columns when they intersect with the header row */
+  .matrix-table th.matrix-group-col {
+    z-index: 30 !important;
+    background-color: var(--ui-widget-hover-background);
+  }
+  
+  .matrix-table th.matrix-question-col {
+    z-index: 29 !important;
+    background-color: var(--ui-widget-hover-background);
+  }
+  
+  /* Keep first column sticky with proper layering */
+  .matrix-table td.matrix-group-col {
+    background-color: var(--ui-widget-primary-background);
+    z-index: 11 !important;
+  }
+  
+  /* Keep second column sticky with proper layering */
+  .matrix-table td.matrix-question-col {
+    background-color: var(--ui-widget-primary-background);
+    z-index: 10 !important;
+  }
 }
 
-/* Make input cells stand out */
-.inline-weights-matrix .matrix-weight-input {
-  width: 60px;
-  text-align: right;
-  border: 1px solid var(--ui-widget-border-color);
-  border-radius: 4px;
-  padding: 4px 8px;
+/* Add a highlight on the fixed columns when scrolling */
+.weights-modal-content .matrix-table td.matrix-group-col,
+.weights-modal-content .matrix-table td.matrix-question-col {
+  box-shadow: 4px 0 6px -2px rgba(0, 0, 0, 0.1);
 }
 
-.inline-weights-matrix .matrix-weight-input:focus {
-  outline: none;
-  border-color: var(--ui-widget-focus-border);
-  box-shadow: var(--ui-widget-focus-shadow);
+/* Style category column header containers and their rotated text */
+.weights-modal-content .matrix-table th.matrix-category-col .matrix-category-header {
+  background-color: var(--ui-widget-hover-background);
+  z-index: 21;
 }
