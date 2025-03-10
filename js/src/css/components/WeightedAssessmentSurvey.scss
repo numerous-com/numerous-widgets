@@ -1828,29 +1828,23 @@
 }
 
 .weights-modal-content {
-  position: relative;
-  height: calc(100vh - 60px);
+  flex: 1;
   overflow: auto;
-  overflow-y: auto;
-  overflow-x: hidden;
+  padding: 0;
+  position: relative;
+  height: calc(100vh - 60px); /* Account for header height */
 }
 
-/* Make the weights matrix fill the container properly */
+/* Make the matrix take full height in the modal */
 .weights-modal-content .weights-matrix {
   height: 100%;
   width: 100%;
-  margin: 0;
-  padding: 0;
-  position: relative;
 }
 
-/* Ensure the table container has the correct scrolling behavior */
-.weights-modal-content .matrix-table-container {
-  height: 100%;
-  width: 100%;
-  overflow: auto;
-  position: relative;
-  scroll-behavior: smooth;
+/* Set scrollbars for the modal content */
+.weights-modal-content {
+  overflow-y: scroll;
+  overflow-x: scroll;
   
   /* Scrollbar styling for WebKit browsers */
   &::-webkit-scrollbar {
@@ -2013,76 +2007,4 @@
   height: 4px;
   background: linear-gradient(to bottom, rgba(0,0,0,0.1), transparent);
   pointer-events: none;
-}
-
-/* Make sure the sticky headers work properly */
-.weights-modal-content {
-  /* Keep existing styles */
-  overflow: auto;
-  
-  /* Ensure the table takes up the full height and width */
-  .matrix-table-container {
-    height: 100%;
-    width: 100%;
-    position: relative;
-  }
-  
-  .matrix-table {
-    width: 100%;
-    table-layout: fixed;
-    border-collapse: separate;
-    border-spacing: 0;
-  }
-  
-  /* Make header cells truly sticky */
-  .matrix-table thead tr {
-    position: sticky;
-    top: 0;
-    z-index: 20;
-  }
-  
-  /* Base styles for all header cells */
-  .matrix-table th {
-    position: sticky;
-    top: 0;
-    background-color: var(--ui-widget-hover-background);
-    z-index: 20;
-    border-bottom: 2px solid var(--ui-widget-border-color);
-    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Higher z-index for sticky columns when they intersect with the header row */
-  .matrix-table th.matrix-group-col {
-    z-index: 30 !important;
-    background-color: var(--ui-widget-hover-background);
-  }
-  
-  .matrix-table th.matrix-question-col {
-    z-index: 29 !important;
-    background-color: var(--ui-widget-hover-background);
-  }
-  
-  /* Keep first column sticky with proper layering */
-  .matrix-table td.matrix-group-col {
-    background-color: var(--ui-widget-primary-background);
-    z-index: 11 !important;
-  }
-  
-  /* Keep second column sticky with proper layering */
-  .matrix-table td.matrix-question-col {
-    background-color: var(--ui-widget-primary-background);
-    z-index: 10 !important;
-  }
-}
-
-/* Add a highlight on the fixed columns when scrolling */
-.weights-modal-content .matrix-table td.matrix-group-col,
-.weights-modal-content .matrix-table td.matrix-question-col {
-  box-shadow: 4px 0 6px -2px rgba(0, 0, 0, 0.1);
-}
-
-/* Style category column header containers and their rotated text */
-.weights-modal-content .matrix-table th.matrix-category-col .matrix-category-header {
-  background-color: var(--ui-widget-hover-background);
-  z-index: 21;
 }
