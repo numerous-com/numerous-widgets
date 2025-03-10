@@ -2,13 +2,7 @@ import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import '../../css/styles.scss';
 import '../../css/components/WeightedAssessmentSurvey.scss';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
-import rehypeHighlight from 'rehype-highlight';
-import 'katex/dist/katex.min.css';
-import 'highlight.js/styles/github.css';
+import { MarkdownRender, SimpleMarkdownRender } from './MarkdownRender';
 
 // Define types for our survey structure
 interface Question {
@@ -70,34 +64,6 @@ interface WeightedAssessmentSurveyWidgetProps {
   disable_editing: boolean;  // Add new prop
   read_only: boolean;  // Add read_only to props
 }
-
-// Create a reusable Markdown component to maintain consistent styling
-interface MarkdownRenderProps {
-  content: string;
-  className?: string;
-}
-
-const MarkdownRender: React.FC<MarkdownRenderProps> = ({ content, className = "" }) => {
-  return (
-    <div className={`markdown-content ${className}`}>
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkMath]}
-        rehypePlugins={[rehypeKatex, rehypeHighlight]}
-        components={{
-          // Custom component rendering
-          a: ({node, ...props}) => (
-            <a {...props} target="_blank" rel="noopener noreferrer" />
-          ),
-          img: ({node, ...props}) => (
-            <img {...props} loading="lazy" />
-          ),
-        }}
-      >
-        {content}
-      </ReactMarkdown>
-    </div>
-  );
-};
 
 function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetProps) {
   const [surveyData, setSurveyData] = useModelState<SurveyData>("survey_data");
@@ -1554,7 +1520,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
             ) : (
               <>
                 <h1 className="survey-title">{surveyData?.title || ''}</h1>
-                <MarkdownRender 
+                <SimpleMarkdownRender 
                   content={surveyData?.description || ''} 
                   className="survey-description"
                 />
@@ -1765,7 +1731,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                   <div className="conclusion-preview">
                     <h4>Preview</h4>
                     <div className="markdown-preview">
-                      <MarkdownRender 
+                      <SimpleMarkdownRender 
                         content={surveyData?.conclusion || ''} 
                         className="markdown-content"
                       />
@@ -1828,7 +1794,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                           </>
                         ) : (
                           <div className="group-description">
-                            <MarkdownRender content={group.description} />
+                            <SimpleMarkdownRender content={group.description} />
                           </div>
                         )}
                         
@@ -1861,7 +1827,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                               ) : (
                                 <div className="question-content">
                                   <div className="question-text-container">
-                                    <MarkdownRender content={question.text} className="question-text" />
+                                  <SimpleMarkdownRender content={question.text} className="question-text" />
                                   </div>
                                 </div>
                               )}
@@ -2022,7 +1988,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                               
                               {readOnly && question.comment && (
                                 <div className="comment-container read-only">
-                                  <MarkdownRender content={question.comment} className="comment-text" />
+                                  <SimpleMarkdownRender content={question.comment} className="comment-text" />
                                 </div>
                               )}
                             </div>
