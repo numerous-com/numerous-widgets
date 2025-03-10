@@ -2,6 +2,20 @@
 
 
 
+## v0.1.47 (2025-03-10)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Implement full-screen weights matrix with enhanced UI and interaction
+
+- Replaced inline weights matrix with full-screen modal
+- Added new modal overlay with close button and header
+- Improved matrix column styling and sticky behavior
+- Enhanced scrollbar and layout for better usability
+- Updated edit weights button to open full-screen matrix
+- Refined column headers and sticky column implementations ([`175b1c1`](https://github.com/numerous-com/numerous-widgets/commit/175b1c1f0a1f3d7291a79617e5c283219a22931a))
+
+
 ## v0.1.46 (2025-03-09)
 
 ### Fix
