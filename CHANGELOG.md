@@ -2,6 +2,17 @@
 
 
 
+## v0.1.50 (2025-03-11)
+
+### Fix
+
+* fix(URLParamsWidget): Modify query params update logic and add debug logging
+
+- Commented out query params equality check to always update
+- Added additional debug logging for change tracking
+- Improved visibility of state update process ([`31e6e7d`](https://github.com/numerous-com/numerous-widgets/commit/31e6e7daa48e989a084093e849a43de8387dccde))
+
+
 ## v0.1.49 (2025-03-10)
 
 ### Fix
