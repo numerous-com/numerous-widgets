@@ -84,12 +84,12 @@ function URLParamsWidget() {
         console.log('New URL:', fullURL);
         console.log('New base:', base);
 
-        if (!isEqual(params, currentState.current.queryParams)) {
+        //if (!isEqual(params, currentState.current.queryParams)) {
             currentState.current.queryParams = { ...params };
             setBrowserQueryParams(params);
             hasChanges = true;
             console.log('Query params updated'); // Debug log
-        }
+        //}
 
         if (!isEqual(segments, currentState.current.pathSegments)) {
             currentState.current.pathSegments = [...segments];
@@ -111,6 +111,7 @@ function URLParamsWidget() {
             hasChanges = true;
             console.log('Base URL updated'); // Debug log
         }
+        console.log('Has changes:', hasChanges); // Debug log
 
         return hasChanges;
     }, [setBrowserQueryParams, setBrowserPathSegments, setBrowserCurrentURL, setBrowserBaseURL, isEqual]);
