@@ -2,6 +2,20 @@
 
 
 
+## v0.1.51 (2025-03-12)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Add advanced slider interactions and validation
+
+- Implemented dynamic slider preview and drag handling
+- Added validation messages for unanswered questions
+- Enhanced slider UI with hover and interaction states
+- Added category icon editor with preview and background toggle
+- Improved comment editing with cursor position preservation
+- Implemented more robust navigation and submission logic ([`5a912e7`](https://github.com/numerous-com/numerous-widgets/commit/5a912e74eebd8f2c288f3f9d9a1237e6beab78a6))
+
+
 ## v0.1.50 (2025-03-11)
 
 ### Fix
