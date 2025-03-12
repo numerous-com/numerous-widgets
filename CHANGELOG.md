@@ -2,6 +2,16 @@
 
 
 
+## v0.1.52 (2025-03-12)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Scroll to top on group navigation
+
+- Added functionality to scroll to the top of the survey content when moving to the next group
+- Improved user experience by ensuring visibility of the new group content ([`dc9417d`](https://github.com/numerous-com/numerous-widgets/commit/dc9417da5e7670d8ff8447404f30d805b87f3b88))
+
+
 ## v0.1.51 (2025-03-12)
 
 ### Fix
