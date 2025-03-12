@@ -363,6 +363,12 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
 
     setCurrentGroupIndex(currentGroupIndex + 1);
     setValidationMessage('');
+    
+    // Scroll to the top of the survey content when moving to next group
+    const surveyContent = document.querySelector('.survey-content');
+    if (surveyContent) {
+      surveyContent.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
   
   const goToPreviousGroup = () => {
