@@ -1,6 +1,7 @@
 """Module providing a URL parameters and slugs widget for the numerous library."""
 
 from collections.abc import Callable
+from contextlib import suppress
 from threading import Lock
 from typing import cast
 
@@ -93,7 +94,8 @@ class URLParams(anywidget.AnyWidget):  # type: ignore[misc]
                 trait_name == "browser_query_params"
                 and self._on_params_change is not None
             ):
-                self._on_params_change(cast(dict[str, str], new_value))
+                with suppress(TypeError, ValueError):
+                    self._on_params_change(cast(dict[str, str], new_value))
             elif (
                 trait_name == "browser_path_segments"
                 and self._on_path_change is not None

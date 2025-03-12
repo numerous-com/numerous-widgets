@@ -21,6 +21,7 @@ interface Category {
   name: string;
   description: string;
   scoringRanges: ScoringRange[];  // Add scoring ranges to categories
+  icon?: string;  // SVG icon code
 }
 
 interface ScoringRange {
@@ -134,6 +135,13 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   
   // Add state for showing final slide
   const [showFinalSlide, setShowFinalSlide] = React.useState(false);
+  
+  // Add state to track slider value during dragging
+  const [sliderDragValue, setSliderDragValue] = React.useState<{
+    groupIndex: number;
+    questionIndex: number;
+    value: number;
+  } | null>(null);
   
   // Force edit_mode to false when disable_editing is true
   React.useEffect(() => {
@@ -301,26 +309,60 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
     };
   };
   
+  // Add state to track validation messages
+  const [validationMessage, setValidationMessage] = React.useState<string>('');
+  
+  // Add function to check if all questions in a specific group are answered
+  const areAllQuestionsAnsweredInGroup = (groupIndex: number): boolean => {
+    if (!surveyData?.groups?.[groupIndex]) return true;
+    return surveyData.groups[groupIndex].questions.every(q => q.value !== null);
+  };
+
+  const countUnansweredQuestionsInGroup = (groupIndex: number): number => {
+    if (!surveyData?.groups?.[groupIndex]) return 0;
+    return surveyData.groups[groupIndex].questions.filter(q => q.value === null).length;
+  };
+
+  const generateValidationMessage = (groupIndex: number): string => {
+    const count = countUnansweredQuestionsInGroup(groupIndex);
+    if (count === 0) return '';
+    return `Please answer ${count} more ${count === 1 ? 'question' : 'questions'} before proceeding.`;
+  };
+  
+  // Add function to get count of unanswered questions in a group
+  const getUnansweredQuestionsInGroup = (groupIndex: number): number => {
+    if (!surveyData?.groups?.[groupIndex]?.questions) return 0;
+    
+    const group = surveyData.groups[groupIndex];
+    return group.questions.filter(q => q.value === null).length;
+  };
+  
   // Modify navigation functions to handle intro slide and final slide
   const goToNextGroup = () => {
+    // Special case for intro screen - bypass validation check
     if (showIntro) {
       setShowIntro(false);
+      setCurrentGroupIndex(0);
+      setValidationMessage('');
       const surveyContent = document.querySelector('.survey-content');
       if (surveyContent) {
         surveyContent.scrollTo({ top: 0, behavior: 'smooth' });
       }
       return;
     }
-    if (currentGroupIndex < surveyData.groups.length - 1) {
-      setCurrentGroupIndex(currentGroupIndex + 1);
-      const surveyContent = document.querySelector('.survey-content');
-      if (surveyContent) {
-        surveyContent.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    } else if (currentGroupIndex === surveyData.groups.length - 1 && !submitted) {
-      // Submit the survey when clicking next on last group
+
+    if (currentGroupIndex >= surveyData?.groups?.length - 1) {
       handleSubmit();
+      return;
     }
+
+    if (!areAllQuestionsAnsweredInGroup(currentGroupIndex)) {
+      setValidationMessage(generateValidationMessage(currentGroupIndex));
+      return;
+    }
+
+    setCurrentGroupIndex(currentGroupIndex + 1);
+    setValidationMessage('');
   };
   
   const goToPreviousGroup = () => {
@@ -357,7 +399,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   };
   
   // Update question value with timestamp and reset submitted state
-  const updateQuestionValue = (groupIndex: number, questionIndex: number, value: number) => {
+  const updateQuestionValue = (groupIndex: number, questionIndex: number, newValue: number | null): void => {
     if (readOnly) return; // Don't update if in read-only mode
     
     const newData = { ...surveyData };
@@ -372,16 +414,91 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
     }
     
     // Store the timestamp for this value
-    question.timestamps[value] = elapsedSeconds;
-    
-    // Update the value
-    question.value = value;
+    // Round to 2 decimal places for use as an object key
+    if (newValue !== null) {
+      const roundedValue = Math.round(newValue * 100) / 100;
+      question.timestamps[roundedValue] = elapsedSeconds;
+      
+      // Update the value - keep full precision
+      question.value = newValue;
+    } else {
+      question.value = null;
+    }
     
     // Reset submitted state
     setSubmitted(false);
     
+    // Update validation message based on current state of questions
+    if (areAllQuestionsAnsweredInGroup(groupIndex)) {
+      setValidationMessage('');
+    } else if (validationMessage) {
+      setValidationMessage(generateValidationMessage(groupIndex));
+    }
+    
     setSurveyData(newData);
   };
+  
+  // Add state to track the current editing comment
+  const [commentBeingEdited, setCommentBeingEdited] = React.useState<{
+    value: string;
+    groupIndex: number;
+    questionIndex: number;
+  } | null>(null);
+  
+  // Add refs to track textarea selection
+  const commentTextareaRef = React.useRef<HTMLTextAreaElement>(null);
+  const selectionStartRef = React.useRef<number | null>(null);
+  const selectionEndRef = React.useRef<number | null>(null);
+  
+  // Update comment editing handlers
+  const handleCommentFocus = (groupIndex: number, questionIndex: number, comment: string) => {
+    // Store the current comment in local state for editing
+    setCommentBeingEdited({
+      value: comment,
+      groupIndex,
+      questionIndex
+    });
+  };
+  
+  const handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (!commentBeingEdited) return;
+    
+    // Store current selection position
+    selectionStartRef.current = e.target.selectionStart;
+    selectionEndRef.current = e.target.selectionEnd;
+    
+    // Update local state
+    setCommentBeingEdited({
+      ...commentBeingEdited,
+      value: e.target.value
+    });
+  };
+  
+  const handleCommentBlur = () => {
+    if (!commentBeingEdited) return;
+    
+    // Apply changes to the actual survey data
+    updateQuestionComment(
+      commentBeingEdited.groupIndex,
+      commentBeingEdited.questionIndex,
+      commentBeingEdited.value
+    );
+    
+    // Clear local editing state
+    setCommentBeingEdited(null);
+  };
+  
+  // Effect to restore cursor position after re-render
+  React.useEffect(() => {
+    if (commentTextareaRef.current && 
+        selectionStartRef.current !== null && 
+        selectionEndRef.current !== null) {
+      commentTextareaRef.current.setSelectionRange(
+        selectionStartRef.current, 
+        selectionEndRef.current
+      );
+    }
+  });
   
   // Update question comment and reset submitted state
   const updateQuestionComment = (groupIndex: number, questionIndex: number, comment: string) => {
@@ -429,6 +546,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
       id: categoryId,
       name: `Category ${surveyData.categories?.length + 1 || 1}`,
       description: "",
+      icon: "",
       scoringRanges: [{ min: 0, max: 100, title: "Default Range", text: "Default range description" }]  // Initialize with default range
     };
     
@@ -462,6 +580,12 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   const updateCategoryDescription = (index: number, description: string) => {
     const updatedSurveyData = { ...surveyData };
     updatedSurveyData.categories[index].description = description;
+    setSurveyData(updatedSurveyData);
+  };
+  
+  const updateCategoryIcon = (index: number, icon: string) => {
+    const updatedSurveyData = { ...surveyData };
+    updatedSurveyData.categories[index].icon = icon;
     setSurveyData(updatedSurveyData);
   };
   
@@ -1479,6 +1603,63 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
     return index !== undefined ? index : -1;
   };
 
+  // Handle slider drag (update visual state only)
+  const handleSliderDrag = (groupIndex: number, questionIndex: number, value: number) => {
+    setSliderDragValue({
+      groupIndex,
+      questionIndex,
+      value
+    });
+  };
+
+  // Handle slider release (commit the value)
+  const handleSliderRelease = () => {
+    if (sliderDragValue) {
+      const { groupIndex, questionIndex, value } = sliderDragValue;
+      updateQuestionValue(groupIndex, questionIndex, value);
+      setSliderDragValue(null);
+    }
+  };
+
+  // Add state for icon preview background mode (checkerboard or dark)
+  const [iconPreviewDarkMode, setIconPreviewDarkMode] = React.useState<Record<string, boolean>>({});
+  
+  // Function to toggle the icon preview background for a specific category
+  const toggleIconPreviewMode = (categoryId: string) => {
+    setIconPreviewDarkMode(prev => ({
+      ...prev,
+      [categoryId]: !prev[categoryId]
+    }));
+  };
+
+  // Add mouse hover handling for sliders
+  const handleSliderMouseMove = (e: React.MouseEvent<HTMLInputElement>, groupIndex: number, questionIndex: number, question: Question) => {
+    // Only show preview position if the slider hasn't been set yet
+    if (question.value !== null) return;
+    
+    const slider = e.currentTarget;
+    const rect = slider.getBoundingClientRect();
+    const position = e.clientX - rect.left;
+    const percentage = Math.max(0, Math.min(1, position / rect.width));
+    
+    // Calculate value based on percentage of slider width
+    const value = question.min + percentage * (question.max - question.min);
+    
+    // Update slider preview position
+    handleSliderDrag(groupIndex, questionIndex, Math.round(value));
+  };
+  
+  const handleSliderMouseLeave = () => {
+    // For unselected sliders, don't immediately clear the preview
+    // Instead, let the CSS transition handle the visual fade-out
+    if (sliderDragValue && surveyData.groups[sliderDragValue.groupIndex]?.questions[sliderDragValue.questionIndex]?.value === null) {
+      // Set a short timeout to allow the CSS transition to complete before removing the thumb completely
+      setTimeout(() => {
+        setSliderDragValue(null);
+      }, 250); // Match this with the CSS transition duration
+    }
+  };
+
   return (
     <div className={`weighted-assessment-survey ${props.class_name || ''} ${readOnly ? 'read-only' : ''}`}>
       <div className="progress-indicator">
@@ -1615,6 +1796,37 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                       onChange={(e) => updateCategoryDescription(index, e.target.value)}
                       placeholder="Category description"
                     />
+                    
+                    <div className="category-icon-editor">
+                      <h4>Category Icon (SVG)</h4>
+                      <div className="icon-editor-container">
+                        <div className="icon-textarea-container">
+                          <textarea
+                            className="textarea-input icon-textarea"
+                            value={category.icon || ''}
+                            onChange={(e) => updateCategoryIcon(index, e.target.value)}
+                            placeholder="Paste SVG code here..."
+                          />
+                        </div>
+                        <div className="icon-preview-container">
+                          <div className="icon-preview-heading">
+                            Preview:
+                            <button 
+                              type="button"
+                              className="icon-preview-toggle"
+                              onClick={() => toggleIconPreviewMode(category.id)}
+                              title={iconPreviewDarkMode[category.id] ? "Switch to checkerboard background" : "Switch to dark background"}
+                            >
+                              {iconPreviewDarkMode[category.id] ? "Light" : "Dark"}
+                            </button>
+                          </div>
+                          <div 
+                            className={`icon-preview ${iconPreviewDarkMode[category.id] ? 'dark-mode' : ''}`}
+                            dangerouslySetInnerHTML={{ __html: category.icon || '<div class="no-icon">No icon</div>' }}
+                          />
+                        </div>
+                      </div>
+                    </div>
                     
                     <div className={`scoring-ranges-editor ${getRangeValidationClass(category.scoringRanges || [])}`}>
                       <div className="scoring-ranges-header">
@@ -1837,11 +2049,20 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                                   <input
                                     type="range"
                                     className={`assessment-slider ${question.value === null ? 'unselected' : ''}`}
-                                    value={question.value !== null ? question.value : question.min}
+                                    value={
+                                      sliderDragValue && 
+                                      sliderDragValue.groupIndex === groupIndex && 
+                                      sliderDragValue.questionIndex === questionIndex
+                                        ? sliderDragValue.value
+                                        : question.value !== null ? question.value : question.min
+                                    }
                                     min={question.min}
                                     max={question.max}
-                                    step={1}
-                                    onChange={(e) => updateQuestionValue(groupIndex, questionIndex, Number(e.target.value))}
+                                    onChange={(e) => handleSliderDrag(groupIndex, questionIndex, Number(e.target.value))}
+                                    onMouseMove={(e) => handleSliderMouseMove(e, groupIndex, questionIndex, question)}
+                                    onMouseLeave={handleSliderMouseLeave}
+                                    onMouseUp={handleSliderRelease}
+                                    onTouchEnd={handleSliderRelease}
                                     disabled={readOnly}
                                   />
                                   <div className="slider-markers">
@@ -1977,10 +2198,19 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                               {visibleComments[question.id] && !readOnly && (
                                 <div className="comment-container">
                                   <textarea
+                                    ref={commentTextareaRef}
                                     className="comment-textarea"
                                     placeholder="Add your comment here..."
-                                    value={question.comment}
-                                    onChange={(e) => updateQuestionComment(groupIndex, questionIndex, e.target.value)}
+                                    value={
+                                      commentBeingEdited && 
+                                      commentBeingEdited.groupIndex === groupIndex && 
+                                      commentBeingEdited.questionIndex === questionIndex
+                                        ? commentBeingEdited.value
+                                        : question.comment
+                                    }
+                                    onChange={handleCommentChange}
+                                    onFocus={() => handleCommentFocus(groupIndex, questionIndex, question.comment)}
+                                    onBlur={handleCommentBlur}
                                     disabled={readOnly}
                                   />
                                 </div>
@@ -2014,14 +2244,19 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                         )}
                       </div>
                       <div className="nav-buttons-intro">
-              <button 
-                className="nav-button next-button"
-                onClick={goToNextGroup}
-                disabled={currentGroupIndex >= surveyData?.groups?.length - 1 && submitted}
-              >
-                {(currentGroupIndex >= surveyData?.groups?.length - 1 && !submitted) ? 'Next' : 'Next'}
-              </button>
-            </div>
+                        {validationMessage && (
+                          <div className="validation-message">
+                            {validationMessage}
+                          </div>
+                        )}
+                        <button 
+                          className="nav-button next-button"
+                          onClick={goToNextGroup}
+                          disabled={!areAllQuestionsAnsweredInGroup(currentGroupIndex)}
+                        >
+                          {(currentGroupIndex >= surveyData?.groups?.length - 1 && !submitted) ? 'Submit' : 'Next'}
+                        </button>
+                      </div>
                       
                     </div>
                   ))

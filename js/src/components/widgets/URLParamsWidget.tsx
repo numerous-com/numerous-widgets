@@ -84,12 +84,13 @@ function URLParamsWidget() {
         console.log('New URL:', fullURL);
         console.log('New base:', base);
 
-        //if (!isEqual(params, currentState.current.queryParams)) {
+        if (!isEqual(params, currentState.current.queryParams)) {
+            console.log('Sending query params to Python:', params); // Debug log
             currentState.current.queryParams = { ...params };
             setBrowserQueryParams(params);
             hasChanges = true;
             console.log('Query params updated'); // Debug log
-        //}
+        }
 
         if (!isEqual(segments, currentState.current.pathSegments)) {
             currentState.current.pathSegments = [...segments];
