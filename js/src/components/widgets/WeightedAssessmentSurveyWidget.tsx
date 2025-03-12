@@ -21,7 +21,7 @@ interface Category {
   name: string;
   description: string;
   scoringRanges: ScoringRange[];  // Add scoring ranges to categories
-  icon?: string;  // SVG icon code
+  imageRef?: string;  // Reference to image file in static folder
 }
 
 interface ScoringRange {
@@ -552,7 +552,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
       id: categoryId,
       name: `Category ${surveyData.categories?.length + 1 || 1}`,
       description: "",
-      icon: "",
+      imageRef: "",
       scoringRanges: [{ min: 0, max: 100, title: "Default Range", text: "Default range description" }]  // Initialize with default range
     };
     
@@ -574,6 +574,12 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
       });
     });
     
+    // Explicitly initialize the dark mode state for this new category
+    setIconPreviewDarkMode(prev => ({
+      ...prev,
+      [categoryId]: false
+    }));
+    
     setSurveyData(updatedSurveyData);
   };
   
@@ -589,9 +595,9 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
     setSurveyData(updatedSurveyData);
   };
   
-  const updateCategoryIcon = (index: number, icon: string) => {
+  const updateCategoryImageRef = (index: number, imageRef: string) => {
     const updatedSurveyData = { ...surveyData };
-    updatedSurveyData.categories[index].icon = icon;
+    updatedSurveyData.categories[index].imageRef = imageRef;
     setSurveyData(updatedSurveyData);
   };
   
@@ -1630,6 +1636,18 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   // Add state for icon preview background mode (checkerboard or dark)
   const [iconPreviewDarkMode, setIconPreviewDarkMode] = React.useState<Record<string, boolean>>({});
   
+  // Initialize icon preview dark mode state when categories change
+  React.useEffect(() => {
+    if (surveyData?.categories) {
+      const newIconPreviewState: Record<string, boolean> = {};
+      surveyData.categories.forEach(category => {
+        // Preserve existing state or initialize to false
+        newIconPreviewState[category.id] = iconPreviewDarkMode[category.id] || false;
+      });
+      setIconPreviewDarkMode(newIconPreviewState);
+    }
+  }, [surveyData?.categories]);
+  
   // Function to toggle the icon preview background for a specific category
   const toggleIconPreviewMode = (categoryId: string) => {
     setIconPreviewDarkMode(prev => ({
@@ -1656,14 +1674,39 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   };
   
   const handleSliderMouseLeave = () => {
-    // For unselected sliders, don't immediately clear the preview
-    // Instead, let the CSS transition handle the visual fade-out
-    if (sliderDragValue && surveyData.groups[sliderDragValue.groupIndex]?.questions[sliderDragValue.questionIndex]?.value === null) {
-      // Set a short timeout to allow the CSS transition to complete before removing the thumb completely
-      setTimeout(() => {
-        setSliderDragValue(null);
-      }, 250); // Match this with the CSS transition duration
+    setSliderDragValue(null);
+  };
+  
+  // Image preview component to handle image loading
+  const ImagePreview: React.FC<{
+    imageRef: string | undefined;
+    categoryId: string;
+    darkMode: boolean;
+  }> = ({ imageRef, categoryId, darkMode }) => {
+    const [hasError, setHasError] = React.useState(false);
+    
+    // Reset error state when imageRef changes
+    React.useEffect(() => {
+      setHasError(false);
+    }, [imageRef]);
+    
+    if (!imageRef || imageRef.trim() === '') {
+      return <div className="no-icon">No image</div>;
     }
+    
+    if (hasError) {
+      return <div className="no-icon">Image not found: {imageRef}</div>;
+    }
+    
+    return (
+      <img 
+        key={`img-${categoryId}-${imageRef}`}
+        src={`/static/${imageRef.trim()}`}
+        alt={`Category ${categoryId} icon`}
+        className="category-image-preview"
+        onError={() => setHasError(true)}
+      />
+    );
   };
 
   return (
@@ -1804,15 +1847,19 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                     />
                     
                     <div className="category-icon-editor">
-                      <h4>Category Icon (SVG)</h4>
+                      <h4>Category Image</h4>
                       <div className="icon-editor-container">
-                        <div className="icon-textarea-container">
-                          <textarea
-                            className="textarea-input icon-textarea"
-                            value={category.icon || ''}
-                            onChange={(e) => updateCategoryIcon(index, e.target.value)}
-                            placeholder="Paste SVG code here..."
+                        <div className="icon-input-container">
+                          <input
+                            type="text"
+                            className="text-input icon-input"
+                            value={category.imageRef || ''}
+                            onChange={(e) => updateCategoryImageRef(index, e.target.value)}
+                            placeholder="Enter image filename (e.g. category1.png)"
                           />
+                          <div className="icon-input-help">
+                            Enter the filename of an image from the static folder
+                          </div>
                         </div>
                         <div className="icon-preview-container">
                           <div className="icon-preview-heading">
@@ -1821,15 +1868,18 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                               type="button"
                               className="icon-preview-toggle"
                               onClick={() => toggleIconPreviewMode(category.id)}
-                              title={iconPreviewDarkMode[category.id] ? "Switch to checkerboard background" : "Switch to dark background"}
+                              title={iconPreviewDarkMode[category.id] ? "Switch to light background" : "Switch to dark background"}
+                              data-category-id={category.id}
                             >
                               {iconPreviewDarkMode[category.id] ? "Light" : "Dark"}
                             </button>
                           </div>
                           <div 
                             className={`icon-preview ${iconPreviewDarkMode[category.id] ? 'dark-mode' : ''}`}
-                            dangerouslySetInnerHTML={{ __html: category.icon || '<div class="no-icon">No icon</div>' }}
-                          />
+                            data-category-id={category.id}
+                          >
+                            <ImagePreview imageRef={category.imageRef} categoryId={category.id} darkMode={iconPreviewDarkMode[category.id] || false} />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -2383,9 +2433,9 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
         ref={fileInputRef}
         style={{ display: 'none' }}
         onChange={uploadSurveyJson}
-      />
-    </div>
-  );
+        />
+      </div>
+    );
 }
 
 export default {
