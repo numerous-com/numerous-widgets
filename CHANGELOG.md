@@ -2,6 +2,18 @@
 
 
 
+## v0.1.53 (2025-03-12)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Update category icon handling to image references
+
+- Replaced SVG icon handling with image file references for categories
+- Updated UI components to support image previews and loading states
+- Enhanced styling for image input and preview sections
+- Improved dark mode handling for image visibility ([`a163a8b`](https://github.com/numerous-com/numerous-widgets/commit/a163a8b4e3bf05f483fe61c5ce75e454d0b265bd))
+
+
 ## v0.1.52 (2025-03-12)
 
 ### Fix
