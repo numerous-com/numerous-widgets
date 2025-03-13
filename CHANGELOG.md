@@ -2,6 +2,17 @@
 
 
 
+## v0.1.55 (2025-03-13)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Enhance validation logic for edit mode
+
+- Updated validation checks to skip when in edit mode
+- Added user feedback for unanswered questions when not in edit mode
+- Improved button disable logic based on question completion status ([`5a0c5eb`](https://github.com/numerous-com/numerous-widgets/commit/5a0c5ebd8f89721f1f0be5edfacc9c3df827347c))
+
+
 ## v0.1.54 (2025-03-13)
 
 ### Fix
