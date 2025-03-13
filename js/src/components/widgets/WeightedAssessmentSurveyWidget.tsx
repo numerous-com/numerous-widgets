@@ -46,6 +46,7 @@ interface SurveyData {
   categories: Category[];
   useQualitativeScale?: boolean; // Option to display qualitative labels (strongly disagree, etc) instead of numbers
   conclusion?: string; // Markdown conclusion text that will be stored but not shown in the flow
+  overallScoringRanges?: ScoringRange[]; // Add overall scoring ranges
 }
 
 // Define interface for storing scroll positions
@@ -87,12 +88,21 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
         title: "",
         description: "",
         groups: [],
-        categories: []
+        categories: [],
+        overallScoringRanges: [{ min: 0, max: 100, title: "Default Range", text: "Default range description" }]
       });
     } else if (!surveyData.groups) {
       setSurveyData({
         ...surveyData,
         groups: []
+      });
+    }
+    
+    // Initialize overallScoringRanges if it doesn't exist
+    if (surveyData && !surveyData.overallScoringRanges) {
+      setSurveyData({
+        ...surveyData,
+        overallScoringRanges: [{ min: 0, max: 100, title: "Default Range", text: "Default range description" }]
       });
     }
   }, [surveyData, setSurveyData]);
@@ -104,7 +114,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   const [currentGroupIndex, setCurrentGroupIndex] = React.useState(0);
   
   // State for edit mode tabs
-  const [activeEditTab, setActiveEditTab] = React.useState<'content' | 'categories' | 'weights' | 'conclusion'>('content');
+  const [activeEditTab, setActiveEditTab] = React.useState<'content' | 'categories' | 'weights' | 'conclusion' | 'overall'>('content');
   
   // State for showing category weights
   const [showCategoryWeights, setShowCategoryWeights] = React.useState<Record<string, boolean>>({});
@@ -1510,7 +1520,8 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
             scoringRanges: Array.isArray(cat.scoringRanges) ? cat.scoringRanges : []
           })) : [],
           useQualitativeScale: uploadedData.useQualitativeScale,
-          conclusion: uploadedData.conclusion || ''
+          conclusion: uploadedData.conclusion || '',
+          overallScoringRanges: Array.isArray(uploadedData.overallScoringRanges) ? uploadedData.overallScoringRanges : [{ min: 0, max: 100, title: "Default Range", text: "Default range description" }]
         };
         
         // Update the survey data
@@ -1704,6 +1715,173 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
     }
   }, [currentGroupIndex, showIntro]);
 
+  // Add function to add an overall scoring range
+  const addOverallScoringRange = () => {
+    const updatedSurveyData = { ...surveyData };
+    
+    if (!updatedSurveyData.overallScoringRanges) {
+      updatedSurveyData.overallScoringRanges = [];
+    }
+    
+    // Find the gap or extend the range
+    let newRange: ScoringRange | undefined;
+    if (updatedSurveyData.overallScoringRanges.length === 0) {
+      newRange = { min: 0, max: 100, title: "Default Range", text: "Default range description" };
+    } else {
+      const sortedRanges = [...updatedSurveyData.overallScoringRanges].sort((a, b) => a.min - b.min);
+      let start = 0;
+      for (const range of sortedRanges) {
+        if (range.min > start) {
+          newRange = { min: start, max: range.min, title: "New Range", text: "New range description" };
+          break;
+        }
+        start = range.max;
+      }
+      if (!newRange && start < 100) {
+        newRange = { min: start, max: 100, title: "New Range", text: "New range description" };
+      }
+    }
+    
+    if (newRange) {
+      updatedSurveyData.overallScoringRanges.push(newRange);
+      setSurveyData(updatedSurveyData);
+    }
+  };
+
+  // Add function to update an overall scoring range
+  const updateOverallScoringRange = (
+    rangeIndex: number,
+    updates: Partial<ScoringRange>
+  ) => {
+    const updatedSurveyData = { ...surveyData };
+    
+    if (!updatedSurveyData.overallScoringRanges) {
+      updatedSurveyData.overallScoringRanges = [];
+      return;
+    }
+    
+    const range = updatedSurveyData.overallScoringRanges[rangeIndex];
+    
+    // Update the range
+    updatedSurveyData.overallScoringRanges[rangeIndex] = {
+      ...range,
+      ...updates
+    };
+    
+    // Sort ranges by min value
+    updatedSurveyData.overallScoringRanges.sort((a, b) => a.min - b.min);
+    
+    setSurveyData(updatedSurveyData);
+  };
+
+  // Add function to delete an overall scoring range
+  const deleteOverallScoringRange = (rangeIndex: number) => {
+    const updatedSurveyData = { ...surveyData };
+    
+    if (!updatedSurveyData.overallScoringRanges) {
+      updatedSurveyData.overallScoringRanges = [];
+      return;
+    }
+    
+    updatedSurveyData.overallScoringRanges.splice(rangeIndex, 1);
+    
+    // If no ranges left, add default range
+    if (updatedSurveyData.overallScoringRanges.length === 0) {
+      updatedSurveyData.overallScoringRanges.push({ min: 0, max: 100, title: "Default Range", text: "Default range description" });
+    }
+    
+    setSurveyData(updatedSurveyData);
+  };
+
+  // Function to render overall scoring ranges
+  const renderOverallScoringRanges = () => {
+    const ranges = surveyData.overallScoringRanges || [];
+    
+    return (
+      <div className={`scoring-ranges-editor ${getRangeValidationClass(ranges)}`}>
+        <div className="scoring-ranges-header">
+          <h4>Overall Scoring Ranges</h4>
+          <button 
+            className="add-button"
+            onClick={addOverallScoringRange}
+          >
+            <svg className="add-button-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/>
+            </svg>
+            Add Range
+          </button>
+        </div>
+        
+        <div className="scoring-ranges-list">
+          {ranges.map((range, rangeIndex) => (
+            <div key={rangeIndex} className="scoring-range-item">
+              <div className="range-inputs">
+                <input
+                  type="number"
+                  className="text-input range-min"
+                  value={range.min}
+                  onChange={(e) => updateOverallScoringRange(
+                    rangeIndex,
+                    { min: Math.max(0, Math.min(100, Number(e.target.value))) }
+                  )}
+                  min={0}
+                  max={100}
+                />
+                <span>to</span>
+                <input
+                  type="number"
+                  className="text-input range-max"
+                  value={range.max}
+                  onChange={(e) => updateOverallScoringRange(
+                    rangeIndex,
+                    { max: Math.max(0, Math.min(100, Number(e.target.value))) }
+                  )}
+                  min={0}
+                  max={100}
+                />
+              </div>
+              <div className="range-text-inputs">
+                <input
+                  type="text"
+                  className="text-input range-title"
+                  value={range.title}
+                  onChange={(e) => updateOverallScoringRange(
+                    rangeIndex,
+                    { title: e.target.value }
+                  )}
+                  placeholder="Range title"
+                />
+                <textarea
+                  className="text-input range-text"
+                  value={range.text}
+                  onChange={(e) => updateOverallScoringRange(
+                    rangeIndex,
+                    { text: e.target.value }
+                  )}
+                  placeholder="Range description"
+                />
+              </div>
+              <button
+                className="delete-button"
+                onClick={() => deleteOverallScoringRange(rangeIndex)}
+                aria-label="Delete range"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/>
+                </svg>
+              </button>
+            </div>
+          ))}
+        </div>
+        {!validateRanges(ranges) && (
+          <div className="ranges-error">
+            Ranges must cover 0-100 without gaps or overlaps
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className={`weighted-assessment-survey ${props.class_name || ''} ${readOnly ? 'read-only' : ''}`}>
       <div className="progress-indicator">
@@ -1788,6 +1966,12 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                   onClick={() => setActiveEditTab('conclusion')}
                 >
                   Conclusion
+                </button>
+                <button 
+                  className={`edit-tab ${activeEditTab === 'overall' ? 'active' : ''}`}
+                  onClick={() => setActiveEditTab('overall')}
+                >
+                  Overall Scoring
                 </button>
               </div>
             )}
@@ -2002,6 +2186,8 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                   </div>
                 </div>
               </div>
+            ) : editMode && activeEditTab === 'overall' ? (
+              renderOverallScoringRanges()
             ) : (
               <>
                 {surveyData?.groups?.length > 0 ? (
