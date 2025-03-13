@@ -352,7 +352,8 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
       return;
     }
 
-    if (!areAllQuestionsAnsweredInGroup(currentGroupIndex)) {
+    // Skip validation check if in edit mode
+    if (!editMode && !areAllQuestionsAnsweredInGroup(currentGroupIndex)) {
       setValidationMessage(generateValidationMessage(currentGroupIndex));
       return;
     }
@@ -2299,10 +2300,15 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                             {validationMessage}
                           </div>
                         )}
+                        {!editMode && !areAllQuestionsAnsweredInGroup(currentGroupIndex) && !validationMessage && (
+                          <div className="validation-message">
+                            Please answer all questions above to proceed
+                          </div>
+                        )}
                         <button 
                           className="nav-button next-button"
                           onClick={goToNextGroup}
-                          disabled={!areAllQuestionsAnsweredInGroup(currentGroupIndex)}
+                          disabled={!editMode && !areAllQuestionsAnsweredInGroup(currentGroupIndex)}
                         >
                           {(currentGroupIndex >= surveyData?.groups?.length - 1 && !submitted) ? 'Submit' : 'Next'}
                         </button>
