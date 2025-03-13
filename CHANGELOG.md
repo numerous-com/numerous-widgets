@@ -2,6 +2,17 @@
 
 
 
+## v0.1.54 (2025-03-13)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Refactor scroll behavior on group navigation
+
+- Removed direct scroll-to-top logic from group navigation functions
+- Added a useEffect hook to handle scrolling when currentGroupIndex changes
+- Improved user experience by ensuring smooth scrolling after DOM updates ([`d0dea5c`](https://github.com/numerous-com/numerous-widgets/commit/d0dea5c7fb15b3c39f9d805ffe1aa52b57640217))
+
+
 ## v0.1.53 (2025-03-12)
 
 ### Fix
