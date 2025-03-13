@@ -2,6 +2,18 @@
 
 
 
+## v0.1.56 (2025-03-13)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Introduce overall scoring ranges functionality
+
+- Added support for overall scoring ranges in the survey data model
+- Implemented functions to add, update, and delete scoring ranges
+- Enhanced UI to manage scoring ranges with validation for gaps and overlaps
+- Updated state management to initialize and render overall scoring ranges ([`68929b4`](https://github.com/numerous-com/numerous-widgets/commit/68929b45cf0f3bceb1ad8c7c3f0ae1cddaf2f8f9))
+
+
 ## v0.1.55 (2025-03-13)
 
 ### Fix
