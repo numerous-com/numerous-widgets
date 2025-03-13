@@ -344,10 +344,6 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
       setShowIntro(false);
       setCurrentGroupIndex(0);
       setValidationMessage('');
-      const surveyContent = document.querySelector('.survey-content');
-      if (surveyContent) {
-        surveyContent.scrollTo({ top: 0, behavior: 'smooth' });
-      }
       return;
     }
 
@@ -363,29 +359,15 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
 
     setCurrentGroupIndex(currentGroupIndex + 1);
     setValidationMessage('');
-    
-    // Scroll to the top of the survey content when moving to next group
-    const surveyContent = document.querySelector('.survey-content');
-    if (surveyContent) {
-      surveyContent.scrollTo({ top: 0, behavior: 'smooth' });
-    }
   };
   
   const goToPreviousGroup = () => {
     if (currentGroupIndex === 0) {
       setShowIntro(true);
-      const surveyContent = document.querySelector('.survey-content');
-      if (surveyContent) {
-        surveyContent.scrollTo({ top: 0, behavior: 'smooth' });
-      }
       return;
     }
     if (currentGroupIndex > 0) {
       setCurrentGroupIndex(currentGroupIndex - 1);
-      const surveyContent = document.querySelector('.survey-content');
-      if (surveyContent) {
-        surveyContent.scrollTo({ top: 0, behavior: 'smooth' });
-      }
     }
   };
   
@@ -1708,6 +1690,18 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
       />
     );
   };
+
+  // Add this useEffect hook near the other useEffect hooks
+  React.useEffect(() => {
+    // Scroll to the top of the survey content when currentGroupIndex changes
+    const surveyContent = document.querySelector('.survey-content');
+    if (surveyContent) {
+      // Use setTimeout to ensure this happens after the DOM has updated
+      setTimeout(() => {
+        surveyContent.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 0);
+    }
+  }, [currentGroupIndex, showIntro]);
 
   return (
     <div className={`weighted-assessment-survey ${props.class_name || ''} ${readOnly ? 'read-only' : ''}`}>
