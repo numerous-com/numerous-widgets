@@ -2,6 +2,18 @@
 
 
 
+## v0.1.58 (2025-03-14)
+
+### Fix
+
+* fix(DOMElementMapWidget): Add JavaScript evaluation and value setting functionality
+
+- Introduced new state management for JavaScript code evaluation and results
+- Implemented methods to set values on DOM elements from Python
+- Enhanced the DOMElementMap class with new traits for JavaScript evaluation and value setting
+- Updated widget configuration to include ToastWidget and relevant styles ([`9c03cde`](https://github.com/numerous-com/numerous-widgets/commit/9c03cde0ab54540b69f4f72e2cd5e572aa30c5bb))
+
+
 ## v0.1.57 (2025-03-14)
 
 ### Fix
