@@ -140,9 +140,41 @@
       }
 
       .option-checkbox {
+        appearance: none;
         width: 16px;
         height: 16px;
+        border: 1px solid var(--ui-widget-border-color);
+        border-radius: 4px;
+        background-color: var(--ui-widget-primary-background);
         cursor: pointer;
+        position: relative;
+
+        &:checked {
+          background-color: var(--ui-widget-focus-border);
+          border-color: var(--ui-widget-focus-border);
+          
+          &::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 2px;
+            width: 4px;
+            height: 8px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+          }
+        }
+
+        &:focus {
+          outline: none;
+          border-color: var(--ui-widget-focus-border);
+          box-shadow: var(--ui-widget-focus-shadow);
+        }
+
+        &:hover:not(:checked) {
+          background-color: var(--ui-widget-hover-background);
+        }
       }
 
       .next-button {
@@ -500,6 +532,8 @@
 
 .comment-container {
   margin-top: 8px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .comment-textarea {
@@ -512,8 +546,9 @@
   font-family: inherit;
   resize: vertical;
   background-color: #f5f5f5;
-  margin-right: 16px;
+  margin-right: 0;
   line-height: 1.5;
+  box-sizing: border-box;
 }
 
 .comment-textarea:focus {
@@ -629,6 +664,7 @@
   position: relative;
   cursor: pointer;
   transition: background 0.2s ease;
+  z-index: 2;
 }
 
 /* Hide the thumb for unselected sliders */
@@ -682,6 +718,8 @@
   border: 2px solid var(--ui-widget-focus-border);
   cursor: pointer;
   transition: transform 0.1s;
+  position: relative;
+  z-index: 3;
 }
 
 .assessment-slider::-moz-range-thumb {
@@ -692,6 +730,8 @@
   border: 2px solid var(--ui-widget-focus-border);
   cursor: pointer;
   transition: transform 0.1s;
+  position: relative;
+  z-index: 3;
 }
 
 .assessment-slider::-webkit-slider-thumb:hover {
@@ -723,6 +763,7 @@
   margin-top: 4px;
   position: relative;
   width: 100%;
+  z-index: 1;
 }
 
 .slider-marker {
@@ -742,6 +783,7 @@
     width: 1px;
     height: 8px;
     background-color: var(--ui-widget-border-color);
+    z-index: 1;
   }
 
   /* Add responsive styling for narrow screens */
