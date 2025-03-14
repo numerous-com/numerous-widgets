@@ -25,6 +25,7 @@
     "TabsWidget",
     "TaskWidget",
     "TimerWidget",
+    "ToastWidget",
     "ToggleButtonWidget",
     "TreeBrowserWidget",
     "URLParamsWidget",

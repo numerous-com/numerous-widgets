@@ -39,6 +39,7 @@ from .base.tabs import Tabs as Tabs
 from .base.tabs import create_tabs_with_visibility as create_tabs_with_visibility
 from .base.task import Task as Task
 from .base.timer import Timer as Timer
+from .base.toast import Toast as Toast
 from .base.toggle_button import ToggleButton as ToggleButton
 from .base.tree import TreeBrowser as TreeBrowser
 from .base.url_params import URLParams as URLParams
