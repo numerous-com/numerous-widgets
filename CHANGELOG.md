@@ -2,6 +2,17 @@
 
 
 
+## v0.1.57 (2025-03-14)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Enhance checkbox and comment styling
+
+- Added custom styles for checkboxes, including hover and focus states
+- Improved comment container and textarea styles for better responsiveness
+- Adjusted z-index for slider components to ensure proper layering ([`4123b8d`](https://github.com/numerous-com/numerous-widgets/commit/4123b8dbc4db77606dd48e45abd670ef4b796882))
+
+
 ## v0.1.56 (2025-03-13)
 
 ### Fix
