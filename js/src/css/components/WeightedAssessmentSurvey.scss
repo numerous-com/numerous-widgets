@@ -843,6 +843,17 @@
     font-size: 10px;
     max-width: 80px;
     
+    /* Hide "agree" and "disagree" (typically 2nd and 4th items) and their ticks */
+    &:nth-child(2),
+    &:nth-child(4) {
+      font-size: 0;
+      
+      /* Hide the tick marks too */
+      &::before {
+        display: none;
+      }
+    }
+    
     /* Stagger labels vertically */
     &:nth-child(even) {
       transform: translateX(-50%) translateY(20px);
@@ -859,6 +870,17 @@
   @media (max-width: 400px) {
     font-size: 9px;
     max-width: 70px;
+    
+    /* Make sure "agree" and "disagree" remain hidden */
+    &:nth-child(2),
+    &:nth-child(4) {
+      font-size: 0;
+      
+      /* Keep tick marks hidden */
+      &::before {
+        display: none;
+      }
+    }
     
     &:nth-child(even) {
       transform: translateX(-50%) translateY(25px);
