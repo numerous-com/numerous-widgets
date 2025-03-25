@@ -2,6 +2,15 @@
 
 
 
+## v0.1.60 (2025-03-25)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Adjust padding for survey layout
+
+- Increased top padding from 3rem to 4rem for improved spacing in the survey component ([`8a3067c`](https://github.com/numerous-com/numerous-widgets/commit/8a3067c68814371394b2522254ae2c3be9a133f7))
+
+
 ## v0.1.59 (2025-03-25)
 
 ### Fix
