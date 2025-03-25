@@ -2,6 +2,16 @@
 
 
 
+## v0.1.59 (2025-03-25)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Hide &#34;agree&#34; and &#34;disagree&#34; options in survey
+
+- Added styles to hide the &#34;agree&#34; and &#34;disagree&#34; labels and their tick marks in the survey component
+- Ensured consistent hiding of these elements across different states ([`4841129`](https://github.com/numerous-com/numerous-widgets/commit/48411291b2c95569864f0137eabb4496ec50bf1d))
+
+
 ## v0.1.58 (2025-03-14)
 
 ### Fix
