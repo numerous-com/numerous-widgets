@@ -338,6 +338,10 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
         self.success_status = success
         self.action_note = note
 
+        # Reset modified state if save was successful
+        if success:
+            self.set_modified(False)
+
         # Reset the flag
         self.do_save = False
 
@@ -354,6 +358,10 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
 
         self.success_status = success
         self.action_note = note
+
+        # Reset modified state if reset was successful
+        if success:
+            self.set_modified(False)
 
         # Reset the flag
         self.do_reset = False
