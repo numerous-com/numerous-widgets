@@ -115,6 +115,7 @@ mark-parentheses = false
 [tool.mypy]
 ignore_missing_imports = true
 exclude = ["python/examples"]
+implicit_optional = true
 
 [project.urls]
 Homepage = "https://github.com/pypa/sampleproject"

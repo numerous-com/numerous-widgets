@@ -10,6 +10,7 @@
     "DOMElementMapWidget",
     "DropDownWidget",
     "HTMLTemplateWidget",
+    "LoadSaveWidget",
     "MapSelectorWidget",
     "MarkdownDisplayWidget",
     "MarkdownDrawerWidget",

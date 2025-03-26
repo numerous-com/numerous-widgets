@@ -26,7 +26,11 @@ The widgets are available in the `widgets` module.
     options:
         show_root_heading: true
 
-## ::: widgets.container
+## ::: widgets.LoadSaveWidget
+    options:
+        show_root_heading: true
+
+## ::: widgets.LoadSaveManager
     options:
         show_root_heading: true
 
