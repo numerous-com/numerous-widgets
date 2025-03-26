@@ -2,6 +2,33 @@
 
 
 
+## v0.1.61 (2025-03-26)
+
+### Fix
+
+* fix(LoadSaveWidget): Reset modified state on successful save and reset actions
+
+- Added logic to reset the modified state to false when a save or reset action is successful.
+- Improved state management for the LoadSaveWidget to ensure accurate tracking of modifications. ([`da600ff`](https://github.com/numerous-com/numerous-widgets/commit/da600ff193b89a75bb341a983319601a28f09a0b))
+
+* fix(Table): Implement column filtering functionality
+
+- Added a FilterDropdown component for filtering table data by column values.
+- Enhanced the Table component to support filtering with state management for column filters.
+- Updated TableWidget to include filtering configuration for columns.
+- Improved styles for filter buttons and dropdowns in the table header. ([`59da7a1`](https://github.com/numerous-com/numerous-widgets/commit/59da7a1dfe36c773c4c36e68de85d0ebb003dd03))
+
+### Unknown
+
+* Fix(LoadSaveWidget): Introduce LoadSave functionality for managing configurations
+
+- Added LoadSaveWidget component for loading, saving, and managing configurations.
+- Implemented LoadSaveManager protocol to define item management methods.
+- Integrated LoadSave functionality into the example application for demonstration.
+- Updated styles for the LoadSave component and its dialogs.
+- Enhanced documentation for the LoadSaveWidget usage. ([`81f09d7`](https://github.com/numerous-com/numerous-widgets/commit/81f09d7d143e720b1b29ed273f0c0a96d4239986))
+
+
 ## v0.1.60 (2025-03-25)
 
 ### Fix
