@@ -1863,11 +1863,105 @@ select::-ms-expand {
     position: relative;
 }
 
-.table th.sortable {
-    cursor: pointer;
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-right: 16px;
 }
 
-.table th.sortable:hover {
+.filter-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    color: var(--ui-widget-secondary-text);
+    opacity: 0.6;
+    transition: opacity 0.2s, background-color 0.2s;
+}
+
+.filter-button:hover {
+    opacity: 1;
+    background-color: var(--ui-widget-hover-background);
+}
+
+.filter-button.active {
+    opacity: 1;
+    color: var(--ui-widget-focus-border);
+}
+
+.filter-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 4px;
+    background: var(--ui-widget-primary-background);
+    border: 1px solid var(--ui-widget-border-color);
+    border-radius: 4px;
+    box-shadow: var(--ui-widget-dropdown-shadow);
+    z-index: var(--z-menu);
+    min-width: 200px;
+}
+
+.filter-dropdown-content {
+    padding: 8px;
+}
+
+.filter-search {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid var(--ui-widget-border-color);
+    border-radius: 4px;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.filter-search:focus {
+    outline: none;
+    border-color: var(--ui-widget-focus-border);
+    box-shadow: var(--ui-widget-focus-shadow);
+}
+
+.filter-values {
+    max-height: 200px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.filter-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.filter-option:hover {
+    background-color: var(--ui-widget-hover-background);
+}
+
+.filter-option input[type="radio"] {
+    margin: 0;
+}
+
+.clear-filter {
+    margin-top: 8px;
+    padding: 6px 12px;
+    background-color: var(--ui-widget-secondary-background);
+    border: 1px solid var(--ui-widget-border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.clear-filter:hover {
     background-color: var(--ui-widget-hover-background);
 }
 

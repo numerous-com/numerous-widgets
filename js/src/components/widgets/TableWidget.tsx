@@ -10,10 +10,19 @@ function TableWidget() {
     const [className] = useModelState<string>("class_name");
     const [selectedRows, setSelectedRows] = useModelState<number[]>("selected_rows");
 
+    // Add filtering configuration to the columns
+    const columnsWithFilters = React.useMemo(() => {
+        return columns.map(column => ({
+            ...column,
+            enableColumnFilter: true,
+            filterFn: 'exact',
+        }));
+    }, [columns]);
+
     return (
         <Table
             data={data}
-            columns={columns}
+            columns={columnsWithFilters}
             pageSize={pageSize}
             className={className}
             onSelectionChange={setSelectedRows}

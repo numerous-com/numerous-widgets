@@ -4,10 +4,16 @@ import {
     getCoreRowModel,
     getSortedRowModel,
     getPaginationRowModel,
+    getFilteredRowModel,
+    getFacetedRowModel,
+    getFacetedUniqueValues,
     flexRender,
     ColumnDef,
     SortingState,
     ColumnResizeMode,
+    FilterFn,
+    Column,
+    ColumnFiltersState,
 } from '@tanstack/react-table';
 
 interface TableProps {
@@ -18,6 +24,46 @@ interface TableProps {
     onSelectionChange: (selectedIndexes: number[]) => void;
 }
 
+interface FilterDropdownProps {
+    column: Column<any>;
+    onClose: () => void;
+}
+
+function FilterDropdown({ column, onClose }: FilterDropdownProps) {
+    const [filterValue, setFilterValue] = React.useState(column.getFilterValue() as string || '');
+    const uniqueValues = React.useMemo(() => {
+        const values = new Set<string>();
+        column.getFacetedUniqueValues().forEach((count, value) => {
+            values.add(String(value));
+        });
+        return Array.from(values).sort();
+    }, [column.getFacetedUniqueValues()]);
+
+    const handleFilterChange = (value: string) => {
+        column.setFilterValue(value || undefined);
+        setFilterValue(value);
+    };
+
+    return (
+        <div className="filter-dropdown" onClick={(e) => e.stopPropagation()}>
+            <div className="filter-dropdown-content">
+                <select
+                    value={filterValue}
+                    onChange={(e) => handleFilterChange(e.target.value)}
+                    className="filter-select"
+                >
+                    <option value="">All values</option>
+                    {uniqueValues.map((value) => (
+                        <option key={value} value={value}>
+                            {value}
+                        </option>
+                    ))}
+                </select>
+            </div>
+        </div>
+    );
+}
+
 export function Table({
     data,
     columns,
@@ -26,20 +72,34 @@ export function Table({
     onSelectionChange,
 }: TableProps) {
     const [sorting, setSorting] = React.useState<SortingState>([]);
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
     const [selectedRows, setSelectedRows] = React.useState<Set<number>>(new Set());
     const [columnResizeMode] = React.useState<ColumnResizeMode>('onChange');
+    const [openFilterColumn, setOpenFilterColumn] = React.useState<string | null>(null);
 
     const table = useReactTable({
         data,
         columns,
         state: {
             sorting,
+            columnFilters,
         },
         onSortingChange: setSorting,
+        onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        getFacetedRowModel: getFacetedRowModel(),
+        getFacetedUniqueValues: getFacetedUniqueValues(),
         columnResizeMode,
+        enableFilters: true,
+        filterFns: {
+            exact: (row, columnId, filterValue) => {
+                const value = row.getValue(columnId);
+                return value === filterValue;
+            },
+        },
     });
 
     React.useEffect(() => {
@@ -56,6 +116,13 @@ export function Table({
         setSelectedRows(newSelection);
         onSelectionChange(Array.from(newSelection));
     };
+
+    // Close filter dropdown when clicking outside
+    React.useEffect(() => {
+        const handleClickOutside = () => setOpenFilterColumn(null);
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+    }, []);
 
     return (
         <div className={`table-container ${className}`}>
@@ -84,23 +151,43 @@ export function Table({
                             {headerGroup.headers.map(header => (
                                 <th
                                     key={header.id}
-                                    onClick={header.column.getToggleSortingHandler()}
-                                    className={header.column.getCanSort() ? 'sortable' : ''}
                                     style={{
                                         width: header.getSize(),
                                         position: 'relative',
                                     }}
                                 >
-                                    {flexRender(
-                                        header.column.columnDef.header,
-                                        header.getContext()
-                                    )}
-                                    {header.column.getCanSort() && (
-                                        <span className="sort-indicator">
-                                            {header.column.getIsSorted() === 'asc' ? ' ↑' : 
-                                             header.column.getIsSorted() === 'desc' ? ' ↓' : ' ↕'}
-                                        </span>
-                                    )}
+                                    <div className="header-content">
+                                        <div
+                                            className={header.column.getCanSort() ? 'sortable' : ''}
+                                            onClick={header.column.getToggleSortingHandler()}
+                                        >
+                                            {flexRender(
+                                                header.column.columnDef.header,
+                                                header.getContext()
+                                            )}
+                                            {header.column.getCanSort() && (
+                                                <span className="sort-indicator">
+                                                    {header.column.getIsSorted() === 'asc' ? ' ↑' : 
+                                                     header.column.getIsSorted() === 'desc' ? ' ↓' : ' ↕'}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <button
+                                            className={`filter-button ${header.column.getFilterValue() ? 'active' : ''}`}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setOpenFilterColumn(openFilterColumn === header.id ? null : header.id);
+                                            }}
+                                        >
+                                            ⚟
+                                        </button>
+                                        {openFilterColumn === header.id && (
+                                            <FilterDropdown
+                                                column={header.column}
+                                                onClose={() => setOpenFilterColumn(null)}
+                                            />
+                                        )}
+                                    </div>
                                     <div
                                         className="resizer"
                                         onMouseDown={header.getResizeHandler()}
