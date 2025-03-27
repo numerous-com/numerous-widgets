@@ -61,3 +61,4 @@ from .task.process_task import (
     sync_with_task as sync_with_task,
 )
 from .templating import render_template as render_template
+from .timeline import TimelineChart as TimelineChart

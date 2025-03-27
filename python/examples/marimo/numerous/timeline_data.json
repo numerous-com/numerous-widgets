@@ -1,0 +1,88 @@
+{
+  "channels": [
+    {
+      "id": "temperature",
+      "name": "Temperature",
+      "description": "Outdoor temperature",
+      "unit": "\u00b0C",
+      "color": "rgba(255, 99, 132, 1)",
+      "chart_id": "weather",
+      "chart_type": "line"
+    },
+    {
+      "id": "humidity",
+      "name": "Humidity",
+      "description": "Relative humidity",
+      "unit": "%",
+      "color": "rgba(54, 162, 235, 1)",
+      "chart_id": "weather",
+      "chart_type": "line"
+    },
+    {
+      "id": "wind",
+      "name": "Wind Speed",
+      "description": "Wind speed measurement",
+      "unit": "m/s",
+      "color": "rgba(75, 192, 192, 1)",
+      "chart_id": "weather",
+      "chart_type": "bar"
+    },
+    {
+      "id": "power",
+      "name": "Power Consumption",
+      "description": "Electrical power consumption",
+      "unit": "kW",
+      "color": "rgba(153, 102, 255, 1)",
+      "chart_id": "energy",
+      "chart_type": "bar"
+    },
+    {
+      "id": "solar",
+      "name": "Solar Generation",
+      "description": "Solar power generation",
+      "unit": "kW",
+      "color": "rgba(255, 159, 64, 1)",
+      "chart_id": "energy",
+      "chart_type": "line"
+    }
+  ],
+  "view_mode": "rendered",
+  "selected_channel_id": "temperature",
+  "chart_options": {},
+  "blocks_metadata": [
+    {
+      "id": "block1",
+      "name": "Yesterday (Actual)",
+      "order": 1,
+      "start_hour": "2025-03-26T09:00:00",
+      "end_hour": "2025-03-27T08:00:00"
+    },
+    {
+      "id": "block2",
+      "name": "Today (Measured + Forecast)",
+      "order": 2,
+      "start_hour": "2025-03-27T09:00:00",
+      "end_hour": "2025-03-28T08:00:00"
+    },
+    {
+      "id": "block3",
+      "name": "Tomorrow (Forecast)",
+      "order": 3,
+      "start_hour": "2025-03-28T09:00:00",
+      "end_hour": "2025-03-29T08:00:00"
+    },
+    {
+      "id": "block4",
+      "name": "Alternative Forecast",
+      "order": 4,
+      "start_hour": "2025-03-28T09:00:00",
+      "end_hour": "2025-03-29T08:00:00",
+      "dependencies": [
+        "block3"
+      ],
+      "isDependent": true,
+      "referenceOrder": 3,
+      "dependencyType": "version"
+    }
+  ]
+}

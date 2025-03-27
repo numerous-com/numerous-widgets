@@ -12,13 +12,16 @@ import {
   LineController,
   BarController,
   PieController,
-  DoughnutController
+  DoughnutController,
+  TimeScale
 } from 'chart.js';
+import 'chartjs-adapter-date-fns';
 
 // Register Chart.js components and controllers
 ChartJS.register(
   CategoryScale,
   LinearScale,
+  TimeScale,
   PointElement,
   LineElement,
   BarElement,
