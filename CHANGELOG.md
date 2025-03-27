@@ -2,6 +2,30 @@
 
 
 
+## v0.2.0 (2025-03-27)
+
+### Feature
+
+* feat(SaveLoadWidget): Introduce Save &amp; Load widget for item management
+
+- Added SaveLoadWidget component to manage a list of items with functionalities for saving, loading, and creating new items.
+- Implemented search functionality to filter items based on user input.
+- Enhanced user interface with confirmation dialogs for critical actions and visual indicators for unsaved changes.
+- Updated documentation and examples to demonstrate the usage of the new widget.
+- Integrated the SaveLoad widget into the existing application structure for seamless user experience. ([`39fa213`](https://github.com/numerous-com/numerous-widgets/commit/39fa213e2c863b9fd4d102234e658d9e7e54b352))
+
+### Fix
+
+* fix(TimelineChart): Introduce TimelineChart widget for hourly data visualization
+
+- Added TimelineChart component to visualize data over time with hourly resolution.
+- Implemented functionality to manage multiple channels and data blocks.
+- Supported two view modes: channel mode for individual channels and rendered mode for combined data.
+- Included example demonstrating the usage of the TimelineChart widget with simulated weather data.
+- Enhanced styles for the TimelineChart and its components for better user experience.
+- Integrated saving and loading functionality for timeline data using HDF5 and JSON formats. ([`217b741`](https://github.com/numerous-com/numerous-widgets/commit/217b741defe69d5016df7b3bcdcfb2e579a2ed52))
+
+
 ## v0.1.61 (2025-03-26)
 
 ### Fix
