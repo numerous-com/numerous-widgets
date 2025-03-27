@@ -124,6 +124,18 @@ class LoadSaveManager(Protocol):
         """
         ...
 
+    def reset_config(self) -> tuple[bool, str | None]:
+        """
+        Reset the current configuration.
+
+        Returns:
+            A tuple of (success, message). If success is True, the configuration was
+            reset successfully. The message is an optional string that will be
+            displayed to the user.
+
+        """
+        ...
+
 
 class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
     """
@@ -201,6 +213,7 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
     disable_load = traitlets.Bool(default_value=False).tag(sync=True)
     disable_save = traitlets.Bool(default_value=False).tag(sync=True)
     disable_save_as = traitlets.Bool(default_value=False).tag(sync=True)
+    disable_save_reason = traitlets.Unicode(allow_none=True).tag(sync=True)
     default_new_item_name = traitlets.Unicode(default_value="New Item").tag(sync=True)
 
     # Action triggers (from Widget to Python)
@@ -240,6 +253,7 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
         disable_load: bool = False,
         disable_save: bool = False,
         disable_save_as: bool = False,
+        disable_save_reason: str | None = None,
         default_new_item_name: str = "New Item",
     ) -> None:
         """
@@ -262,6 +276,8 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
             disable_load: Whether to disable the load button.
             disable_save: Whether to disable the save button.
             disable_save_as: Whether to disable the "Save As" button.
+            disable_save_reason: Optional reason why saving is disabled
+                (shown as tooltip).
             default_new_item_name: Default name for new items.
             *args: Additional positional arguments.
             **kwargs: Additional keyword arguments.
@@ -282,6 +298,7 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
         self.disable_load = disable_load
         self.disable_save = disable_save
         self.disable_save_as = disable_save_as
+        self.disable_save_reason = disable_save_reason
         self.default_new_item_name = default_new_item_name
 
         # Store callbacks as instance variables, making sure they are properly typed
@@ -313,6 +330,30 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
         """
         self.is_modified = is_modified
         self.modification_note = note
+
+    def set_disable_save(self, disable: bool, reason: str | None = None) -> None:
+        """
+        Set whether saving is disabled and optionally provide a reason.
+
+        Args:
+            disable: Whether to disable the save button.
+            reason: Optional reason why saving is disabled (shown as tooltip).
+
+        """
+        self.disable_save = disable
+        self.disable_save_reason = reason
+
+    def set_disable_save_as(self, disable: bool, reason: str | None = None) -> None:
+        """
+        Set whether Save As is disabled and optionally provide a reason.
+
+        Args:
+            disable: Whether to disable the Save As button.
+            reason: Optional reason why Save As is disabled (shown as tooltip).
+
+        """
+        self.disable_save_as = disable
+        self.disable_save_reason = reason
 
     def set_selected_item(self, item_id: str | None) -> None:
         """

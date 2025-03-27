@@ -23,6 +23,7 @@ function LoadSaveWidget() {
 	const [disableLoad, setDisableLoad] = useModelState<boolean>("disable_load");
 	const [disableSave, setDisableSave] = useModelState<boolean>("disable_save");
 	const [disableSaveAs, setDisableSaveAs] = useModelState<boolean>("disable_save_as");
+	const [disableSaveReason, setDisableSaveReason] = useModelState<string | null>("disable_save_reason");
 	const [defaultNewItemName, setDefaultNewItemName] = useModelState<string>("default_new_item_name");
 	
 	// Action triggers
@@ -42,6 +43,29 @@ function LoadSaveWidget() {
 	const [newItemName, setNewItemName] = useModelState<string | null>("new_item_name");
 	const [createNewItem, setCreateNewItem] = useModelState<boolean>("create_new_item");
 	const [isSaveAs, setIsSaveAs] = useModelState<boolean>("is_save_as");
+
+	// Local state for tracking operations
+	const [saveInProgress, setSaveInProgress] = React.useState(false);
+	const saveTargetRef = React.useRef<string | null>(null);
+	
+	// Handle effects for save operations
+	React.useEffect(() => {
+		// When a save operation completes (doSave resets to false)
+		if (saveInProgress && !doSave) {
+			setSaveInProgress(false);
+			
+			// If we had a save target ID, handle the custom message
+			if (saveTargetRef.current) {
+				const targetItem = items?.find(item => item.id === saveTargetRef.current);
+				const targetName = targetItem ? targetItem.label : "Selected item";
+				setActionNote(`Saved to "${targetName}" successfully`);
+				setSuccessStatus(true);
+				
+				// Clear the save target
+				saveTargetRef.current = null;
+			}
+		}
+	}, [doSave, saveInProgress, items, setActionNote, setSuccessStatus]);
 
 	// Handle save action
 	const handleSave = () => {
@@ -91,6 +115,27 @@ function LoadSaveWidget() {
 		// 2. Inside that method, it will check is_save_as to determine behavior
 		// 3. It will create the item and automatically save it
 	};
+	
+	// Handle save-as to an existing item ID
+	const handleSaveAsWithId = (itemId: string) => {
+		console.log(`Performing direct save to existing ID: "${itemId}"`);
+		
+		// Store the target ID for our save operation
+		saveTargetRef.current = itemId;
+		
+		// Get the original ID to restore after save
+		const originalId = selectedItemId;
+		
+		// Temporarily set the selected ID to our target
+		// This is handled imperatively - we'll suppress the normal load message
+		setSelectedItemId(itemId);
+		
+		// Mark that we've started a save operation
+		setSaveInProgress(true);
+		
+		// Trigger the save
+		setDoSave(true);
+	};
 
 	// Handle search
 	const handleSearch = (query: string) => {
@@ -133,11 +178,13 @@ function LoadSaveWidget() {
 				disableLoad={disableLoad || false}
 				disableSave={disableSave || false}
 				disableSaveAs={disableSaveAs || false}
+				disableSaveReason={disableSaveReason}
 				onLoad={handleLoad}
 				onSave={handleSave}
 				onReset={handleReset}
 				onNew={handleNew}
 				onSaveAs={handleSaveAs}
+				onSaveAsWithId={handleSaveAsWithId}
 				onSearch={handleSearch}
 				searchResults={searchResults || items || []}
 				note={actionNote}

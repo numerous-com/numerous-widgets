@@ -23,18 +23,6 @@ def _(timeline_chart):
 
 
 @app.cell
-def _(aw, wi):
-    loaded_timeline = aw(wi.TimelineChart.load_data("timeline_data"))
-    return (loaded_timeline,)
-
-
-@app.cell
-def _(loaded_timeline):
-    loaded_timeline
-    return
-
-
-@app.cell
 def _(aw, datetime, timedelta, wi):
     """Example demonstrating the TimelineChart widget."""
 
@@ -547,12 +535,14 @@ def _(aw, wi):
                     }
                 }
             }
+            print(self.configs)
             self.current_config: Optional[Dict[str, Any]] = None
             self.current_config_id: Optional[str] = None
             self.modified: bool = False
 
         def get_configs(self) -> List[Dict[str, str]]:
             """Get list of configurations for display in the widget."""
+            print("Config manager: Widget requested configs")
             return [
                 {"id": config["id"], "label": config["label"]}
                 for config in self.configs.values()
@@ -574,17 +564,22 @@ def _(aw, wi):
                 force: Whether to force a save even if the content appears unmodified.
                        This is used for Save As operations.
             """
+            print(f"Config manager: Widget request save configs, force: {force}")
+
             if self.current_config and self.current_config_id:
                 if self.modified or force:
                     self.configs[self.current_config_id] = self.current_config.copy()
                     self.modified = False
                     time.sleep(0.5)  # Simulate a delay for saving
+                    print(self.configs)
                     return True, f"Configuration **{self.current_config['label']}** saved successfully"
                 return True, None  # No changes to save
             return False, "No configuration to save"
 
         def reset_config(self) -> Tuple[bool, Optional[str]]:
             """Reset the current configuration."""
+            print("Config manager: Widget requested reset")
+
             if self.current_config_id:
                 self.current_config = self.configs[self.current_config_id].copy()
                 self.modified = False
@@ -593,6 +588,8 @@ def _(aw, wi):
 
         def modify_config(self, change: Dict[str, Any]) -> str:
             """Make changes to the current configuration."""
+            print("Config manager: App modified item - updating data structure")
+
             if not self.current_config:
                 return "No configuration loaded"
 
@@ -606,6 +603,8 @@ def _(aw, wi):
 
         def search_configs(self, query: str) -> List[Dict[str, str]]:
             """Search configurations by name."""
+            print("Config manager: Widget requested search")
+
             if not query:
                 return self.get_configs()
 
@@ -623,6 +622,8 @@ def _(aw, wi):
                 is_save_as: Whether this is a Save As operation, in which case we should
                            copy the current configuration's content
             """
+            print("Config manager: Widget requested create new config")
+
             config_id = f"config-{str(uuid.uuid4())[:8]}"
 
 
@@ -1153,17 +1154,6 @@ def _(widget_html):
 def _(chat):
     chat.set_thinking("system", True)
     return
-
-
-@app.cell
-def _(aw):
-    from numerous.widgets.advanced.weighted_assessment_survey import WeightedAssessmentSurvey
-    assement_survey = aw(WeightedAssessmentSurvey())
-    def print_results(results):
-        print(results)
-    assement_survey.on_submit(print_results)
-    #assement_survey
-    return WeightedAssessmentSurvey, assement_survey, print_results
 
 
 if __name__ == "__main__":

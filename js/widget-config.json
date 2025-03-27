@@ -20,6 +20,7 @@
     "ProgressBarWidget",
     "ProjectMenuWidget",
     "RadioButtonsWidget",
+    "SaveLoadWidget",
     "SliderWidget",
     "StringInputWidget",
     "TableWidget",

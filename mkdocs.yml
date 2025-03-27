@@ -7,6 +7,7 @@ nav:
   - Platform Docs: https://numerous.com/docs
   - API Reference:
     - Widgets: widgets.md
+    - Save & Load: save_load_widget.md
     - Process Task: process_task.md
     - State Model: state_model.md
     - Templating: templating.md
