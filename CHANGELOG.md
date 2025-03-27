@@ -2,6 +2,20 @@
 
 
 
+## v0.2.1 (2025-03-27)
+
+### Fix
+
+* fix(tests): Enhance testing setup and add linting for TypeScript and React
+
+- Introduced ESLint configuration for TypeScript and React to enforce coding standards.
+- Added pre-commit hooks for TypeScript linting and Jest testing to ensure code quality.
+- Created setupTests.ts for Jest to include testing-library/jest-dom for improved testing capabilities.
+- Added mock files for CSS imports and @anywidget/react to facilitate testing.
+- Updated package.json and package-lock.json with necessary dependencies for testing and linting.
+- Refactored components to improve code quality and maintainability. ([`b1a18c3`](https://github.com/numerous-com/numerous-widgets/commit/b1a18c36738da2f6fd19b727230eaa14812332d6))
+
+
 ## v0.2.0 (2025-03-27)
 
 ### Feature
