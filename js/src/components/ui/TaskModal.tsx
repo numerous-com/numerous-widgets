@@ -67,7 +67,9 @@ export function TaskDetailModal({
         switch (type.toLowerCase()) {
             case 'error':
                 return 'text-red-500';
-            case 'warning' || '[warning]':
+            case 'warning':
+                return 'text-yellow-500';
+            case '[warning]':
                 return 'text-yellow-500';
             case 'success':
                 return 'text-green-500';
@@ -141,6 +143,7 @@ export function TaskDetailModal({
                             value={isAutoScrollEnabled}
                             onChange={(checked) => setIsAutoScrollEnabled(checked)}
                             uiLabel="Auto-scroll"
+                            uiTooltip="Automatically scroll to new log entries"
                         />
                         <Button 
                             label="Close"

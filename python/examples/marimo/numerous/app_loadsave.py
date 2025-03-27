@@ -229,12 +229,5 @@ def _(aw, wi):
     )
 
 
-@app.cell
-def _(aw, wi):
-    project_widget = aw(wi.ProjectsMenu())
-    project_widget
-    return (project_widget,)
-
-
 if __name__ == "__main__":
     app.run()

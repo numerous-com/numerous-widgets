@@ -370,7 +370,7 @@ export function TimelineChart({
         const endDate = parseISO(latestEnd);
         
         const labels: string[] = [];
-        let currentDate = new Date(startDate);
+        const currentDate = new Date(startDate);
         
         while (currentDate <= endDate) {
             labels.push(format(currentDate, 'yyyy-MM-dd HH:00'));

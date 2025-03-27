@@ -721,7 +721,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
     // Calculate appropriate step size to ensure we have at most 6 markers
     const range = max - min;
     const maxMarkers = 6;
-    let step = Math.ceil(range / (maxMarkers - 1));
+    const step = Math.ceil(range / (maxMarkers - 1));
     
     // Create array of marker values
     const markers = [];
