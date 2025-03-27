@@ -26,6 +26,7 @@
     "TableWidget",
     "TabsWidget",
     "TaskWidget",
+    "TimelineChartWidget",
     "TimerWidget",
     "ToastWidget",
     "ToggleButtonWidget",
