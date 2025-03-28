@@ -2,6 +2,18 @@
 
 
 
+## v0.2.3 (2025-03-28)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Update comment handling and group initialization
+
+- Modified the `clearAllAnswers` function to reset question comments to an empty string.
+- Changed the default comment initialization from an empty string to `None` for proper clearing.
+- Updated group initialization to start with an empty array instead of a default group structure.
+- Enhanced group handling logic to prevent adding default empty groups during data merging. ([`146d777`](https://github.com/numerous-com/numerous-widgets/commit/146d777ef16912485e275400bb0a8f575d46a945))
+
+
 ## v0.2.2 (2025-03-28)
 
 ### Fix
