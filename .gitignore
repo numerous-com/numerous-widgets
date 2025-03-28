@@ -23,3 +23,5 @@ node_modules
 python/src/numerous/widgets/static
 
 *.mdc
+
+js/coverage
