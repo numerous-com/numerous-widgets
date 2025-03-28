@@ -2,6 +2,19 @@
 
 
 
+## v0.2.2 (2025-03-28)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Add secure survey mode with data filtering
+
+- Introduced a new `survey_mode` option to limit data sent to JavaScript, enhancing security.
+- Implemented `_filter_survey_data_for_js` method to filter sensitive information from survey data.
+- Updated `toggle_edit_mode` to manage data visibility based on the survey mode.
+- Ensured complete survey data is saved and loaded correctly, regardless of the mode.
+- Enhanced `get_results` method to merge submitted results with complete data in survey mode. ([`6761163`](https://github.com/numerous-com/numerous-widgets/commit/6761163cff561370e356b5f41605c8d14d0e63e4))
+
+
 ## v0.2.1 (2025-03-27)
 
 ### Fix
