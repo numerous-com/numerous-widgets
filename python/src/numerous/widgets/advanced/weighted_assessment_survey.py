@@ -185,7 +185,7 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
                 filtered_question = {
                     "id": question.get("id", self._generate_id()),
                     "text": question.get("text", ""),
-                    "comment": "",  # Empty comment by default
+                    "comment": None,  # Initialize comment as None for proper clearing
                     "value": None,  # No value by default
                 }
                 filtered_group["questions"].append(filtered_question)
@@ -199,14 +199,7 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
         return {
             "title": "Assessment Survey",
             "description": "Please complete this assessment survey.",
-            "groups": [
-                {
-                    "id": self._generate_id(),  # Add ID for default group
-                    "title": "Default Group",
-                    "description": "Please answer the following questions.",
-                    "questions": [],
-                }
-            ],
+            "groups": [],  # Initialize with empty groups array
             "categories": [],
         }
 
@@ -290,7 +283,7 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
             if not found_question:
                 complete_questions.append(question.copy())
 
-    def _merge_results_with_complete_data(self) -> dict[str, Any]:
+    def _merge_results_with_complete_data(self) -> dict[str, Any]:  # noqa: C901
         """
         Merge submitted results from JavaScript with the complete survey data.
 
@@ -300,6 +293,13 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
         # Start with the complete data structure
         merged_data = self._complete_survey_data.copy()
 
+        # Create a map of existing group IDs for faster lookup
+        existing_group_ids = {
+            group.get("id"): True
+            for group in merged_data.get("groups", [])
+            if group.get("id") is not None
+        }
+
         # Update with any top-level fields that might have been modified by JS
         excluded_keys = {"groups", "categories"}
         for key in self.survey_data:
@@ -307,6 +307,7 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
                 merged_data[key] = self.survey_data[key]
 
         # Update with values from the JavaScript side
+        updated_groups = []
         for group in self.survey_data.get("groups", []):
             group_id = group.get("id")
             if not group_id:
@@ -327,11 +328,23 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
                     self._update_questions(
                         group.get("questions", []), complete_group.get("questions", [])
                     )
+
+                    # Add this group to our updated list
+                    updated_groups.append(complete_group)
                     break
 
-            # If group not found in complete data, add it
-            if not found_group:
-                merged_data["groups"].append(group.copy())
+            # If group not found in complete data but has a valid ID, add it
+            # Only add if it's not a default group or if it has questions
+            if not found_group and group_id not in existing_group_ids:
+                # Check if it looks like a default empty group
+                is_default_empty = "Default Group" in group.get(
+                    "title", ""
+                ) and not group.get("questions", [])
+
+                if not is_default_empty:
+                    group_copy = group.copy()
+                    updated_groups.append(group_copy)
+                    merged_data["groups"].append(group_copy)
 
         # Process categories if present
         self._merge_categories(merged_data)

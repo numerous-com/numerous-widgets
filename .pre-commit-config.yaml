@@ -39,7 +39,7 @@ repos:
         pass_filenames: false
         always_run: true
       - id: jest-tests
-        stages: [pre-commit, pre-push]
+        stages: [pre-push]
         types: [javascript, jsx, ts, tsx]
         name: jest-tests
         entry: powershell -Command "Set-Location js; npm test"

@@ -1374,10 +1374,11 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   const clearAllAnswers = () => {
     const newData = { ...surveyData };
     
-    // Clear all question values
+    // Clear all question values and comments
     newData.groups.forEach(group => {
       group.questions.forEach(question => {
         question.value = null;
+        question.comment = "";
       });
     });
     
