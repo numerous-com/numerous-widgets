@@ -17,11 +17,25 @@ def _():
 
 
 @app.cell
-def _(current_data, load_save_widget, mo, set_current_data, set_modified):
+def _(mo):
+    current_data, set_current_data = mo.state(0)
+    selected_item_id, set_selected_item_id = mo.state(None)
+    modified, set_modified = mo.state(False)
+    return (
+        current_data,
+        modified,
+        selected_item_id,
+        set_current_data,
+        set_modified,
+        set_selected_item_id,
+    )
+
+
+@app.cell
+def _(current_data, mo, set_modified):
     def on_number_change(event):
-        load_save_widget.set_modified(True)
-        set_current_data(event)
         set_modified(True)
+        #set_current_data(event)
         print(event)
 
     ui_number = mo.ui.number(current_data(), on_change=on_number_change)
@@ -94,11 +108,31 @@ def _():
 
 
 @app.cell
-def _(aw, configs, mo, wi):
-    current_data, set_current_data = mo.state(0)
-    selected_item_id, set_selected_item_id = mo.state(None)
-    modified, set_modified = mo.state(False)
+def _(aw, configs, wi):
+    # Create a widget
+    load_save_widget = aw(wi.LoadSaveWidget(
+        items=configs,
 
+        default_new_item_name="New Configuration",
+        #selected_item_id=selected_item_id(),
+        #modified=modified()
+
+    ))
+    print("!!!")
+    return (load_save_widget,)
+
+
+@app.cell
+def _(
+    configs,
+    current_data,
+    load_save_widget,
+    selected_item_id,
+    set_current_data,
+    set_modified,
+    set_selected_item_id,
+    ui_number,
+):
     def find_config_by_id(config_id):
 
         for conf in configs:
@@ -115,8 +149,10 @@ def _(aw, configs, mo, wi):
         return True, "OK"
 
     def on_save(force):
-        conf = find_config_by_id(load_save_widget.selected_item_id)
-        conf["settings"]["param1"] = current_data()
+        # Get all data from ui components
+
+        conf = find_config_by_id(selected_item_id())
+        conf["settings"]["param1"] = ui_number.value
         set_modified(False)
 
         print(f"Save {current_data()}")
@@ -131,9 +167,6 @@ def _(aw, configs, mo, wi):
         load_save_widget.set_modified(False, "Theres a new val")
         return True, "Reset"
 
-    def search_configs(query):
-        return configs
-
     def on_new(name):
         _id = str(int(configs[-1]["id"])+1)
         new_item = {"id": _id, "label": name, "settings": {
@@ -146,34 +179,31 @@ def _(aw, configs, mo, wi):
 
         return new_item, True, f"Created new configuration: **{name}**"
 
-    # Create a widget
-    load_save_widget = aw(wi.LoadSaveWidget(
-        items=configs,
-        on_load=on_load,
-        on_save=on_save,
-        on_reset=on_reset,
-        on_search=search_configs,
-        on_new=on_new,
-        default_new_item_name="New Configuration",
-        selected_item_id=selected_item_id(),
-        modified=modified()
 
-    ))
+    load_save_widget._on_load_callback = on_load
+    load_save_widget._on_save_callback = on_save
+    load_save_widget._on_reset_callback = on_reset
+    load_save_widget._on_new_callback = on_new
+
     return (
-        current_data,
         find_config_by_id,
-        load_save_widget,
-        modified,
         on_load,
         on_new,
         on_reset,
         on_save,
-        search_configs,
-        selected_item_id,
-        set_current_data,
-        set_modified,
-        set_selected_item_id,
     )
+
+
+@app.cell
+def _(load_save_widget, modified):
+    load_save_widget.set_modified(modified())
+    print("!")
+    return
+
+
+@app.cell
+def _():
+    return
 
 
 if __name__ == "__main__":

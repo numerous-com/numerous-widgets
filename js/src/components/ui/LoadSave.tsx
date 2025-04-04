@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MarkdownDisplay } from './MarkdownDisplay';
+import { useLoadSave } from '../widgets/LoadSaveContext';
 
 // Icons for the UI
 const SearchIcon = () => (
@@ -29,41 +30,8 @@ interface Note {
 interface LoadSaveModalProps {
   isOpen: boolean;
   onClose: () => void;
-  items: Item[];
-  selectedItemId: string | null;
-  onSelectItem: (itemId: string) => void;
-  onSave: () => void;
-  onNew: (name: string) => void;
-  onReset: () => void;
-  onSearch: (query: string) => void;
-  isModified: boolean;
-  disableLoad: boolean;
-  disableSave: boolean;
-  searchResults: Item[];
-  note: Note | null;
-}
-
-interface LoadSaveProps {
-  items: Item[];
-  selectedItemId: string | null;
-  isModified: boolean;
-  modificationNote: string | null;
-  disableLoad: boolean;
-  disableSave: boolean;
-  disableSaveAs: boolean;
-  disableSaveReason: string | null;
-  onLoad: (itemId: string) => void;
-  onSave: () => void;
-  onReset: () => void;
-  onNew: (name: string) => void;
-  onSaveAs: (name: string) => void;
-  onSaveAsWithId: (itemId: string) => void;
-  onRename: (itemId: string, newName: string) => void;
-  onSearch: (query: string) => void;
-  searchResults: Item[];
-  note: string | null;
-  isSuccess: boolean;
-  defaultNewItemName: string;
+  isSaveAsMode?: boolean;
+  showSaveConfirmation?: (message: string, action: () => void, title?: string) => void;
 }
 
 // New Item Dialog Component
@@ -89,7 +57,6 @@ const NewItemDialog: React.FC<{
     e.preventDefault();
     setIsSubmitting(true);
     onSubmit(name);
-    // Close the dialog immediately to indicate the item is being created and loaded
     onClose();
   };
 
@@ -376,31 +343,31 @@ const RenameDialog: React.FC<{
 };
 
 // Modal Component
-export const LoadSaveModal: React.FC<LoadSaveModalProps & { 
-  isSaveAsMode?: boolean;
-  showSaveConfirmation?: (message: string, action: () => void, title?: string) => void;
-  onSaveAsWithId?: (itemId: string) => void;
-  disableSaveReason?: string | null;
-}> = ({
+export const LoadSaveModal: React.FC<LoadSaveModalProps> = ({
   isOpen,
   onClose,
-  items,
-  selectedItemId,
-  onSelectItem,
-  onSave,
-  onNew,
-  onReset,
-  onSearch,
-  isModified,
-  disableLoad,
-  disableSave,
-  searchResults,
-  note,
   isSaveAsMode = false,
   showSaveConfirmation,
-  onSaveAsWithId,
-  disableSaveReason
 }) => {
+  const {
+    items,
+    selectedItemId,
+    isModified,
+    disableLoad,
+    disableSave,
+    disableSaveAs,
+    disableSaveReason,
+    searchResults,
+    actionNote,
+    successStatus,
+    handleLoad,
+    handleSave,
+    handleNew,
+    handleReset,
+    handleSearch,
+    handleSaveAsWithId,
+  } = useLoadSave();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [isNewItemDialogOpen, setIsNewItemDialogOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(selectedItemId);
@@ -410,28 +377,25 @@ export const LoadSaveModal: React.FC<LoadSaveModalProps & {
     setSelectedId(selectedItemId);
   }, [selectedItemId]);
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
-    onSearch(query);
+    handleSearch(query);
   };
 
   const handleSelectItem = (itemId: string) => {
-    // Just select the item visually, don't load it yet
     setSelectedId(itemId);
   };
   
-  const handleLoad = () => {
+  const handleLoadItem = () => {
     if (selectedId) {
-      // No need to check for unsaved changes since Browse button is hidden when modified
-      onSelectItem(selectedId);
+      handleLoad(selectedId);
       onClose();
     }
   };
 
   const handleNewItem = (name: string) => {
-    // Create new item and close the modal
-    onNew(name);
+    handleNew(name);
     onClose();
   };
 
@@ -441,12 +405,12 @@ export const LoadSaveModal: React.FC<LoadSaveModalProps & {
     }
   };
 
-  const handleReset = () => {
+  const handleResetClick = () => {
     if (showSaveConfirmation) {
       showSaveConfirmation(
         "Are you sure you want to reset? This will discard all unsaved changes.", 
         () => {
-          onReset();
+          handleReset();
         },
         "Confirm Reset"
       );
@@ -475,8 +439,20 @@ export const LoadSaveModal: React.FC<LoadSaveModalProps & {
                 className="loadsave-search-input"
                 placeholder="Search items..."
                 value={searchQuery}
-                onChange={handleSearch}
+                onChange={handleSearchChange}
               />
+              {searchQuery.trim() !== '' && (
+                <button 
+                  className="loadsave-search-clear" 
+                  onClick={() => {
+                    setSearchQuery('');
+                    handleSearch('');
+                  }}
+                  title="Clear search"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              )}
             </div>
             
             <div 
@@ -518,7 +494,7 @@ export const LoadSaveModal: React.FC<LoadSaveModalProps & {
                 <>
                   <button
                     className={`loadsave-button-secondary ${!selectedId ? 'disabled' : ''}`}
-                    onClick={handleReset}
+                    onClick={handleResetClick}
                     disabled={!selectedId}
                   >
                     Reset
@@ -530,7 +506,7 @@ export const LoadSaveModal: React.FC<LoadSaveModalProps & {
                         showSaveConfirmation(
                           "Are you sure you want to save? This will overwrite the current data.", 
                           () => {
-                            onSave();
+                            handleSave();
                             onClose();
                           },
                           "Confirm Save"
@@ -554,18 +530,16 @@ export const LoadSaveModal: React.FC<LoadSaveModalProps & {
                       showSaveConfirmation(
                         `Are you sure you want to save to "${targetName}"? This will overwrite the existing data.`, 
                         () => {
-                          if (onSaveAsWithId) {
-                            onSaveAsWithId(selectedId);
-                            onClose();
-                          }
+                          handleSaveAsWithId(selectedId);
+                          onClose();
                         },
                         "Confirm Save As"
                       );
                     }
                   } : 
-                  handleLoad
+                  handleLoadItem
                 }
-                disabled={!selectedId || (isSaveAsMode ? (disableSave || false) : disableLoad)}
+                disabled={!selectedId || (isSaveAsMode ? disableSave : disableLoad)}
                 title={isSaveAsMode && disableSave && disableSaveReason 
                   ? disableSaveReason 
                   : (isSaveAsMode ? "Save to selected item" : "Load selected item")}
@@ -592,13 +566,13 @@ export const LoadSaveModal: React.FC<LoadSaveModalProps & {
             showSaveConfirmation(
               `Are you sure you want to save as "${name}"? This will create a new item with your current data.`, 
               () => {
-                onNew(name);
+                handleNew(name);
                 onClose();
               },
               "Confirm Save As"
             );
           } else {
-            onNew(name);
+            handleNew(name);
             onClose();
           }
         }}
@@ -632,28 +606,30 @@ const Toast: React.FC<{
 };
 
 // Main LoadSave Component
-export const LoadSave: React.FC<LoadSaveProps> = ({
-  items,
-  selectedItemId,
-  isModified,
-  modificationNote,
-  disableLoad,
-  disableSave,
-  disableSaveAs,
-  disableSaveReason,
-  onLoad,
-  onSave,
-  onReset,
-  onNew,
-  onSaveAs,
-  onSaveAsWithId,
-  onRename,
-  onSearch,
-  searchResults,
-  note,
-  isSuccess,
-  defaultNewItemName
-}) => {
+export const LoadSave: React.FC = () => {
+  const {
+    items,
+    selectedItemId,
+    isModified,
+    modificationNote,
+    disableLoad,
+    disableSave,
+    disableSaveAs,
+    disableSaveReason,
+    defaultNewItemName,
+    searchResults,
+    actionNote,
+    successStatus,
+    handleLoad,
+    handleSave,
+    handleReset,
+    handleNew,
+    handleSaveAs,
+    handleSaveAsWithId,
+    handleSearch,
+    handleRename,
+  } = useLoadSave();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewItemDialogOpen, setIsNewItemDialogOpen] = useState(false);
   const [isSaveAsDialogOpen, setIsSaveAsDialogOpen] = useState(false);
@@ -672,14 +648,14 @@ export const LoadSave: React.FC<LoadSaveProps> = ({
   
   // Show toast when note changes
   useEffect(() => {
-    if (note) {
+    if (actionNote) {
       setToastMessage({
-        message: note,
-        type: isSuccess ? 'success' : 'error'
+        message: actionNote,
+        type: successStatus ? 'success' : 'error'
       });
       setIsToastVisible(true);
     }
-  }, [note, isSuccess]);
+  }, [actionNote, successStatus]);
 
   const selectedItem = items.find(item => item.id === selectedItemId);
 
@@ -701,45 +677,39 @@ export const LoadSave: React.FC<LoadSaveProps> = ({
     setIsSaveConfirmOpen(true);
   };
 
-  const handleSave = () => {
+  const handleSaveClick = () => {
     showSaveConfirmation(
       "Are you sure you want to save? This will overwrite the current data.", 
       () => {
-        onSave();
+        handleSave();
         setIsMenuOpen(false);
       },
       "Confirm Save"
     );
   };
 
-  const handleReset = () => {
+  const handleResetClick = () => {
     showSaveConfirmation(
       "Are you sure you want to reset? This will discard all unsaved changes.", 
       () => {
-        onReset();
+        handleReset();
         setIsMenuOpen(false);
       },
       "Confirm Reset"
     );
   };
   
-  const handleSaveAs = (name: string) => {
+  const handleSaveAsClick = (name: string) => {
     showSaveConfirmation(`Are you sure you want to save as "${name}"? This will create a new item with your current data.`, () => {
-      onSaveAs(name);
+      handleSaveAs(name);
     });
   };
 
-  const handleRename = (name: string) => {
+  const handleRenameClick = (name: string) => {
     if (selectedItemId) {
-      onRename(selectedItemId, name);
+      handleRename(selectedItemId, name);
     }
     setIsMenuOpen(false);
-  };
-
-  // Method to save current content to an existing item
-  const handleSaveAsWithId = (itemId: string) => {
-    // Use the new dedicated function for saving to an existing ID
-    onSaveAsWithId(itemId);
   };
 
   return (
@@ -804,7 +774,7 @@ export const LoadSave: React.FC<LoadSaveProps> = ({
               <>
                 <button
                   className="dropdown-item"
-                  onClick={handleReset}
+                  onClick={handleResetClick}
                   title="Reset changes"
                 >
                   Reset
@@ -812,7 +782,7 @@ export const LoadSave: React.FC<LoadSaveProps> = ({
                 {selectedItemId && (
                   <button
                     className={`dropdown-item ${disableSave ? 'disabled' : ''}`}
-                    onClick={handleSave}
+                    onClick={handleSaveClick}
                     disabled={disableSave}
                     title={disableSave && disableSaveReason ? disableSaveReason : "Save changes"}
                   >
@@ -828,22 +798,8 @@ export const LoadSave: React.FC<LoadSaveProps> = ({
       <LoadSaveModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        items={items}
-        selectedItemId={selectedItemId}
-        onSelectItem={onLoad}
-        onSave={onSave}
-        onNew={onNew}
-        onReset={onReset}
-        onSearch={onSearch}
-        isModified={isModified}
-        disableLoad={disableLoad}
-        disableSave={disableSave}
-        searchResults={searchResults}
-        note={note ? { type: isSuccess ? 'success' : 'error', message: note } : null}
         isSaveAsMode={isSaveAsMode}
         showSaveConfirmation={showSaveConfirmation}
-        onSaveAsWithId={handleSaveAsWithId}
-        disableSaveReason={disableSaveReason}
       />
 
       <NewItemDialog
@@ -852,7 +808,7 @@ export const LoadSave: React.FC<LoadSaveProps> = ({
         onSubmit={name => {
           showSaveConfirmation(
             `Are you sure you want to create a new item named "${name}"?`,
-            () => onNew(name),
+            () => handleNew(name),
             "Confirm Create"
           );
         }}
@@ -862,28 +818,14 @@ export const LoadSave: React.FC<LoadSaveProps> = ({
       <SaveAsDialog
         isOpen={isSaveAsDialogOpen}
         onClose={() => setIsSaveAsDialogOpen(false)}
-        onSubmit={(name) => {
-          if (showSaveConfirmation) {
-            showSaveConfirmation(
-              `Are you sure you want to save as "${name}"? This will create a new item with your current data.`, 
-              () => {
-                onNew(name);
-                onClose();
-              },
-              "Confirm Save As"
-            );
-          } else {
-            onNew(name);
-            onClose();
-          }
-        }}
+        onSubmit={handleSaveAsClick}
         defaultName={selectedItem ? `${selectedItem.label} (Copy)` : defaultNewItemName}
       />
 
       <RenameDialog
         isOpen={isRenameDialogOpen}
         onClose={() => setIsRenameDialogOpen(false)}
-        onSubmit={handleRename}
+        onSubmit={handleRenameClick}
         defaultName={selectedItem ? selectedItem.label : ""}
       />
 

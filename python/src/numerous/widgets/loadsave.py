@@ -74,20 +74,6 @@ class LoadSaveManager(Protocol):
         """
         ...
 
-    def search_items(self, query: str) -> list[dict[str, str]]:
-        """
-        Search items by query string.
-
-        Args:
-            query: The search string to match against item names/labels.
-
-        Returns:
-            A filtered list of items matching the query, each with at least 'id'
-            and 'label' keys.
-
-        """
-        ...
-
     def create_new_item(
         self, name: str, is_save_as: bool = False
     ) -> tuple[dict[str, str], bool, str | None]:
@@ -195,7 +181,6 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
             on_load=manager.load_item,
             on_save=manager.save_item,
             on_reset=manager.reset_item,
-            on_search=manager.search_items,
             on_new=manager.create_new_item,
             on_rename=manager.rename_item
         )
@@ -219,7 +204,6 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
     # Action triggers (from Widget to Python)
     do_save = traitlets.Bool(default_value=False).tag(sync=True)
     do_reset = traitlets.Bool(default_value=False).tag(sync=True)
-    do_search = traitlets.Unicode(default_value="").tag(sync=True)
     do_load = traitlets.Bool(default_value=False).tag(sync=True)
 
     # Response traits (from Python to Widget)
@@ -239,7 +223,6 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
     LoadCallback = Callable[[str], tuple[bool, str | None]]
     SaveCallback = Callable[[bool], tuple[bool, str | None]]
     ResetCallback = Callable[[], tuple[bool, str | None]]
-    SearchCallback = Callable[[str], list[dict[str, Any]]]
     NewItemCallback = Callable[[str, bool], tuple[dict[str, Any], bool, str | None]]
 
     def __init__(
@@ -248,7 +231,6 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
         on_load: LoadCallback | None = None,
         on_save: SaveCallback | None = None,
         on_reset: ResetCallback | None = None,
-        on_search: SearchCallback | None = None,
         on_new: NewItemCallback | None = None,
         selected_item_id: str | None = None,
         disable_load: bool = False,
@@ -271,8 +253,6 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
                 Should return (success, note).
             on_reset: Callback when reset is requested.
                 Should return (success, note).
-            on_search: Callback when search is requested.
-                Should return a list of items matching the search.
             on_new: Callback when new item creation is requested.
                 Should return (item, success, note).
             selected_item_id: ID of the item to select initially.
@@ -293,7 +273,6 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
         self._on_load_callback = on_load
         self._on_save_callback = on_save
         self._on_reset_callback = on_reset
-        self._on_search_callback = on_search
         self._on_new_callback = on_new
 
         # Initialize the widget
@@ -412,22 +391,6 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
 
         # Reset the flag
         self.do_reset = False
-
-    @traitlets.observe("do_search")  # type: ignore[misc]
-    def _do_search_changed(self, change: traitlets.Bunch) -> None:
-        """Handle search requests from the widget."""
-        if not change.new:
-            self.search_results = self.items.copy()
-            return
-
-        if self._on_search_callback is not None:
-            self.search_results = self._on_search_callback(change.new)
-        else:
-            # Simple fallback: case-insensitive search in labels
-            query = change.new.lower()
-            self.search_results = [
-                item for item in self.items if query in item["label"].lower()
-            ]
 
     @traitlets.observe("selected_item_id")  # type: ignore[misc]
     def _selected_item_id_changed(self, change: traitlets.Bunch) -> None:

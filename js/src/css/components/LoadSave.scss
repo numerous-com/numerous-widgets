@@ -197,6 +197,32 @@
   pointer-events: none;
 }
 
+.loadsave-search-clear {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--ui-widget-secondary-text);
+  font-size: 18px;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.loadsave-search-clear:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--ui-widget-primary-text);
+}
+
 .loadsave-items-list {
   flex: 1;
   overflow-y: auto;
