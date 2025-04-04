@@ -1,6 +1,6 @@
 # Save & Load Widget
 
-The Save & Load widget provides a user interface for managing a flat list of items, configurations, or cases. It allows users to search, load, save, reset, and create new items while synchronizing with the application.
+The Save & Load widget provides a user interface for managing a flat list of items, configurations, or cases. It allows users to search, load, save, reset, create new items, and rename existing items while synchronizing with the application.
 
 ## Features
 
@@ -11,6 +11,7 @@ The Save & Load widget provides a user interface for managing a flat list of ite
 - **Save As Functionality**: Save the current state to a new item or existing item
 - **Reset Functionality**: Reset the current item to its original state
 - **New Item Creation**: Create new items with custom labels
+- **Rename Functionality**: Rename existing items with custom labels
 - **Modification Tracking**: Visual indication of unsaved changes with optional change notes
 - **Customizable Callbacks**: Override default behavior with custom callbacks
 - **Disable Load/Save**: Ability to disable loading or saving functionality with optional reason messages
@@ -35,6 +36,7 @@ load_save_widget = mo.ui.anywidget(wi.LoadSaveWidget(
     on_reset=config_manager.reset_config,
     on_search=config_manager.search_configs,
     on_new=config_manager.create_new_config,
+    on_rename=config_manager.rename_config,
     default_new_item_name="New Configuration"
 ))
 
@@ -138,6 +140,19 @@ class ConfigManager:
 
         self.configs[config_id] = new_config
         return {"id": config_id, "label": name}, True, f"Created new configuration: **{name}**"
+        
+    def rename_config(self, config_id: str, new_name: str) -> tuple[bool, str | None]:
+        """Rename an existing configuration."""
+        if config_id in self.configs:
+            old_name = self.configs[config_id]["label"]
+            self.configs[config_id]["label"] = new_name
+            
+            # If this is the current config, update it too
+            if self.current_config and self.current_config_id == config_id:
+                self.current_config["label"] = new_name
+                
+            return True, f"Renamed configuration from **{old_name}** to **{new_name}**"
+        return False, "Configuration not found"
 ```
 
 ### Handling Modifications
@@ -174,6 +189,7 @@ LoadSaveWidget(
     on_reset: ResetCallback | None = None,
     on_search: SearchCallback | None = None,
     on_new: NewItemCallback | None = None,
+    on_rename: RenameCallback | None = None,
     selected_item_id: str | None = None,
     disable_load: bool = False,
     disable_save: bool = False,
@@ -191,6 +207,7 @@ LoadSaveWidget(
 - **on_reset**: Callback when reset is requested. Should return (success, note).
 - **on_search**: Callback when search is requested. Should return a list of items matching the search.
 - **on_new**: Callback when new item creation is requested. Should return (item, success, note).
+- **on_rename**: Callback when item rename is requested. Should return (success, note).
 - **selected_item_id**: ID of the item to select initially.
 - **disable_load**: Whether to disable the load button.
 - **disable_save**: Whether to disable the save button.
@@ -232,17 +249,38 @@ LoadSaveWidget(
   - Takes name and is_save_as flag as parameters
   - Returns new item, success flag, and optional message
 
+- **RenameCallback = Callable[[str, str], tuple[bool, str | None]]**
+  - Called when item rename is requested
+  - Takes item ID and new name as parameters
+  - Returns success flag and optional message
+
 ## User Interface Features
 
 The widget provides a comprehensive user interface with:
 
 - Item selection dropdown with search functionality
 - Visual indication of modified state
-- Save, Save As, Reset, and Load operations
+- Save, Save As, Reset, Load, and Rename operations
 - Confirmation dialogs for potentially destructive actions
 - Toast notifications for operation status
 - Keyboard navigation support
 - Responsive design
+
+### Confirmation Dialogs
+
+The widget implements a confirmation dialog system for critical actions:
+
+- **Save Confirmation**: Confirms before overwriting existing data
+- **Save As Confirmation**: Confirms before saving to a new or existing item
+- **Reset Confirmation**: Confirms before discarding unsaved changes 
+- **Delete Confirmation**: Confirms before deleting an item (if implemented)
+- **Rename Confirmation**: Confirms before renaming an item (if implemented)
+
+Each confirmation dialog includes:
+- A descriptive title
+- A custom message describing the action
+- Cancel and Confirm buttons
+- Proper focus management for keyboard navigation
 
 ## Internal Processing Flow
 
@@ -258,5 +296,11 @@ When a Save As operation is performed, the widget follows this sequence:
    - Sets it as the current item
    - Performs a save operation
    - Displays a success message
+
+When a Rename operation is performed:
+1. The widget shows a rename dialog with the current name pre-filled
+2. Upon confirmation, it calls the `onRename` callback with the item ID and new name
+3. The UI is updated to reflect the new name
+4. A success or error notification is displayed
 
 The widget handles all UI state management automatically, providing appropriate feedback to the user at each step. 
