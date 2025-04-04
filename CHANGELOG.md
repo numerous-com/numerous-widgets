@@ -2,6 +2,26 @@
 
 
 
+## v0.2.4 (2025-04-04)
+
+### Fix
+
+* fix(LoadSave): Simplify LoadSave component and integrate context for state management
+
+- Refactored LoadSave and LoadSaveModal components to utilize context for state management, improving code organization and readability.
+- Removed redundant props and state variables, streamlining the component&#39;s interface.
+- Enhanced search functionality with a clear button for better user experience.
+- Updated LoadSaveWidget to leverage the new context, simplifying its implementation.
+- Adjusted styles for the new clear search button in LoadSave.scss. ([`16ca213`](https://github.com/numerous-com/numerous-widgets/commit/16ca213a8e86374ecfd273965ff1eb9fc683bf0d))
+
+* fix(loadsave): Fixed issue with load save using selected_item_id for loading.
+
+- Deleted the SaveLoad component from the UI, which managed item saving and loading functionalities.
+- Removed related SCSS styles for the SaveLoad component to clean up the codebase.
+- Updated LoadSaveWidget to incorporate new loading logic and state management.
+- Enhanced the LoadSaveWidget to handle loading requests more effectively with new state variables. ([`fa75de2`](https://github.com/numerous-com/numerous-widgets/commit/fa75de2fab27e3bfe9aab3b25cfe3db66b6f902e))
+
+
 ## v0.2.3 (2025-03-28)
 
 ### Fix
