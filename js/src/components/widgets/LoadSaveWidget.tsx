@@ -30,6 +30,7 @@ function LoadSaveWidget() {
 	const [doSave, setDoSave] = useModelState<boolean>("do_save");
 	const [doReset, setDoReset] = useModelState<boolean>("do_reset");
 	const [doSearch, setDoSearch] = useModelState<string>("do_search");
+	const [doLoad, setDoLoad] = useModelState<boolean>("do_load");
 	
 	// Response states
 	const [actionNote, setActionNote] = useModelState<string | null>("action_note");
@@ -86,8 +87,11 @@ function LoadSaveWidget() {
 	const handleLoad = (itemId: string) => {
 		if (itemId === selectedItemId) return; // Don't reload the same item
 		
-		// Set the ID which will trigger the Python-side load callback
+		// Set the ID which will be used by the Python-side load callback
 		setSelectedItemId(itemId);
+		
+		// Trigger the load callback on the Python side
+		setDoLoad(true);
 		
 		// Loading feedback is handled automatically through the actionNote mechanism
 		// which shows a toast notification when action_note is set by Python
@@ -126,8 +130,8 @@ function LoadSaveWidget() {
 		// Get the original ID to restore after save
 		const originalId = selectedItemId;
 		
-		// Temporarily set the selected ID to our target
-		// This is handled imperatively - we'll suppress the normal load message
+		// Temporarily set the selected ID to our target without triggering load
+		// This is handled imperatively - we'll update ID without triggering load
 		setSelectedItemId(itemId);
 		
 		// Mark that we've started a save operation

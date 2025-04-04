@@ -220,6 +220,7 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
     do_save = traitlets.Bool(default_value=False).tag(sync=True)
     do_reset = traitlets.Bool(default_value=False).tag(sync=True)
     do_search = traitlets.Unicode(default_value="").tag(sync=True)
+    do_load = traitlets.Bool(default_value=False).tag(sync=True)
 
     # Response traits (from Python to Widget)
     action_note = traitlets.Unicode(allow_none=True).tag(sync=True)
@@ -255,6 +256,8 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
         disable_save_as: bool = False,
         disable_save_reason: str | None = None,
         default_new_item_name: str = "New Item",
+        modified: bool = False,
+        modification_note: str | None = None,
     ) -> None:
         """
         Initialize the LoadSaveWidget.
@@ -279,12 +282,19 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
             disable_save_reason: Optional reason why saving is disabled
                 (shown as tooltip).
             default_new_item_name: Default name for new items.
-            *args: Additional positional arguments.
-            **kwargs: Additional keyword arguments.
+            modified: Whether the current item is modified.
+            modification_note: Optional note to display about the modification.
 
         """
         if items is None:
             items = []
+
+        # Store callbacks as instance variables, making sure they are properly typed
+        self._on_load_callback = on_load
+        self._on_save_callback = on_save
+        self._on_reset_callback = on_reset
+        self._on_search_callback = on_search
+        self._on_new_callback = on_new
 
         # Initialize the widget
         super().__init__()
@@ -301,12 +311,8 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
         self.disable_save_reason = disable_save_reason
         self.default_new_item_name = default_new_item_name
 
-        # Store callbacks as instance variables, making sure they are properly typed
-        self._on_load_callback = on_load
-        self._on_save_callback = on_save
-        self._on_reset_callback = on_reset
-        self._on_search_callback = on_search
-        self._on_new_callback = on_new
+        self.is_modified = modified
+        self.modification_note = modification_note
 
     def set_items(self, items: list[dict[str, Any]]) -> None:
         """
@@ -429,10 +435,21 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
         if change.new == change.old or not change.new:
             return
 
-        if self._on_load_callback is not None:
-            success, note = self._on_load_callback(change.new)
+        # Selection changed, but loading will now be triggered by do_load
+
+    @traitlets.observe("do_load")  # type: ignore[misc]
+    def _do_load_changed(self, change: traitlets.Bunch) -> None:
+        """Handle load requests from the widget."""
+        if not change.new:
+            return
+
+        if self._on_load_callback is not None and self.selected_item_id:
+            success, note = self._on_load_callback(self.selected_item_id)
             self.success_status = success
             self.action_note = note
+
+        # Reset the flag
+        self.do_load = False
 
     @traitlets.observe("create_new_item")  # type: ignore[misc]
     def _create_new_item_changed(self, change: traitlets.Bunch) -> None:
