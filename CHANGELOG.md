@@ -2,6 +2,20 @@
 
 
 
+## v0.2.5 (2025-04-08)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Enhance question management with category types and movement functionality
+
+- Added support for categorizing questions as &#39;performance&#39; or &#39;enabler&#39; with a new `categoryTypes` property.
+- Implemented functionality to move questions between groups and reorder them within the same group.
+- Introduced a &#34;Do Not Know&#34; checkbox to allow users to indicate uncertainty in their responses.
+- Enhanced the UI with a new Category Types Matrix for managing question-category associations.
+- Updated styles for new buttons and dropdowns related to question movement and type selection.
+- Improved data handling in the backend to ensure `categoryTypes` are preserved during updates. ([`785ba8b`](https://github.com/numerous-com/numerous-widgets/commit/785ba8bda23e69178f52da5149bcbe9b69423caa))
+
+
 ## v0.2.4 (2025-04-04)
 
 ### Fix
