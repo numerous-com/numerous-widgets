@@ -2,6 +2,18 @@
 
 
 
+## v0.2.6 (2025-04-08)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Enhance question answering logic to include &#34;Do Not Know&#34; responses
+
+- Updated logic to count answered questions to include those marked as &#34;Do Not Know&#34;.
+- Modified functions to check if all questions in a group are answered, considering &#34;Do Not Know&#34; as a valid response.
+- Adjusted validation messages to reflect the inclusion of &#34;Do Not Know&#34; in unanswered question counts.
+- Enhanced the `clearAllAnswers` function to reset &#34;Do Not Know&#34; flags along with question values and comments. ([`45e3c8c`](https://github.com/numerous-com/numerous-widgets/commit/45e3c8cfdbfb7af5eee30d598c1ab48c781c6891))
+
+
 ## v0.2.5 (2025-04-08)
 
 ### Fix
