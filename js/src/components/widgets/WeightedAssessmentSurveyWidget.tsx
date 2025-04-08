@@ -13,7 +13,9 @@ interface Question {
   max: number;
   comment: string;
   categoryWeights: Record<string, number>;
+  categoryTypes: Record<string, 'performance' | 'enabler'>; // Performance or Enabler categorization
   timestamps: Record<number, number>; // Store timestamps for each value change
+  doNotKnow?: boolean; // Flag to indicate "I do not know" response
 }
 
 interface Category {
@@ -114,7 +116,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   const [currentGroupIndex, setCurrentGroupIndex] = React.useState(0);
   
   // State for edit mode tabs
-  const [activeEditTab, setActiveEditTab] = React.useState<'content' | 'categories' | 'weights' | 'conclusion' | 'overall'>('content');
+  const [activeEditTab, setActiveEditTab] = React.useState<'content' | 'categories' | 'weights' | 'types' | 'conclusion' | 'overall'>('content');
   
   // State for showing category weights
   const [showCategoryWeights, setShowCategoryWeights] = React.useState<Record<string, boolean>>({});
@@ -399,42 +401,29 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   
   // Update question value with timestamp and reset submitted state
   const updateQuestionValue = (groupIndex: number, questionIndex: number, newValue: number | null): void => {
-    if (readOnly) return; // Don't update if in read-only mode
+    // Create a copy of the survey data
+    const updatedSurveyData = { ...surveyData };
+    const question = updatedSurveyData.groups[groupIndex].questions[questionIndex];
     
-    const newData = { ...surveyData };
-    const question = newData.groups[groupIndex].questions[questionIndex];
+    // Update the question value
+    question.value = newValue;
     
-    // Calculate elapsed time in seconds
-    const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
-    
-    // Initialize timestamps object if it doesn't exist
-    if (!question.timestamps) {
-      question.timestamps = {};
-    }
-    
-    // Store the timestamp for this value
-    // Round to 2 decimal places for use as an object key
+    // If setting a value, uncheck "I do not know"
     if (newValue !== null) {
-      const roundedValue = Math.round(newValue * 100) / 100;
-      question.timestamps[roundedValue] = elapsedSeconds;
-      
-      // Update the value - keep full precision
-      question.value = newValue;
+      question.doNotKnow = false;
+    }
+    
+    // Update timestamps
+    if (!question.timestamps) {
+      question.timestamps = {
+        created: Date.now(),
+        modified: Date.now()
+      };
     } else {
-      question.value = null;
+      question.timestamps.modified = Date.now();
     }
     
-    // Reset submitted state
-    setSubmitted(false);
-    
-    // Update validation message based on current state of questions
-    if (areAllQuestionsAnsweredInGroup(groupIndex)) {
-      setValidationMessage('');
-    } else if (validationMessage) {
-      setValidationMessage(generateValidationMessage(groupIndex));
-    }
-    
-    setSurveyData(newData);
+    setSurveyData(updatedSurveyData);
   };
   
   // Add state to track the current editing comment
@@ -557,13 +546,18 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
     
     updatedSurveyData.categories.push(newCategory);
     
-    // Initialize this category's weight in all questions
+    // Initialize this category's weight and type in all questions
     updatedSurveyData.groups.forEach(group => {
       group.questions.forEach(question => {
         if (!question.categoryWeights) {
           question.categoryWeights = {};
         }
         question.categoryWeights[categoryId] = 0;
+        
+        if (!question.categoryTypes) {
+          question.categoryTypes = {};
+        }
+        question.categoryTypes[categoryId] = 'performance'; // Default to 'performance'
       });
     });
     
@@ -677,11 +671,14 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
     const group = newData.groups[groupIndex];
     const questionId = generateRandomId();
     
-    // Initialize category weights for the new question
+    // Initialize category weights and types for the new question
     const categoryWeights: Record<string, number> = {};
+    const categoryTypes: Record<string, 'performance' | 'enabler'> = {};
+    
     if (newData.categories) {
       newData.categories.forEach(category => {
         categoryWeights[category.id] = 0;
+        categoryTypes[category.id] = 'performance'; // Default to 'performance'
       });
     }
     
@@ -693,6 +690,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
       max: 5,
       comment: "",
       categoryWeights,
+      categoryTypes,
       timestamps: {}
     });
     
@@ -700,9 +698,34 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   };
   
   const deleteQuestion = (groupIndex: number, questionIndex: number) => {
+    // Make a copy of the survey data
     const newData = { ...surveyData };
+    
+    // Remove the question at the specified index
     newData.groups[groupIndex].questions.splice(questionIndex, 1);
+    
+    // Update the state
     setSurveyData(newData);
+  };
+  
+  // Add moveQuestion function here
+  const moveQuestion = (sourceGroupIndex: number, questionIndex: number, targetGroupIndex: number) => {
+    if (sourceGroupIndex === targetGroupIndex) return;
+    
+    // Create a copy of the survey data
+    const updatedSurveyData = { ...surveyData };
+    
+    // Get the question to move
+    const questionToMove = { ...updatedSurveyData.groups[sourceGroupIndex].questions[questionIndex] };
+    
+    // Add the question to the target group
+    updatedSurveyData.groups[targetGroupIndex].questions.push(questionToMove);
+    
+    // Remove the question from the source group
+    updatedSurveyData.groups[sourceGroupIndex].questions.splice(questionIndex, 1);
+    
+    // Update the survey data
+    setSurveyData(updatedSurveyData);
   };
   
   const deleteGroup = (groupIndex: number) => {
@@ -1150,42 +1173,62 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   // Update the render section where the weights tab content is shown
   const renderWeightsSection = () => {
     return (
-      <div className="weights-matrix-container">
-        <div className="weights-matrix-header">
-          <h3>Category Weights Matrix</h3>
-          <p className="weights-matrix-description">
-            View and edit the weights of each question across categories.
-          </p>
+      <div className="weights-section">
+        <div className="section-actions">
+          <button 
+            className="edit-weights-button"
+            onClick={() => setShowWeightsMatrix(true)}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z" fill="currentColor"/>
+            </svg>
+            Edit Category Weights
+          </button>
+          
+          {/* Add button for category types matrix */}
+          <button 
+            className="edit-types-button"
+            onClick={() => setShowCategoryTypesMatrix(true)}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor"/>
+            </svg>
+            Edit Performance/Enabler Types
+          </button>
         </div>
-        
-        <button 
-          className="edit-weights-button"
-          onClick={() => setShowWeightsMatrix(true)}
-        >
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z" fill="currentColor"/>
-            <path d="M11 7h2v10h-2z" fill="currentColor"/>
-            <path d="M7 11h10v2H7z" fill="currentColor"/>
-          </svg>
-          Open Full-Screen Matrix
-        </button>
         
         {showWeightsMatrix && (
           <div className="weights-modal-overlay" onClick={() => setShowWeightsMatrix(false)}>
             <div className="weights-modal-fullscreen" onClick={e => e.stopPropagation()}>
               <div className="weights-modal-header">
                 <h2>Category Weights Matrix</h2>
-                <button 
-                  className="weights-modal-close"
-                  onClick={() => setShowWeightsMatrix(false)}
-                >
-                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <button className="weights-modal-close" onClick={() => setShowWeightsMatrix(false)}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="currentColor"/>
                   </svg>
                 </button>
               </div>
-              <div className="weights-modal-content">
+              <div className="weights-modal-content" ref={modalContentRef}>
                 <WeightsMatrix />
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Add modal for category types matrix */}
+        {showCategoryTypesMatrix && (
+          <div className="weights-modal-overlay" onClick={() => setShowCategoryTypesMatrix(false)}>
+            <div className="weights-modal-fullscreen" onClick={e => e.stopPropagation()}>
+              <div className="weights-modal-header">
+                <h2>Performance/Enabler Categories Matrix</h2>
+                <button className="weights-modal-close" onClick={() => setShowCategoryTypesMatrix(false)}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="currentColor"/>
+                  </svg>
+                </button>
+              </div>
+              <div className="weights-modal-content" ref={modalContentRef}>
+                <CategoryTypesMatrix />
               </div>
             </div>
           </div>
@@ -1356,7 +1399,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
     setSurveyData(updatedSurveyData);
   };
 
-  // Add clearQuestionAnswer function after updateQuestionValue
+  // Fix clearQuestionAnswer function
   const clearQuestionAnswer = (groupIndex: number, questionIndex: number) => {
     const newData = { ...surveyData };
     const question = newData.groups[groupIndex].questions[questionIndex];
@@ -1368,6 +1411,26 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
     setSubmitted(false);
     
     setSurveyData(newData);
+  };
+  
+  // Add toggleDoNotKnow function
+  const toggleDoNotKnow = (groupIndex: number, questionIndex: number) => {
+    const updatedSurveyData = { ...surveyData };
+    const question = updatedSurveyData.groups[groupIndex].questions[questionIndex];
+    
+    // Toggle the doNotKnow state
+    question.doNotKnow = !question.doNotKnow;
+    
+    // If doNotKnow is true, clear the answer
+    if (question.doNotKnow) {
+      question.value = null;
+    }
+    
+    // Reset submitted state
+    setSubmitted(false);
+    
+    // Update the survey data
+    setSurveyData(updatedSurveyData);
   };
 
   // Add function to clear all answers
@@ -1510,6 +1573,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
               max: q.max !== undefined ? q.max : 5,
               comment: q.comment || '',
               categoryWeights: q.categoryWeights || {},
+              categoryTypes: q.categoryTypes || {},
               timestamps: q.timestamps || {}
             })) : [],
             scoringRanges: Array.isArray(group.scoringRanges) ? group.scoringRanges : []
@@ -1565,9 +1629,9 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
     switch (normalizedValue) {
       case 0: return "Strongly Disagree";
       case 1: return "Disagree";
-      case 2: return "Neutral";
-      case 3: return "Agree";
-      case 4: return "Strongly Agree";
+      case 2: return "Agree";
+      case 3: return "Strongly Agree";
+      case 4: return "Best in Class";
       default: return value.toString(); // Fallback to numeric value
     }
   };
@@ -1883,6 +1947,158 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
     );
   };
 
+  // Add after moveQuestion function
+  const moveQuestionUp = (groupIndex: number, questionIndex: number) => {
+    if (questionIndex === 0) return; // Already at the top
+    
+    // Create a copy of the survey data
+    const updatedSurveyData = { ...surveyData };
+    const questions = updatedSurveyData.groups[groupIndex].questions;
+    
+    // Swap the question with the one above it
+    const temp = questions[questionIndex];
+    questions[questionIndex] = questions[questionIndex - 1];
+    questions[questionIndex - 1] = temp;
+    
+    // Update the survey data
+    setSurveyData(updatedSurveyData);
+  };
+  
+  const moveQuestionDown = (groupIndex: number, questionIndex: number) => {
+    const questions = surveyData.groups[groupIndex].questions;
+    if (questionIndex === questions.length - 1) return; // Already at the bottom
+    
+    // Create a copy of the survey data
+    const updatedSurveyData = { ...surveyData };
+    
+    // Swap the question with the one below it
+    const temp = updatedSurveyData.groups[groupIndex].questions[questionIndex];
+    updatedSurveyData.groups[groupIndex].questions[questionIndex] = updatedSurveyData.groups[groupIndex].questions[questionIndex + 1];
+    updatedSurveyData.groups[groupIndex].questions[questionIndex + 1] = temp;
+    
+    // Update the survey data
+    setSurveyData(updatedSurveyData);
+  };
+
+  // Add after updateCategoryWeight function
+  const toggleCategoryType = (
+    groupIndex: number,
+    questionIndex: number,
+    categoryId: string
+  ) => {
+    const newData = { ...surveyData };
+    const question = newData.groups[groupIndex].questions[questionIndex];
+    
+    if (!question.categoryTypes) {
+      question.categoryTypes = {};
+    }
+    
+    // Toggle between 'performance' and 'enabler'
+    question.categoryTypes[categoryId] = 
+      question.categoryTypes[categoryId] === 'performance' ? 'enabler' : 'performance';
+    
+    setSurveyData(newData);
+  };
+
+  // Add after the WeightsMatrix component definition
+  const CategoryTypesMatrix = () => {
+    const allQuestions = getAllQuestions();
+    const categories = surveyData.categories || [];
+    
+    // Add a ref to track the modal content scroll position
+    const modalContentRef = React.useRef<HTMLDivElement>(null);
+    const scrollPositionRef = React.useRef<number>(0);
+    
+    // Use layout effect to restore scroll position immediately after any re-render
+    React.useLayoutEffect(() => {
+      if (modalContentRef.current && scrollPositionRef.current > 0) {
+        modalContentRef.current.scrollTop = scrollPositionRef.current;
+      }
+    });
+    
+    // Handle cell click to toggle type
+    const handleTypeToggle = (
+      questionId: string,
+      categoryId: string
+    ) => {
+      // Save the current scroll position when toggling cell
+      if (modalContentRef.current) {
+        scrollPositionRef.current = modalContentRef.current.scrollTop;
+      }
+      
+      const groupIndex = getGroupIndexByQuestionId(questionId);
+      if (groupIndex === -1) return;
+      
+      const questionIndex = findQuestionIndexInGroup(groupIndex, questionId);
+      if (questionIndex === -1) return;
+      
+      // Toggle the type
+      toggleCategoryType(groupIndex, questionIndex, categoryId);
+    };
+    
+    return (
+      <div className="category-types-matrix">
+        <div className="category-types-matrix-header">
+          <h3>Performance/Enabler Matrix</h3>
+          <p className="category-types-matrix-description">
+            Click a cell to toggle between Performance and Enabler for each question-category combination.
+          </p>
+        </div>
+        <div className="matrix-table-container" ref={modalContentRef}>
+          <table className="matrix-table">
+            <thead>
+              <tr>
+                <th className="matrix-group-col">Group</th>
+                <th className="matrix-question-col">Question</th>
+                {categories.map(category => (
+                  <th key={category.id} className="matrix-category-col">
+                    <div className="matrix-category-header" title={category.name}>
+                      {category.name}
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {allQuestions.map((question, questionIndex) => {
+                const groupIndex = getGroupIndexByQuestionId(question.id);
+                const group = surveyData?.groups?.[groupIndex];
+                
+                return (
+                  <tr key={question.id}>
+                    <td className="matrix-group-cell matrix-group-col" data-title={group?.title}>
+                      {group?.title}
+                    </td>
+                    <td className="matrix-question-cell matrix-question-col" data-title={question.text}>
+                      {question.text}
+                    </td>
+                    {categories.map((category, categoryIndex) => {
+                      const type = question.categoryTypes?.[category.id] || 'performance';
+                      
+                      return (
+                        <td 
+                          key={category.id}
+                          className={`matrix-type-cell ${type === 'performance' ? 'performance-cell' : 'enabler-cell'}`}
+                          onClick={() => handleTypeToggle(question.id, category.id)}
+                          title={`Click to toggle between Performance and Enabler`}
+                        >
+                          {type === 'performance' ? 'Performance' : 'Enabler'}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  };
+
+  // Add new state for showing the category types matrix
+  const [showCategoryTypesMatrix, setShowCategoryTypesMatrix] = React.useState(false);
+  
   return (
     <div className={`weighted-assessment-survey ${props.class_name || ''} ${readOnly ? 'read-only' : ''}`}>
       <div className="progress-indicator">
@@ -1963,6 +2179,12 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                   Weights Matrix
                 </button>
                 <button 
+                  className={`edit-tab ${activeEditTab === 'types' ? 'active' : ''}`}
+                  onClick={() => setActiveEditTab('types')}
+                >
+                  Types Matrix
+                </button>
+                <button 
                   className={`edit-tab ${activeEditTab === 'conclusion' ? 'active' : ''}`}
                   onClick={() => setActiveEditTab('conclusion')}
                 >
@@ -1979,6 +2201,44 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
             
             {editMode && activeEditTab === 'weights' ? (
               renderWeightsSection()
+            ) : editMode && activeEditTab === 'types' ? (
+              // Add section for category types
+              <div className="category-types-section">
+                <div className="section-header">
+                  <h3>Performance/Enabler Categories</h3>
+                  <p className="section-description">
+                    Categorize each question-category combination as either a Performance or an Enabler.
+                  </p>
+                </div>
+                
+                <button 
+                  className="edit-types-button"
+                  onClick={() => setShowCategoryTypesMatrix(true)}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor"/>
+                  </svg>
+                  Open Performance/Enabler Matrix
+                </button>
+                
+                {showCategoryTypesMatrix && (
+                  <div className="weights-modal-overlay" onClick={() => setShowCategoryTypesMatrix(false)}>
+                    <div className="weights-modal-fullscreen" onClick={e => e.stopPropagation()}>
+                      <div className="weights-modal-header">
+                        <h2>Performance/Enabler Categories Matrix</h2>
+                        <button className="weights-modal-close" onClick={() => setShowCategoryTypesMatrix(false)}>
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="currentColor"/>
+                          </svg>
+                        </button>
+                      </div>
+                      <div className="weights-modal-content">
+                        <CategoryTypesMatrix />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             ) : editMode && activeEditTab === 'categories' ? (
               <div className="categories-editor">
                 <div className="categories-header">
@@ -2306,6 +2566,22 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                                   <div className="slider-markers">
                                     {renderSliderMarkers(question.min, question.max)}
                                   </div>
+                                  
+                                  {/* Add "I do not know" checkbox */}
+                                  {!editMode && !readOnly && (
+                                    <div className="do-not-know-container">
+                                      <label className="do-not-know-label">
+                                        <input
+                                          type="checkbox"
+                                          className="do-not-know-checkbox"
+                                          checked={question.doNotKnow || false}
+                                          onChange={() => toggleDoNotKnow(groupIndex, questionIndex)}
+                                          disabled={readOnly}
+                                        />
+                                        <span>I do not know</span>
+                                      </label>
+                                    </div>
+                                  )}
                                 </div>
                                 
                                 {!readOnly && (
@@ -2374,6 +2650,30 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                               
                               {editMode && (
                                 <div className="question-controls">
+                                  {/* Add move up/down buttons */}
+                                  <button 
+                                    className="move-up-button" 
+                                    onClick={() => moveQuestionUp(groupIndex, questionIndex)}
+                                    aria-label="Move question up"
+                                    title="Move question up"
+                                    disabled={questionIndex === 0}
+                                  >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                      <path d="M7 14l5-5 5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                  </button>
+                                  <button 
+                                    className="move-down-button" 
+                                    onClick={() => moveQuestionDown(groupIndex, questionIndex)}
+                                    aria-label="Move question down"
+                                    title="Move question down"
+                                    disabled={questionIndex === surveyData.groups[groupIndex].questions.length - 1}
+                                  >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                      <path d="M7 10l5 5 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                  </button>
+                                  
                                   {surveyData.categories && surveyData.categories.length > 0 && (
                                     <button 
                                       className="category-weights-button" 
@@ -2397,6 +2697,47 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                                       <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="currentColor"/>
                                     </svg>
                                   </button>
+                                  
+                                  {/* Add move button */}
+                                  {surveyData.groups.length > 1 && (
+                                    <div className="move-question-container">
+                                      <button
+                                        type="button"
+                                        className="move-button"
+                                        title="Move question to another group"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          const dropdown = e.currentTarget.nextElementSibling as HTMLElement;
+                                          dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+                                        }}
+                                      >
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                          <path d="M19 15l-6-6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        </svg>
+                                      </button>
+                                      <div className="move-dropdown">
+                                        {surveyData.groups.map((group, targetGroupIndex) => (
+                                          targetGroupIndex !== groupIndex && (
+                                            <div 
+                                              key={group.id} 
+                                              className="move-dropdown-item"
+                                              onClick={() => {
+                                                moveQuestion(groupIndex, questionIndex, targetGroupIndex);
+                                                // Close all dropdowns
+                                                const dropdowns = document.querySelectorAll('.move-dropdown');
+                                                dropdowns.forEach(dropdown => {
+                                                  (dropdown as HTMLElement).style.display = 'none';
+                                                });
+                                              }}
+                                            >
+                                              {group.title || `Group ${targetGroupIndex + 1}`}
+                                            </div>
+                                          )
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                  
                                   <button 
                                     className="delete-button" 
                                     onClick={() => deleteQuestion(groupIndex, questionIndex)}

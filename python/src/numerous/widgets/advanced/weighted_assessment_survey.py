@@ -187,6 +187,7 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
                     "text": question.get("text", ""),
                     "comment": None,  # Initialize comment as None for proper clearing
                     "value": None,  # No value by default
+                    "doNotKnow": question.get("doNotKnow", False),
                 }
                 filtered_group["questions"].append(filtered_question)
 
@@ -275,8 +276,17 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
                 if complete_question.get("id") == question_id:
                     found_question = True
                     # Copy all properties from the submitted question
+                    # Make sure to preserve key properties like categoryTypes
+                    category_types = complete_question.get("categoryTypes", {})
+
                     for key in question:
                         complete_question[key] = question[key]
+
+                    # Restore categoryTypes if they were missing from the survey data
+                    # This ensures that Performance/Enabler settings are not lost
+                    if "categoryTypes" not in question and category_types:
+                        complete_question["categoryTypes"] = category_types
+
                     break
 
             # If question not found in complete data, add it
