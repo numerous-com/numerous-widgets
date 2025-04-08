@@ -301,7 +301,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
           totalQuestions += group.questions.length;
           
           group.questions.forEach(question => {
-            if (question?.value !== null) {
+            if (question?.value !== null || question?.doNotKnow === true) {
               answeredQuestions++;
             }
           });
@@ -327,18 +327,18 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   // Add function to check if all questions in a specific group are answered
   const areAllQuestionsAnsweredInGroup = (groupIndex: number): boolean => {
     if (!surveyData?.groups?.[groupIndex]) return true;
-    return surveyData.groups[groupIndex].questions.every(q => q.value !== null);
+    return surveyData.groups[groupIndex].questions.every(q => q.value !== null || q.doNotKnow === true);
   };
 
   const countUnansweredQuestionsInGroup = (groupIndex: number): number => {
     if (!surveyData?.groups?.[groupIndex]) return 0;
-    return surveyData.groups[groupIndex].questions.filter(q => q.value === null).length;
+    return surveyData.groups[groupIndex].questions.filter(q => q.value === null && q.doNotKnow !== true).length;
   };
 
   const generateValidationMessage = (groupIndex: number): string => {
     const count = countUnansweredQuestionsInGroup(groupIndex);
     if (count === 0) return '';
-    return `Please answer ${count} more ${count === 1 ? 'question' : 'questions'} before proceeding.`;
+    return `Please answer or check "I do not know" for ${count} more ${count === 1 ? 'question' : 'questions'} before proceeding.`;
   };
   
   // Add function to get count of unanswered questions in a group
@@ -346,7 +346,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
     if (!surveyData?.groups?.[groupIndex]?.questions) return 0;
     
     const group = surveyData.groups[groupIndex];
-    return group.questions.filter(q => q.value === null).length;
+    return group.questions.filter(q => q.value === null && q.doNotKnow !== true).length;
   };
   
   // Modify navigation functions to handle intro slide and final slide
@@ -1437,11 +1437,12 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   const clearAllAnswers = () => {
     const newData = { ...surveyData };
     
-    // Clear all question values and comments
+    // Clear all question values, comments, and doNotKnow flags
     newData.groups.forEach(group => {
       group.questions.forEach(question => {
         question.value = null;
         question.comment = "";
+        question.doNotKnow = false;
       });
     });
     
