@@ -2,6 +2,18 @@
 
 
 
+## v0.2.7 (2025-04-14)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Add anti-text field for questions and update UI
+
+- Introduced an optional `antiText` field in the question structure to capture additional context.
+- Updated the survey widget to initialize and process the `antiText` field in both edit and display modes.
+- Added a new input field for `antiText` in the UI, allowing users to enter relevant anti-question text.
+- Enhanced styles for the new anti-text input to ensure consistency with existing UI elements. ([`46c2ac4`](https://github.com/numerous-com/numerous-widgets/commit/46c2ac433451e4d678ba7c0099585de0ff3b5163))
+
+
 ## v0.2.6 (2025-04-08)
 
 ### Fix
