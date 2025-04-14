@@ -63,6 +63,8 @@ class SurveyData(TypedDict):
     useQualitativeScale: NotRequired[bool]
     conclusion: NotRequired[str]
     overallScoringRanges: NotRequired[list[ScoringRange]]
+    submitted_utc_timestamp: NotRequired[float]
+    submitted_local_timestamp_string: NotRequired[str]
 
 
 # Keep aliases for compatibility if needed, but prefer TypedDicts
@@ -168,6 +170,16 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
                 "conclusion": survey_data.get("conclusion", ""),
                 "overallScoringRanges": survey_data.get("overallScoringRanges", []),
             }
+
+            # Only add timestamp fields if they have non-None values
+            if survey_data.get("submitted_utc_timestamp") is not None:
+                survey_data_to_use["submitted_utc_timestamp"] = survey_data[
+                    "submitted_utc_timestamp"
+                ]
+            if survey_data.get("submitted_local_timestamp_string") is not None:
+                survey_data_to_use["submitted_local_timestamp_string"] = survey_data[
+                    "submitted_local_timestamp_string"
+                ]
 
         # Explicitly cast to SurveyData to satisfy MyPy
         typed_survey_data = cast(SurveyData, survey_data_to_use)

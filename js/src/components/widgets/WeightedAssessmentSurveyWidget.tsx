@@ -14,7 +14,7 @@ interface Question {
   comment: string;
   categoryWeights: Record<string, number>;
   categoryTypes: Record<string, 'performance' | 'enabler'>; // Performance or Enabler categorization
-  timestamps: Record<number, number>; // Store timestamps for each value change
+  timestamps: Record<string, number>; // Use string keys (created, modified)
   doNotKnow?: boolean; // Flag to indicate "I do not know" response
   antiText?: string; // Add optional anti-text field
 }
@@ -50,6 +50,8 @@ interface SurveyData {
   useQualitativeScale?: boolean; // Option to display qualitative labels (strongly disagree, etc) instead of numbers
   conclusion?: string; // Markdown conclusion text that will be stored but not shown in the flow
   overallScoringRanges?: ScoringRange[]; // Add overall scoring ranges
+  submitted_utc_timestamp?: number; // UTC timestamp from Date.now()
+  submitted_local_timestamp_string?: string; // Local timestamp string
 }
 
 // Define interface for storing scroll positions
@@ -68,9 +70,11 @@ interface WeightedAssessmentSurveyWidgetProps {
   saved: boolean;  // Add new prop for save events
   disable_editing: boolean;  // Add new prop
   read_only: boolean;  // Add read_only to props
+  model?: any; // Add optional model prop
 }
 
-function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetProps) {
+// Explicitly type the component function
+const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetProps> = (props) => {
   const [surveyData, setSurveyData] = useModelState<SurveyData>("survey_data");
   const [editMode, setEditMode] = useModelState<boolean>("edit_mode");
   const [className] = useModelState<string>("class_name");
@@ -692,7 +696,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
       comment: "",
       categoryWeights,
       categoryTypes,
-      timestamps: {},
+      timestamps: {}, // Initialize as empty object
       antiText: "" // Initialize antiText
     });
     
@@ -823,15 +827,27 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   
   // Handle submit action
   const handleSubmit = async () => {
-    // Set the submitted flag to true to trigger Python callback
+    // Add timestamps before setting submitted flag
+    const utcTimestamp = Date.now();
+    // Use toString() for a more reliable local string with timezone info
+    const localTimestampString = new Date().toString();
+
+    // Update surveyData state with timestamps by merging
+    setSurveyData({
+      ...surveyData, // Spread the current survey data
+      submitted_utc_timestamp: utcTimestamp,
+      submitted_local_timestamp_string: localTimestampString,
+    });
+
+    // Now, set the submitted flag to true to trigger Python callback
     await setSubmitted(true);
     
-    // Ensure model changes are saved
+    // Ensure model changes are saved (if model exists)
     if (props.model) {
       await props.model.save_changes();
     }
     
-    // Update local UI state
+    // Update local UI state (optional)
     setIsSaved(true);
   };
   
@@ -1187,16 +1203,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
             Edit Category Weights
           </button>
           
-          {/* Add button for category types matrix */}
-          <button 
-            className="edit-types-button"
-            onClick={() => setShowCategoryTypesMatrix(true)}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor"/>
-            </svg>
-            Edit Performance/Enabler Types
-          </button>
+          {/* Button for category types matrix removed from here */}
         </div>
         
         {showWeightsMatrix && (
@@ -1217,7 +1224,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
           </div>
         )}
         
-        {/* Add modal for category types matrix */}
+        {/* Modal for category types matrix rendering remains, triggered by the Types tab */}
         {showCategoryTypesMatrix && (
           <div className="weights-modal-overlay" onClick={() => setShowCategoryTypesMatrix(false)}>
             <div className="weights-modal-fullscreen" onClick={e => e.stopPropagation()}>
@@ -1454,69 +1461,60 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
     setSurveyData(newData);
   };
 
-  // Add generateRandomAnswers function after clearAllAnswers
+  // Generate random answers for testing
   const generateRandomAnswers = async () => {
-    const newData = { ...surveyData };
+    const updatedSurveyData = { ...surveyData };
     
-    // Sample comments in plain text (without markdown formatting)
-    const commentTemplates = [
-      "This score seems appropriate based on the current circumstances.",
-      "I'd like to note that this area needs improvement.",
-      "Additional Notes: This rating reflects recent changes we've observed.",
-      "Score is based on the following factors: Recent performance, Historical data, Team feedback",
-      "This is a provisional rating that may change with more information.",
-      "Rating justification: Value represents current assessment based on available data",
-      "I'm confident in this score based on multiple observations.",
-      "Previous rating was lower but recent improvements justify this score.",
-      "Reasoning: This score aligns with our expectations for this category.",
-      "Rating is influenced by: Primary factors, Secondary considerations, External variables",
-      "Note: This assessment is preliminary and subject to review.",
-      "The score reflects a balanced consideration of strengths and weaknesses."
-    ];
-    
-    // Generate random answers for all questions
-    newData.groups.forEach(group => {
+    // Loop through all groups
+    updatedSurveyData.groups.forEach(group => {
+      // Loop through all questions in the group
       group.questions.forEach(question => {
-        // Ensure min and max are valid numbers
-        const min = typeof question.min === 'number' ? question.min : 0;
-        const max = typeof question.max === 'number' ? question.max : 5;
+        // Generate a random value between min and max
+        const min = question.min || 0;
+        const max = question.max || 5;
+        const randomValue = Math.floor(Math.random() * (max - min + 1)) + min;
         
-        // Generate a random value between min and max (inclusive)
-        const range = max - min;
-        const randomValue = Math.floor(Math.random() * (range + 1)) + min;
+        // Set the random value for the question
         question.value = randomValue;
         
-        // Generate a random comment for approximately 40% of questions
-        if (Math.random() < 0.4) {
-          // Select a random comment template
-          const commentTemplate = commentTemplates[Math.floor(Math.random() * commentTemplates.length)];
-          
-          // Create value-specific comment content
-          let valueSpecificComment = "";
-          if (randomValue <= min + (range * 0.25)) {
-            valueSpecificComment = "\n\nThis low score indicates significant concerns.";
-          } else if (randomValue <= min + (range * 0.5)) {
-            valueSpecificComment = "\n\nThis score indicates some areas for improvement.";
-          } else if (randomValue <= min + (range * 0.75)) {
-            valueSpecificComment = "\n\nThis above-average score shows good progress.";
-          } else {
-            valueSpecificComment = "\n\nThis high score reflects excellent performance.";
-          }
-          
-          // Combine template and value-specific comment
-          question.comment = commentTemplate + valueSpecificComment;
+        // Set a random comment with 25% probability
+        if (Math.random() < 0.25) {
+          question.comment = `This is a randomly generated comment for question ${question.id}.`;
         } else {
-          // Clear any existing comment
           question.comment = "";
+        }
+        
+        // Initialize timestamps or update the modified timestamp
+        if (!question.timestamps) {
+          question.timestamps = {
+            created: Date.now(),
+            modified: Date.now()
+          };
+        } else {
+          question.timestamps.modified = Date.now();
         }
       });
     });
     
-    // Update survey data
-    setSurveyData(newData);
+    // Add submission timestamps, just like handleSubmit does
+    const utcTimestamp = Date.now();
+    const localTimestampString = new Date().toString();
     
-    // Set submitted to true to trigger Python callback
+    updatedSurveyData.submitted_utc_timestamp = utcTimestamp;
+    updatedSurveyData.submitted_local_timestamp_string = localTimestampString;
+    
+    // Update the survey data state
+    setSurveyData(updatedSurveyData);
+    
+    // Trigger the submission process - this will call the Python on_submit callback
     await setSubmitted(true);
+    
+    // Ensure model changes are saved (if model exists)
+    if (props.model) {
+      await props.model.save_changes();
+    }
+    
+    // No alert message - silently complete the random data generation
   };
 
   // Add downloadSurveyJson function after generateRandomAnswers
@@ -1590,7 +1588,9 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
           })) : [],
           useQualitativeScale: uploadedData.useQualitativeScale,
           conclusion: uploadedData.conclusion || '',
-          overallScoringRanges: Array.isArray(uploadedData.overallScoringRanges) ? uploadedData.overallScoringRanges : [{ min: 0, max: 100, title: "Default Range", text: "Default range description" }]
+          overallScoringRanges: Array.isArray(uploadedData.overallScoringRanges) ? uploadedData.overallScoringRanges : [{ min: 0, max: 100, title: "Default Range", text: "Default range description" }],
+          submitted_utc_timestamp: uploadedData.submitted_utc_timestamp,
+          submitted_local_timestamp_string: uploadedData.submitted_local_timestamp_string
         };
         
         // Update the survey data
@@ -2243,7 +2243,7 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                           </svg>
                         </button>
                       </div>
-                      <div className="weights-modal-content">
+                      <div className="weights-modal-content" ref={modalContentRef}>
                         <CategoryTypesMatrix />
                       </div>
                     </div>
@@ -2992,5 +2992,5 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
 }
 
 export default {
-  render: createRender(WeightedAssessmentSurveyWidget)
+  render: createRender(WeightedAssessmentSurveyWidget as any) // Cast to any for createRender
 } 
