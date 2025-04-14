@@ -2,6 +2,19 @@
 
 
 
+## v0.2.8 (2025-04-14)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Update timestamps handling and enhance survey data structure
+
+- Changed the `timestamps` property in the `Question` interface to use string keys for better clarity.
+- Added `submitted_utc_timestamp` and `submitted_local_timestamp_string` fields to the `SurveyData` interface for tracking submission times.
+- Updated the `handleSubmit` and `generateRandomAnswers` functions to include timestamp management.
+- Removed the button for editing category types from the UI while retaining the modal functionality.
+- Ensured model changes are saved after submission in both the submit and random answer generation processes. ([`1d413a6`](https://github.com/numerous-com/numerous-widgets/commit/1d413a65b96c5d74d77631e5c6751c62321f4de9))
+
+
 ## v0.2.7 (2025-04-14)
 
 ### Fix
