@@ -2477,3 +2477,27 @@
   gap: 12px;
   margin-bottom: 16px;
 }
+
+/* Add styles for anti-text input */
+.anti-text-container {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--ui-widget-border-color);
+}
+
+.anti-text-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ui-widget-secondary-text);
+  margin-bottom: 4px;
+}
+
+.anti-text-input {
+  width: 100%;
+  min-height: auto; /* Override any min-height from .text-input */
+  height: auto; /* Let the browser determine height */
+  padding: 8px; /* Match standard text-input padding if needed */
+  font-size: 14px;
+  line-height: normal; /* Ensure standard line height */
+}

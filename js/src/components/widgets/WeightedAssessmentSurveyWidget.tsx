@@ -16,6 +16,7 @@ interface Question {
   categoryTypes: Record<string, 'performance' | 'enabler'>; // Performance or Enabler categorization
   timestamps: Record<number, number>; // Store timestamps for each value change
   doNotKnow?: boolean; // Flag to indicate "I do not know" response
+  antiText?: string; // Add optional anti-text field
 }
 
 interface Category {
@@ -691,7 +692,8 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
       comment: "",
       categoryWeights,
       categoryTypes,
-      timestamps: {}
+      timestamps: {},
+      antiText: "" // Initialize antiText
     });
     
     setSurveyData(newData);
@@ -1575,7 +1577,8 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
               comment: q.comment || '',
               categoryWeights: q.categoryWeights || {},
               categoryTypes: q.categoryTypes || {},
-              timestamps: q.timestamps || {}
+              timestamps: q.timestamps || {},
+              antiText: q.antiText || '' // Process antiText
             })) : [],
             scoringRanges: Array.isArray(group.scoringRanges) ? group.scoringRanges : []
           })),
@@ -2100,6 +2103,13 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
   // Add new state for showing the category types matrix
   const [showCategoryTypesMatrix, setShowCategoryTypesMatrix] = React.useState(false);
   
+  // Add function to update anti-text in edit mode
+  const updateQuestionAntiText = (groupIndex: number, questionIndex: number, antiText: string) => {
+    const newData = { ...surveyData };
+    newData.groups[groupIndex].questions[questionIndex].antiText = antiText;
+    setSurveyData(newData);
+  };
+  
   return (
     <div className={`weighted-assessment-survey ${props.class_name || ''} ${readOnly ? 'read-only' : ''}`}>
       <div className="progress-indicator">
@@ -2540,6 +2550,20 @@ function WeightedAssessmentSurveyWidget(props: WeightedAssessmentSurveyWidgetPro
                                   <div className="question-text-container">
                                   <SimpleMarkdownRender content={question.text} className="question-text" />
                                   </div>
+                                </div>
+                              )}
+                              
+                              {/* Add anti-text input in edit mode */}
+                              {editMode && (
+                                <div className="anti-text-container">
+                                  <label className="anti-text-label">Anti-Question Text:</label>
+                                  <input
+                                    type="text"
+                                    className="text-input anti-text-input"
+                                    value={question.antiText || ''}
+                                    onChange={(e) => updateQuestionAntiText(groupIndex, questionIndex, e.target.value)}
+                                    placeholder="Enter the anti-question text here..."
+                                  />
                                 </div>
                               )}
                               
