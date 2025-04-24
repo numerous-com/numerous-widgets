@@ -2,6 +2,16 @@
 
 
 
+## v0.2.9 (2025-04-24)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Temporarily hide &#34;I do not know&#34; checkbox in the UI
+
+- Updated the rendering logic for the &#34;I do not know&#34; checkbox to be hidden for now, while retaining the comment for future reference.
+- This change is made to streamline the user interface during the current development phase ([`2227cc3`](https://github.com/numerous-com/numerous-widgets/commit/2227cc302e6234b6a294987594bdf7e4b5013828))
+
+
 ## v0.2.8 (2025-04-14)
 
 ### Fix
