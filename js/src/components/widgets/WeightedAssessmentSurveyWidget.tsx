@@ -343,7 +343,7 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
   const generateValidationMessage = (groupIndex: number): string => {
     const count = countUnansweredQuestionsInGroup(groupIndex);
     if (count === 0) return '';
-    return `Please answer or check "I do not know" for ${count} more ${count === 1 ? 'question' : 'questions'} before proceeding.`;
+    return `Please answer ${count} more ${count === 1 ? 'question' : 'questions'} before proceeding.`;
   };
   
   // Add function to get count of unanswered questions in a group
@@ -2593,7 +2593,7 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
                                   </div>
                                   
                                   {/* Add "I do not know" checkbox */}
-                                  {!editMode && !readOnly && (
+                                  {false && !editMode && !readOnly && (
                                     <div className="do-not-know-container">
                                       <label className="do-not-know-label">
                                         <input

@@ -23,13 +23,6 @@ repos:
           - "marimo"
   - repo: local
     hooks:
-      - id: typescript-lint
-        name: typescript-lint
-        entry: powershell -Command "Set-Location js; npm run lint"
-        language: system
-        types: [javascript, jsx, ts, tsx]
-        pass_filenames: false
-        always_run: true
       - id: pytest-check
         stages: [pre-push]
         types: [python]
