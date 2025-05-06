@@ -756,7 +756,7 @@
   transition: background 0.25s ease-out;
 }
 
-/* Slider value markers */
+/* Slider Markers (Numbers 0-5 with text labels for 0 and 5) */
 .slider-markers {
   display: flex;
   justify-content: space-between;
@@ -764,6 +764,9 @@
   position: relative;
   width: 100%;
   z-index: 1;
+  height: 30px;
+  padding: 0 5px;
+  box-sizing: border-box;
 }
 
 .slider-marker {
@@ -772,154 +775,60 @@
   position: absolute;
   transform: translateX(-50%);
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.2;
   
-  /* Add tick mark for each marker */
+  .marker-number {
+    font-weight: 500;
+  }
+
+  .marker-text {
+    font-size: 10px;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+  
   &::before {
     content: '';
     position: absolute;
-    top: -15px;
+    top: -10px;
     left: 50%;
     transform: translateX(-50%);
     width: 1px;
-    height: 8px;
+    height: 6px;
     background-color: var(--ui-widget-border-color);
     z-index: 1;
   }
 
-  /* Add responsive styling for narrow screens */
-  @media (max-width: 600px) {
-    font-size: 10px;
-    
-    /* Alternate between top and bottom positioning for labels */
-    &:nth-child(even) {
-      top: 20px;
-    }
-    &:nth-child(odd) {
-      top: 5px;
-    }
+  /* Adjustments for first (0) and last (5) markers for text alignment */
+  &.marker-min {
+    transform: none; // Remove centering transform
+    text-align: left;
+    align-items: flex-start;
+    &::before { left: 0; transform: none; }
+    .marker-text { text-align: left; }
   }
-
-  /* Extra narrow screens */
-  @media (max-width: 400px) {
-    font-size: 9px;
-    
-    &:nth-child(even) {
-      top: 25px;
-    }
-    &:nth-child(odd) {
-      top: 8px;
-    }
-  }
-}
-
-.slider-markers.qualitative-scale {
-  margin-top: 8px;
-  margin-bottom: 8px;
-  padding: 0 40px;
-  width: calc(100% - 80px);
-
-  /* Add more space for staggered labels on narrow screens */
-  @media (max-width: 600px) {
-    margin-bottom: 35px;
-  }
-}
-
-.slider-markers.qualitative-scale .slider-marker {
-  font-size: 11px;
-  font-weight: 500;
-  white-space: nowrap;
-  max-width: 100px;
-  overflow: visible;
-  text-overflow: clip;
   
-  /* Adjust tick mark for qualitative scale */
-  &::before {
-    top: -18px;
-    height: 10px;
-  }
-
-  /* Responsive styling for qualitative scale */
-  @media (max-width: 600px) {
-    font-size: 10px;
-    max-width: 80px;
-    
-    /* Hide "agree" and "disagree" (typically 2nd and 4th items) and their ticks */
-    &:nth-child(2),
-    &:nth-child(4) {
-      font-size: 0;
-      
-      /* Hide the tick marks too */
-      &::before {
-        display: none;
-      }
-    }
-    
-    /* Stagger labels vertically */
-    &:nth-child(even) {
-      transform: translateX(-50%) translateY(20px);
-    }
-    
-    /* Adjust tick marks for staggered layout */
-    &:nth-child(even)::before {
-      top: -38px;
-      height: 30px;
-    }
-  }
-
-  /* Extra narrow screens */
-  @media (max-width: 400px) {
-    font-size: 9px;
-    max-width: 70px;
-    
-    /* Make sure "agree" and "disagree" remain hidden */
-    &:nth-child(2),
-    &:nth-child(4) {
-      font-size: 0;
-      
-      /* Keep tick marks hidden */
-      &::before {
-        display: none;
-      }
-    }
-    
-    &:nth-child(even) {
-      transform: translateX(-50%) translateY(25px);
-    }
-  }
-}
-
-/* Add specific positioning for first and last labels */
-.slider-markers.qualitative-scale .slider-marker:first-child {
-  left: 0 !important; 
-  transform: none;
-  text-align: left;
-  max-width: none;
-  
-  &::before {
-    left: 0;
-    transform: none;
-  }
-}
-
-.slider-markers.qualitative-scale .slider-marker:last-child {
-  left: auto !important;
-  right: 0;
-  transform: none;
-  text-align: right;
-  max-width: none;
-  
-  &::before {
+  &.marker-max {
     left: auto;
     right: 0;
     transform: none;
+    text-align: right;
+    align-items: flex-end;
   }
-}
 
-/* Ensure middle labels are properly centered */
-.slider-markers.qualitative-scale .slider-marker:nth-child(2),
-.slider-markers.qualitative-scale .slider-marker:nth-child(3),
-.slider-markers.qualitative-scale .slider-marker:nth-child(4) {
-  transform: translateX(-50%);
+  /* Responsive adjustments if needed */
+  @media (max-width: 400px) {
+    .marker-text {
+      font-size: 9px;
+    }
+    &::before {
+      top: -8px;
+      height: 4px;
+    }
+  }
 }
 
 /* Selected value display */

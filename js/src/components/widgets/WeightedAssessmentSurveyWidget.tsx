@@ -747,60 +747,41 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
   
   // Generate slider markers
   const renderSliderMarkers = (min: number, max: number) => {
-    // Calculate appropriate step size to ensure we have at most 6 markers
-    const range = max - min;
-    const maxMarkers = 6;
-    const step = Math.ceil(range / (maxMarkers - 1));
+    const numericLabels = [0, 1, 2, 3, 4, 5];
+    // const range = max - min; // No longer needed for positioning labels
     
-    // Create array of marker values
-    const markers = [];
-    for (let value = min; value <= max; value += step) {
-      markers.push(value);
-    }
-    
-    // Ensure the max value is always included
-    if (markers[markers.length - 1] !== max) {
-      markers[markers.length - 1] = max;
-    }
-    
-    // When using qualitative scale, always show exactly 5 labels
-    if (surveyData.useQualitativeScale) {
-      const qualitativeValues = [0, 1, 2, 3, 4]; // These will be normalized to the min-max range
-      
+    // Handle case where min === max - render a single centered label
+    if (min === max) {
       return (
-        <div className="slider-markers qualitative-scale">
-          {qualitativeValues.map((value) => {
-            // Calculate the actual value in the min-max range
-            const actualValue = min + (value * (max - min) / 4);
-            // Calculate the position as a percentage along the slider
-            const percentage = (value / 4) * 100;
-            return (
-              <div 
-                key={value} 
-                className="slider-marker"
-                style={{ left: `${percentage}%` }}
-              >
-                {getQualitativeLabel(value, 0, 4)} {/* Always use standard 0-4 range for labels */}
-              </div>
-            );
-          })}
+        <div className="slider-markers numeric-scale">
+          <div className="slider-marker single-value-marker" style={{ left: '50%' }}>
+            <span className="marker-number">{min}</span>
+            {/* Add text if the single value is 0 or 5 */}
+            {min === 0 && <span className="marker-text">Strongly Disagree</span>}
+            {min === 5 && <span className="marker-text">Strongly Agree</span>}
+          </div>
         </div>
       );
     }
-    
-    // Default numeric display
+
     return (
-      <div className="slider-markers">
-        {markers.map((value) => {
-          // Calculate the position as a percentage along the slider
-          const percentage = ((value - min) / (max - min)) * 100;
+      <div className="slider-markers numeric-scale">
+        {numericLabels.map((value) => {
+          // Position labels based on a fixed 0-5 scale
+          const percentage = (value / 5) * 100;
+          
+          const isFirstLabel = value === 0;
+          const isLastLabel = value === 5;
+
           return (
             <div 
               key={value} 
-              className="slider-marker"
+              className={`slider-marker numeric-marker ${isFirstLabel ? 'marker-min' : ''} ${isLastLabel ? 'marker-max' : ''}`}
               style={{ left: `${percentage}%` }}
             >
-              {value}
+              <span className="marker-number">{value}</span>
+              {value === 0 && <span className="marker-text">Strongly Disagree</span>}
+              {value === 5 && <span className="marker-text">Strongly Agree</span>}
             </div>
           );
         })}
@@ -1623,23 +1604,6 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
     }
   };
 
-  // Get the qualitative labels for a numeric value
-  const getQualitativeLabel = (value: number, min: number, max: number) => {
-    // If min and max don't match the standard 0-4 range, adjust accordingly
-    const normalizedValue = min === 0 && max === 4 
-      ? value 
-      : Math.round((value - min) / (max - min) * 4);
-    
-    switch (normalizedValue) {
-      case 0: return "Strongly Disagree";
-      case 1: return "Disagree";
-      case 2: return "Agree";
-      case 3: return "Strongly Agree";
-      case 4: return "Best in Class";
-      default: return value.toString(); // Fallback to numeric value
-    }
-  };
-  
   // Function to toggle qualitative scale option
   const toggleQualitativeScale = () => {
     const updatedSurveyData = { ...surveyData };
