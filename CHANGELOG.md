@@ -2,6 +2,18 @@
 
 
 
+## v0.2.10 (2025-05-06)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Simplify slider marker rendering and enhance styling
+
+- Removed the qualitative scale logic and replaced it with a numeric scale displaying values from 0 to 5.
+- Updated the rendering of slider markers to include text labels for &#34;Strongly Disagree&#34; and &#34;Strongly Agree&#34; at the respective ends.
+- Enhanced CSS for slider markers to improve layout and responsiveness, including adjustments for text alignment and spacing.
+- Cleaned up unused code related to qualitative labels and adjusted marker positioning for better visual clarity. ([`1f71abc`](https://github.com/numerous-com/numerous-widgets/commit/1f71abcee9dc0b256ad0f4ce781ca3e80003ad1b))
+
+
 ## v0.2.9 (2025-04-24)
 
 ### Fix
