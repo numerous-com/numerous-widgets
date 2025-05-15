@@ -2,6 +2,17 @@
 
 
 
+## v0.2.12 (2025-05-15)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Improve slider drag handling and state management
+
+- Added state management for tracking if the user is actively dragging the slider.
+- Updated mouse event handlers to properly manage the slider drag state, ensuring the drag value is only cleared when not actively dragging.
+- Enhanced touch event handling to maintain consistent behavior across devices. ([`2a5c8c5`](https://github.com/numerous-com/numerous-widgets/commit/2a5c8c509494005c34ca78dd558a002e2435021b))
+
+
 ## v0.2.11 (2025-05-15)
 
 ### Fix
