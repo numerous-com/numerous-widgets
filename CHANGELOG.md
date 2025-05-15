@@ -2,6 +2,16 @@
 
 
 
+## v0.2.13 (2025-05-15)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Update help text tooltip implementation
+
+- Changed the help text display from using the `title` attribute to a `data-title` attribute for better accessibility and consistency.
+- Updated CSS to reflect the change in tooltip functionality, ensuring help text is displayed correctly on hover. ([`ffdb5d6`](https://github.com/numerous-com/numerous-widgets/commit/ffdb5d6f3d2987af5141cfb1f58a5e855dedfa91))
+
+
 ## v0.2.12 (2025-05-15)
 
 ### Fix
