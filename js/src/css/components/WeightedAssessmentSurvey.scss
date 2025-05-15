@@ -2439,8 +2439,8 @@
 }
 
 /* Add tooltip functionality */
-.question-help-icon[title]:hover::after {
-  content: attr(title);
+.question-help-icon[data-title]:hover::after {
+  content: attr(data-title);
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -2460,7 +2460,7 @@
   word-break: break-word;
 }
 
-.question-help-icon[title]:hover::before {
+.question-help-icon[data-title]:hover::before {
   content: '';
   position: absolute;
   left: 50%;
