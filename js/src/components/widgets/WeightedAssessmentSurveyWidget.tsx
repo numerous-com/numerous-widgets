@@ -17,6 +17,7 @@ interface Question {
   timestamps: Record<string, number>; // Use string keys (created, modified)
   doNotKnow?: boolean; // Flag to indicate "I do not know" response
   antiText?: string; // Add optional anti-text field
+  helpText?: string; // Add optional help text field for info icon tooltip
 }
 
 interface Category {
@@ -2074,6 +2075,13 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
     setSurveyData(newData);
   };
   
+  // Add function to update question help text in edit mode
+  const updateQuestionHelpText = (groupIndex: number, questionIndex: number, helpText: string) => {
+    const newData = { ...surveyData };
+    newData.groups[groupIndex].questions[questionIndex].helpText = helpText;
+    setSurveyData(newData);
+  };
+  
   return (
     <div className={`weighted-assessment-survey ${props.class_name || ''} ${readOnly ? 'read-only' : ''}`}>
       <div className="progress-indicator">
@@ -2512,12 +2520,39 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
                               ) : (
                                 <div className="question-content">
                                   <div className="question-text-container">
-                                  <SimpleMarkdownRender content={question.text} className="question-text" />
+                                    <div className="question-text-with-help">
+                                      <SimpleMarkdownRender 
+                                        content={question.text}
+                                        className="question-text-inline"
+                                      />
+                                      {question.helpText && (
+                                        <span className="question-help-icon" title={question.helpText}>
+                                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z" fill="currentColor"/>
+                                          </svg>
+                                        </span>
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
                               )}
                               
-                              {/* Add anti-text input in edit mode */}
+                              {/* Add help text editor in edit mode */}
+                              {editMode && (
+                                <div className="help-text-container">
+                                  <label className="help-text-label">
+                                    Question Help Text (shown on hover):
+                                    <textarea
+                                      className="textarea-input help-text-input"
+                                      value={question.helpText || ""}
+                                      onChange={(e) => updateQuestionHelpText(groupIndex, questionIndex, e.target.value)}
+                                      placeholder="Enter optional help text for this question..."
+                                    />
+                                  </label>
+                                </div>
+                              )}
+
+                              {/* Anti-text input in edit mode */}
                               {editMode && (
                                 <div className="anti-text-container">
                                   <label className="anti-text-label">Anti-Question Text:</label>
@@ -2545,11 +2580,21 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
                                     }
                                     min={question.min}
                                     max={question.max}
-                                    onChange={(e) => handleSliderDrag(groupIndex, questionIndex, Number(e.target.value))}
+                                    onChange={(e) => {
+                                      const newValue = Number(e.target.value);
+                                      handleSliderDrag(groupIndex, questionIndex, newValue);
+                                      // Also update the value immediately to prevent Chrome issues
+                                      updateQuestionValue(groupIndex, questionIndex, newValue);
+                                    }}
                                     onMouseMove={(e) => handleSliderMouseMove(e, groupIndex, questionIndex, question)}
                                     onMouseLeave={handleSliderMouseLeave}
                                     onMouseUp={handleSliderRelease}
                                     onTouchEnd={handleSliderRelease}
+                                    onClick={(e) => {
+                                      // Ensure the value is updated on direct click
+                                      const newValue = Number((e.target as HTMLInputElement).value);
+                                      updateQuestionValue(groupIndex, questionIndex, newValue);
+                                    }}
                                     disabled={readOnly}
                                   />
                                   <div className="slider-markers">

@@ -37,6 +37,7 @@ class Question(TypedDict):
     timestamps: dict[str, float]  # Using dict for created/modified
     doNotKnow: NotRequired[bool]
     antiText: NotRequired[str]
+    helpText: NotRequired[str]  # Add helpText for question info/tooltip
 
 
 class Category(TypedDict):
