@@ -1701,8 +1701,12 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
     handleSliderDrag(groupIndex, questionIndex, Math.round(value));
   };
   
+  // Only clear drag value if not actively dragging
   const handleSliderMouseLeave = () => {
-    setSliderDragValue(null);
+    // Only clear if not actively dragging
+    if (!isDragging) {
+      setSliderDragValue(null);
+    }
   };
   
   // Image preview component to handle image loading
@@ -2080,6 +2084,20 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
     const newData = { ...surveyData };
     newData.groups[groupIndex].questions[questionIndex].helpText = helpText;
     setSurveyData(newData);
+  };
+  
+  // Add state to track if user is actively dragging
+  const [isDragging, setIsDragging] = React.useState(false);
+  
+  // Handle slider mouse down - start dragging
+  const handleSliderMouseDown = (groupIndex: number, questionIndex: number) => {
+    setIsDragging(true);
+  };
+  
+  // Handle slider mouse up - end dragging
+  const handleSliderMouseUp = () => {
+    setIsDragging(false);
+    handleSliderRelease();
   };
   
   return (
@@ -2586,10 +2604,17 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
                                       // Also update the value immediately to prevent Chrome issues
                                       updateQuestionValue(groupIndex, questionIndex, newValue);
                                     }}
-                                    onMouseMove={(e) => handleSliderMouseMove(e, groupIndex, questionIndex, question)}
+                                    onMouseDown={() => handleSliderMouseDown(groupIndex, questionIndex)}
+                                    onMouseUp={handleSliderMouseUp}
                                     onMouseLeave={handleSliderMouseLeave}
-                                    onMouseUp={handleSliderRelease}
-                                    onTouchEnd={handleSliderRelease}
+                                    onTouchEnd={() => {
+                                      setIsDragging(false);
+                                      handleSliderRelease();
+                                    }}
+                                    onTouchCancel={() => {
+                                      setIsDragging(false);
+                                      setSliderDragValue(null);
+                                    }}
                                     onClick={(e) => {
                                       // Ensure the value is updated on direct click
                                       const newValue = Number((e.target as HTMLInputElement).value);
