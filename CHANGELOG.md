@@ -2,6 +2,18 @@
 
 
 
+## v0.2.11 (2025-05-15)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Add help text functionality for questions
+
+- Introduced an optional `helpText` field in the `Question` interface to provide additional information via tooltips.
+- Implemented a help text editor in edit mode, allowing users to input help text for each question.
+- Enhanced the UI to display a help icon next to question text, showing the help text on hover.
+- Updated CSS for help text and icons to improve layout and user experience. ([`386b7d4`](https://github.com/numerous-com/numerous-widgets/commit/386b7d4a777aef23b84512ad0d5d4d203dcaeabd))
+
+
 ## v0.2.10 (2025-05-06)
 
 ### Fix
