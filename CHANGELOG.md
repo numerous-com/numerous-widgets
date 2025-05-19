@@ -2,6 +2,18 @@
 
 
 
+## v0.2.14 (2025-05-19)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Simplify slider handling and state management
+
+- Removed unnecessary state tracking for slider drag values, streamlining the slider interaction process.
+- Consolidated slider change handling into a single function for both change and click events.
+- Updated progress bar rendering to enhance accessibility with ARIA attributes.
+- Cleaned up mouse event handlers related to slider interactions, improving code clarity and maintainability. ([`250b037`](https://github.com/numerous-com/numerous-widgets/commit/250b037b8a994b909496114848dca88921ae216d))
+
+
 ## v0.2.13 (2025-05-15)
 
 ### Fix
