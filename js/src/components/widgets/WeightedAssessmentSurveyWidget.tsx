@@ -154,13 +154,6 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
   // Add state for showing final slide
   const [showFinalSlide, setShowFinalSlide] = React.useState(false);
   
-  // Add state to track slider value during dragging
-  const [sliderDragValue, setSliderDragValue] = React.useState<{
-    groupIndex: number;
-    questionIndex: number;
-    value: number;
-  } | null>(null);
-  
   // Force edit_mode to false when disable_editing is true
   React.useEffect(() => {
     if (props.disable_editing && editMode) {
@@ -405,7 +398,7 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
     setSurveyData(newData);
   };
   
-  // Update question value with timestamp and reset submitted state
+  // Update question value directly without intermediate state
   const updateQuestionValue = (groupIndex: number, questionIndex: number, newValue: number | null): void => {
     // Create a copy of the survey data
     const updatedSurveyData = { ...surveyData };
@@ -429,6 +422,7 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
       question.timestamps.modified = Date.now();
     }
     
+    // Update state in a single operation
     setSurveyData(updatedSurveyData);
   };
   
@@ -790,12 +784,24 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
     );
   };
   
-  // Replace renderProgressDots with renderProgressBar
+  // Simplified handler for slider change
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>, groupIndex: number, questionIndex: number) => {
+    const newValue = Number(e.target.value);
+    updateQuestionValue(groupIndex, questionIndex, newValue);
+  };
+
+  // Handle slider click - update value on direct click
+  const handleSliderClick = (e: React.MouseEvent<HTMLInputElement>, groupIndex: number, questionIndex: number) => {
+    const newValue = Number((e.target as HTMLInputElement).value);
+    updateQuestionValue(groupIndex, questionIndex, newValue);
+  };
+
+  // Make the progress bar non-interactive by updating renderProgressBar
   const renderProgressBar = () => {
     const progressPercentage = progress.percentage;
     
     return (
-      <div className="progress-bar-container">
+      <div className="progress-bar-container" role="progressbar" aria-valuenow={progressPercentage} aria-valuemin={0} aria-valuemax={100}>
         <div 
           className="progress-bar-fill"
           style={{ width: `${progressPercentage}%` }}
@@ -1643,24 +1649,6 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
     return index !== undefined ? index : -1;
   };
 
-  // Handle slider drag (update visual state only)
-  const handleSliderDrag = (groupIndex: number, questionIndex: number, value: number) => {
-    setSliderDragValue({
-      groupIndex,
-      questionIndex,
-      value
-    });
-  };
-
-  // Handle slider release (commit the value)
-  const handleSliderRelease = () => {
-    if (sliderDragValue) {
-      const { groupIndex, questionIndex, value } = sliderDragValue;
-      updateQuestionValue(groupIndex, questionIndex, value);
-      setSliderDragValue(null);
-    }
-  };
-
   // Add state for icon preview background mode (checkerboard or dark)
   const [iconPreviewDarkMode, setIconPreviewDarkMode] = React.useState<Record<string, boolean>>({});
   
@@ -1684,31 +1672,16 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
     }));
   };
 
-  // Add mouse hover handling for sliders
-  const handleSliderMouseMove = (e: React.MouseEvent<HTMLInputElement>, groupIndex: number, questionIndex: number, question: Question) => {
-    // Only show preview position if the slider hasn't been set yet
-    if (question.value !== null) return;
-    
-    const slider = e.currentTarget;
-    const rect = slider.getBoundingClientRect();
-    const position = e.clientX - rect.left;
-    const percentage = Math.max(0, Math.min(1, position / rect.width));
-    
-    // Calculate value based on percentage of slider width
-    const value = question.min + percentage * (question.max - question.min);
-    
-    // Update slider preview position
-    handleSliderDrag(groupIndex, questionIndex, Math.round(value));
-  };
-  
-  // Only clear drag value if not actively dragging
+  // Handle slider mouse leave - no longer needed after simplification
   const handleSliderMouseLeave = () => {
-    // Only clear if not actively dragging
-    if (!isDragging) {
-      setSliderDragValue(null);
-    }
+    // Function kept for compatibility but simplified - does nothing now
   };
-  
+
+  // Add mouse hover handling for sliders - no longer needed, simplifying state management
+  const handleSliderMouseMove = (e: React.MouseEvent<HTMLInputElement>, groupIndex: number, questionIndex: number, question: Question) => {
+    // Function kept for compatibility but simplified - does nothing now
+  };
+
   // Image preview component to handle image loading
   const ImagePreview: React.FC<{
     imageRef: string | undefined;
@@ -2086,18 +2059,14 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
     setSurveyData(newData);
   };
   
-  // Add state to track if user is actively dragging
-  const [isDragging, setIsDragging] = React.useState(false);
-  
   // Handle slider mouse down - start dragging
   const handleSliderMouseDown = (groupIndex: number, questionIndex: number) => {
-    setIsDragging(true);
+    // Function kept for compatibility but simplified - does nothing now
   };
   
   // Handle slider mouse up - end dragging
   const handleSliderMouseUp = () => {
-    setIsDragging(false);
-    handleSliderRelease();
+    // Function kept for compatibility but simplified - does nothing now
   };
   
   return (
@@ -2589,37 +2558,11 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
                                   <input
                                     type="range"
                                     className={`assessment-slider ${question.value === null ? 'unselected' : ''}`}
-                                    value={
-                                      sliderDragValue && 
-                                      sliderDragValue.groupIndex === groupIndex && 
-                                      sliderDragValue.questionIndex === questionIndex
-                                        ? sliderDragValue.value
-                                        : question.value !== null ? question.value : question.min
-                                    }
+                                    value={question.value !== null ? question.value : question.min}
                                     min={question.min}
                                     max={question.max}
-                                    onChange={(e) => {
-                                      const newValue = Number(e.target.value);
-                                      handleSliderDrag(groupIndex, questionIndex, newValue);
-                                      // Also update the value immediately to prevent Chrome issues
-                                      updateQuestionValue(groupIndex, questionIndex, newValue);
-                                    }}
-                                    onMouseDown={() => handleSliderMouseDown(groupIndex, questionIndex)}
-                                    onMouseUp={handleSliderMouseUp}
-                                    onMouseLeave={handleSliderMouseLeave}
-                                    onTouchEnd={() => {
-                                      setIsDragging(false);
-                                      handleSliderRelease();
-                                    }}
-                                    onTouchCancel={() => {
-                                      setIsDragging(false);
-                                      setSliderDragValue(null);
-                                    }}
-                                    onClick={(e) => {
-                                      // Ensure the value is updated on direct click
-                                      const newValue = Number((e.target as HTMLInputElement).value);
-                                      updateQuestionValue(groupIndex, questionIndex, newValue);
-                                    }}
+                                    onChange={(e) => handleSliderChange(e, groupIndex, questionIndex)}
+                                    onClick={(e) => handleSliderClick(e, groupIndex, questionIndex)}
                                     disabled={readOnly}
                                   />
                                   <div className="slider-markers">
