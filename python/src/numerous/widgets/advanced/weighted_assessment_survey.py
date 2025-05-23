@@ -66,6 +66,7 @@ class SurveyData(TypedDict):
     overallScoringRanges: NotRequired[list[ScoringRange]]
     submitted_utc_timestamp: NotRequired[float]
     submitted_local_timestamp_string: NotRequired[str]
+    enable_do_not_know: NotRequired[bool]  # Option to enable "I do not know" feature
 
 
 # Keep aliases for compatibility if needed, but prefer TypedDicts
@@ -96,6 +97,8 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
         disable_editing: Whether the survey is disabled for editing (default: False)
         read_only: Whether the survey is in read-only mode (default: False)
         survey_mode: Whether to run in secure survey mode, limiting data sent to JS
+                     (default: False)
+        enable_do_not_know: Whether to enable the "I do not know" option for questions
                      (default: False)
 
     Examples:
@@ -136,6 +139,7 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
     saved = traitlets.Bool(default_value=False).tag(sync=True)
     disable_editing = traitlets.Bool(default_value=False).tag(sync=True)
     read_only = traitlets.Bool(default_value=False).tag(sync=True)
+    enable_do_not_know = traitlets.Bool(default_value=False).tag(sync=True)
 
     # Load the JavaScript and CSS from external files
     _esm = ESM
@@ -152,6 +156,7 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
         disable_editing: bool = False,
         read_only: bool = False,
         survey_mode: bool = False,
+        enable_do_not_know: bool = False,
     ) -> None:
         # Initialize widget
         super().__init__()
@@ -170,6 +175,7 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
                 "useQualitativeScale": survey_data.get("useQualitativeScale", False),
                 "conclusion": survey_data.get("conclusion", ""),
                 "overallScoringRanges": survey_data.get("overallScoringRanges", []),
+                "enable_do_not_know": survey_data.get("enable_do_not_know", False),
             }
 
             # Only add timestamp fields if they have non-None values
@@ -204,6 +210,7 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
         self.disable_editing = disable_editing
         self.read_only = read_only
         self._survey_mode = survey_mode
+        self.enable_do_not_know = enable_do_not_know
 
         # Register callbacks if provided
         if on_submit is not None:
@@ -587,3 +594,25 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
         """
         # Set the saved flag to True to trigger the callback
         self.saved = True
+
+    def set_enable_do_not_know(self, enable: bool) -> None:
+        """
+        Set the enable_do_not_know property after initialization.
+
+        This updates both the traitlet and the survey data structure.
+
+        Args:
+            enable: Whether to enable the "I do not know" option
+
+        """
+        # Update the traitlet property
+        self.enable_do_not_know = enable
+
+        # Update both survey data dictionaries
+        survey_data_dict = cast(dict[str, Any], self.survey_data)
+        survey_data_dict["enable_do_not_know"] = enable
+
+        # Also update the complete survey data if using survey mode
+        if self._survey_mode:
+            complete_data_dict = cast(dict[str, Any], self._complete_survey_data)
+            complete_data_dict["enable_do_not_know"] = enable

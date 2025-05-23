@@ -71,6 +71,7 @@ interface WeightedAssessmentSurveyWidgetProps {
   saved: boolean;  // Add new prop for save events
   disable_editing: boolean;  // Add new prop
   read_only: boolean;  // Add read_only to props
+  enable_do_not_know: boolean; // Add new prop for enabling "I do not know"
   model?: any; // Add optional model prop
 }
 
@@ -82,6 +83,7 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
   const [saved, setSaved] = useModelState<boolean>("saved");  // Get both value and setter
   const [disableEditing] = useModelState<boolean>("disable_editing");
   const [readOnly] = useModelState<boolean>("read_only");
+  const [enableDoNotKnow] = useModelState<boolean>("enable_do_not_know"); // Retrieve the new state
   
   // Add state for original data near the top with other state declarations
   const [originalData, setOriginalData] = React.useState<SurveyData | null>(null);
@@ -2570,7 +2572,7 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
                                   </div>
                                   
                                   {/* Add "I do not know" checkbox */}
-                                  {false && !editMode && !readOnly && (
+                                  {enableDoNotKnow && !editMode && !readOnly && (
                                     <div className="do-not-know-container">
                                       <label className="do-not-know-label">
                                         <input
