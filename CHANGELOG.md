@@ -2,6 +2,17 @@
 
 
 
+## v0.2.15 (2025-05-23)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Add &#34;I do not know&#34; option
+
+- Introduced a new prop `enable_do_not_know` to the WeightedAssessmentSurveyWidget for enabling the &#34;I do not know&#34; feature.
+- Updated the SurveyData structure to include the new option.
+- Enhanced the widget&#39;s functionality to conditionally render the &#34;I do not know&#34; checkbox based on the new prop. ([`ea77b12`](https://github.com/numerous-com/numerous-widgets/commit/ea77b125e0822b9d446f02012f8f94c6b05361a6))
+
+
 ## v0.2.14 (2025-05-19)
 
 ### Fix
