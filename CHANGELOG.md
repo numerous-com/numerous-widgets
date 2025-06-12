@@ -2,6 +2,15 @@
 
 
 
+## v0.2.16 (2025-06-12)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Ensure doNotKnow is reset when setting question value
+
+- Updated the logic to set `doNotKnow` to false whenever a value is assigned to a question, ensuring consistent behavior in the survey flow. ([`eb81288`](https://github.com/numerous-com/numerous-widgets/commit/eb812880a5280e14fdfafd7227d76675fd541670))
+
+
 ## v0.2.15 (2025-05-23)
 
 ### Fix
