@@ -1467,6 +1467,9 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
         // Set the random value for the question
         question.value = randomValue;
         
+        // Ensure doNotKnow is set to false when setting a value (consistent with normal flow)
+        question.doNotKnow = false;
+        
         // Set a random comment with 25% probability
         if (Math.random() < 0.25) {
           question.comment = `This is a randomly generated comment for question ${question.id}.`;
