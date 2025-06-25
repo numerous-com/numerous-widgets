@@ -246,9 +246,6 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
       ...updates
     };
     
-    // Sort ranges by min value
-    group.scoringRanges.sort((a, b) => a.min - b.min);
-    
     setSurveyData(newData);
   };
 
@@ -1377,9 +1374,6 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
       ...updates
     };
     
-    // Sort ranges by min value
-    category.scoringRanges.sort((a, b) => a.min - b.min);
-    
     setSurveyData(updatedSurveyData);
   };
 
@@ -1783,9 +1777,6 @@ const WeightedAssessmentSurveyWidget: React.FC<WeightedAssessmentSurveyWidgetPro
       ...range,
       ...updates
     };
-    
-    // Sort ranges by min value
-    updatedSurveyData.overallScoringRanges.sort((a, b) => a.min - b.min);
     
     setSurveyData(updatedSurveyData);
   };
