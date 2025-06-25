@@ -2,6 +2,15 @@
 
 
 
+## v0.2.17 (2025-06-25)
+
+### Fix
+
+* fix(WeightedAssessmentSurvey): Remove redundant sorting of scoring ranges
+
+- Eliminated unnecessary sorting of scoring ranges by minimum value in multiple locations within the WeightedAssessmentSurveyWidget, improving code clarity and performance. ([`578c505`](https://github.com/numerous-com/numerous-widgets/commit/578c505e4598a0e32ab660bb74fbdf05bb20b736))
+
+
 ## v0.2.16 (2025-06-12)
 
 ### Fix
