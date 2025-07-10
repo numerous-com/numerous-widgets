@@ -21,6 +21,7 @@ from .base.container import (
 from .base.container import (
     side_by_side_container as side_by_side_container,
 )
+from .base.copy_to_clipboard import CopyToClipboard as CopyToClipboard
 from .base.datetime_picker import DateTimePicker as DateTimePicker
 from .base.datetime_range_picker import DateTimeRangePicker as DateTimeRangePicker
 from .base.dom_element_map import DOMElementMap as DOMElementMap

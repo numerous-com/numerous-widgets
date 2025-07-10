@@ -5,6 +5,7 @@
     "ChatWidget",
     "ChartWidget",
     "CheckBoxWidget",
+    "CopyToClipboardWidget",
     "DateTimePickerWidget",
     "DateTimeRangePickerWidget",
     "DOMElementMapWidget",

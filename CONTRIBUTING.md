@@ -280,7 +280,9 @@ print(f'Widget created: {widget.val}')
 
 ### Widget Testing
 
-#### Python Tests
+**IMPORTANT**: Every new widget must include comprehensive tests for both Python and JavaScript components.
+
+#### Python Tests (Required)
 
 Create `python/tests/test_example.py`:
 
@@ -289,45 +291,232 @@ import pytest
 from numerous.widgets import Example
 
 def test_example_creation():
+    """Test basic widget creation with default values."""
     widget = Example(value="test", label="Test Label")
     assert widget.value == "test"
     assert widget.label == "Test Label"
     assert widget.disabled is False
 
+def test_example_with_custom_options():
+    """Test widget creation with all custom options."""
+    widget = Example(
+        value="custom value",
+        label="Custom Label",
+        disabled=True,
+        class_name="custom-class"
+    )
+    assert widget.value == "custom value"
+    assert widget.label == "Custom Label"
+    assert widget.disabled is True
+    assert widget.class_name == "custom-class"
+
 def test_example_val_property():
+    """Test the val property getter and setter."""
     widget = Example(value="initial")
     assert widget.val == "initial"
     
     widget.val = "updated"
     assert widget.value == "updated"
+    assert widget.val == "updated"
+
+def test_example_callback():
+    """Test callback functionality if widget has callbacks."""
+    callback_calls = []
+    
+    def on_change_callback(change):
+        callback_calls.append(change)
+    
+    widget = Example(
+        value="test",
+        on_change=on_change_callback
+    )
+    
+    # Clear initial calls (initialization triggers observers)
+    callback_calls.clear()
+    
+    # Simulate state change
+    widget.some_state = "new_value"
+    
+    assert len(callback_calls) == 1
+    assert callback_calls[0]["new"] == "new_value"
+
+def test_example_edge_cases():
+    """Test edge cases like empty values, unicode, etc."""
+    # Empty value
+    widget = Example(value="")
+    assert widget.value == ""
+    
+    # Unicode characters
+    unicode_text = "Hello 🌍! Unicode: αβγ"
+    widget = Example(value=unicode_text)
+    assert widget.value == unicode_text
 ```
 
-#### JavaScript Tests
+#### JavaScript Tests (Required)
 
-Create `js/src/components/widgets/__tests__/ExampleWidget.test.tsx`:
+**Create Widget Component Test**: `js/src/components/widgets/__tests__/ExampleWidget.test.tsx`:
 
 ```typescript
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import ExampleWidget from '../ExampleWidget';
 import { Example } from '../../ui/Example';
+import * as ExampleWidgetModule from '../ExampleWidget';
 
-describe('Example Component', () => {
-    test('renders with correct props', () => {
-        const mockOnChange = jest.fn();
-        render(
-            <Example
-                value="test value"
-                label="Test Label"
-                disabled={false}
-                onChange={mockOnChange}
-            />
-        );
-        
-        expect(screen.getByDisplayValue('test value')).toBeInTheDocument();
-        expect(screen.getByText('Test Label')).toBeInTheDocument();
-    });
+// Mock dependencies
+jest.mock('../../ui/Example', () => ({
+  Example: jest.fn(() => null)
+}));
+
+jest.mock('../../css/styles.scss', () => ({}));
+
+jest.mock('@anywidget/react', () => ({
+  createRender: jest.fn(comp => comp),
+  useModelState: jest.fn()
+}));
+
+const mockSetValue = jest.fn();
+
+describe('ExampleWidget', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    
+    (jest.requireMock('@anywidget/react').useModelState)
+      .mockImplementation((key: string) => {
+        switch (key) {
+          case 'value': return ['test value', mockSetValue];
+          case 'label': return ['Test Label'];
+          case 'disabled': return [false];
+          default: return [undefined, jest.fn()];
+        }
+      });
+  });
+  
+  it('renders Example component with correct props', () => {
+    const useCallbackSpy = jest.spyOn(React, 'useCallback');
+    useCallbackSpy.mockImplementation(fn => fn);
+    
+    const ExampleWidgetFunction = (ExampleWidgetModule as any).default.render;
+    const exampleWidget = ExampleWidgetFunction();
+    
+    expect(exampleWidget.type).toBe(Example);
+    expect(exampleWidget.props.value).toBe('test value');
+    expect(exampleWidget.props.label).toBe('Test Label');
+    expect(exampleWidget.props.disabled).toBe(false);
+    expect(typeof exampleWidget.props.onChange).toBe('function');
+    
+    useCallbackSpy.mockRestore();
+  });
+  
+  it('handles value changes correctly', () => {
+    const useCallbackSpy = jest.spyOn(React, 'useCallback');
+    useCallbackSpy.mockImplementation(fn => fn);
+    
+    const ExampleWidgetFunction = (ExampleWidgetModule as any).default.render;
+    const exampleWidget = ExampleWidgetFunction();
+    
+    exampleWidget.props.onChange('new value');
+    
+    expect(mockSetValue).toHaveBeenCalledWith('new value');
+    
+    useCallbackSpy.mockRestore();
+  });
 });
 ```
+
+**Create UI Component Test**: `js/src/components/ui/__tests__/Example.test.tsx`:
+
+```typescript
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { Example } from '../Example';
+
+describe('Example UI Component', () => {
+  const defaultProps = {
+    value: 'test value',
+    label: 'Test Label',
+    disabled: false,
+    onChange: jest.fn(),
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders correctly with default props', () => {
+    render(<Example {...defaultProps} />);
+    
+    expect(screen.getByText('Test Label')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('test value')).toBeInTheDocument();
+  });
+
+  it('handles user interactions', () => {
+    render(<Example {...defaultProps} />);
+    
+    const input = screen.getByDisplayValue('test value');
+    fireEvent.change(input, { target: { value: 'new value' } });
+    
+    expect(defaultProps.onChange).toHaveBeenCalledWith('new value');
+  });
+
+  it('respects disabled state', () => {
+    render(<Example {...defaultProps} disabled={true} />);
+    
+    const input = screen.getByDisplayValue('test value');
+    expect(input).toBeDisabled();
+  });
+
+  it('applies custom className', () => {
+    render(<Example {...defaultProps} className="custom-class" />);
+    
+    const container = screen.getByText('Test Label').parentElement;
+    expect(container).toHaveClass('custom-class');
+  });
+});
+```
+
+#### Testing Guidelines
+
+1. **Python Test Coverage**:
+   - Basic widget creation with default values
+   - Widget creation with all custom options
+   - Property getters and setters (especially `val` property)
+   - Callback functionality (if applicable)
+   - Edge cases: empty values, unicode, special characters
+   - Error handling scenarios
+
+2. **JavaScript Test Coverage**:
+   - Widget component renders UI component correctly
+   - All props are passed through correctly
+   - State changes trigger correct Python model updates
+   - User interactions work as expected
+   - UI component respects all props (disabled, className, etc.)
+   - Visual states and feedback work correctly
+
+3. **Integration Tests**:
+   - Widget can be imported and instantiated
+   - Widget displays in development environment
+   - Callbacks trigger correctly when user interacts
+   - State synchronization between Python and JavaScript
+
+#### Running Tests
+
+```bash
+# Run Python tests for specific widget
+pytest python/tests/test_example.py -v
+
+# Run JavaScript tests for specific widget
+cd js
+npm test -- Example
+
+# Run all tests
+pre-commit run --all-files
+```
+
+#### Test File Naming Convention
+
+- **Python**: `python/tests/test_widget_name.py`
+- **Widget Component**: `js/src/components/widgets/__tests__/WidgetNameWidget.test.tsx`
+- **UI Component**: `js/src/components/ui/__tests__/ComponentName.test.tsx`
 
 ## 🧪 Testing
 

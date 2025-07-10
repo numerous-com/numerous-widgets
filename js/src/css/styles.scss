@@ -2462,5 +2462,110 @@ select::-ms-expand {
   white-space: nowrap;
 }
 
+/* Copy to Clipboard Widget Styles */
+.copy-to-clipboard-container {
+  width: 100%;
+  font-family: "Nunito Sans", sans-serif;
+}
+
+.copy-to-clipboard-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.copy-to-clipboard-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid var(--ui-widget-border-color);
+  border-radius: 4px;
+  background-color: var(--ui-widget-primary-background);
+  color: var(--ui-widget-primary-text);
+  font-size: 14px;
+  font-family: "Nunito Sans", sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 80px;
+  justify-content: center;
+}
+
+.copy-to-clipboard-button:hover:not(:disabled) {
+  background-color: var(--ui-widget-secondary-background);
+  border-color: var(--ui-widget-focus-border);
+}
+
+.copy-to-clipboard-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.copy-to-clipboard-button.success {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+}
+
+.copy-to-clipboard-button.error {
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
+}
+
+.copy-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.copy-icon.spinning {
+  animation: spin 1s linear infinite;
+}
+
+.copy-icon.success {
+  color: #28a745;
+}
+
+.copy-icon.error {
+  color: #dc3545;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.copy-button-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.copy-value-display {
+  flex: 1;
+  min-width: 0;
+}
+
+.copy-value {
+  display: inline-block;
+  padding: 4px 8px;
+  background-color: var(--ui-widget-secondary-background);
+  border: 1px solid var(--ui-widget-border-color);
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: "Courier New", monospace;
+  color: var(--ui-widget-secondary-text);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 
 
