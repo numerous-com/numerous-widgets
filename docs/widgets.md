@@ -74,6 +74,10 @@ The widgets are available in the `widgets` module.
     options:
         show_root_heading: true
 
+## ::: widgets.Text
+    options:
+        show_root_heading: true
+
 ## ::: widgets.Task
     options:
         show_root_heading: true

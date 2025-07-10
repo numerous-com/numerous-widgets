@@ -2426,5 +2426,41 @@ select::-ms-expand {
   font-family: "Nunito Sans", sans-serif !important;
 }
 
+/* Text Widget Styles */
+.text-display-container {
+  width: 100%;
+  font-family: "Nunito Sans", sans-serif;
+}
+
+.text-display {
+  width: 100%;
+  border: 1px solid var(--ui-widget-border-color);
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  background-color: var(--ui-widget-primary-background);
+  color: var(--ui-widget-primary-text);
+  font-family: "Nunito Sans", sans-serif;
+}
+
+.text-display.disabled {
+  background-color: var(--ui-widget-secondary-background);
+  color: var(--ui-widget-secondary-text);
+  cursor: not-allowed;
+}
+
+.text-display-multiline {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.text-display-single {
+  height: 32px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 
 
