@@ -1,5 +1,6 @@
 """Module providing a save & load widget for generic items."""
 
+import inspect
 from collections.abc import Callable
 from typing import Any, Protocol, runtime_checkable
 
@@ -46,13 +47,17 @@ class LoadSaveManager(Protocol):
         """
         ...
 
-    def save_item(self, force: bool = False) -> tuple[bool, str | None]:
+    def save_item(
+        self, force: bool = False, target_name: str | None = None
+    ) -> tuple[bool, str | None]:
         """
         Save the current item.
 
         Args:
             force: Whether to force a save even if the item doesn't appear modified.
                    This is used for Save As operations.
+            target_name: The name of the target item to save to. This is used for
+                        Save As operations to existing items.
 
         Returns:
             A tuple of (success, message). If success is True, the item was saved
@@ -163,12 +168,20 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
                     return True, f"Loaded {self.current_config['label']}"
                 return False, "Configuration not found"
 
-            def save_item(self, force=False):
+            def save_item(self, force=False, target_name=None):
                 if self.current_config and self.current_id:
                     if self.modified or force:
-                        self.configs[self.current_id] = self.current_config.copy()
+                        target_id = self.current_id
+                        if target_name:
+                            # Find the target by name
+                            for config_id, config in self.configs.items():
+                                if config["label"] == target_name:
+                                    target_id = config_id
+                                    break
+
+                        self.configs[target_id] = self.current_config.copy()
                         self.modified = False
-                        return True, "Saved successfully"
+                        return True, f"Saved to {target_name or 'current item'}"
                     return True, None
                 return False, "No configuration to save"
 
@@ -198,13 +211,16 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
     disable_load = traitlets.Bool(default_value=False).tag(sync=True)
     disable_save = traitlets.Bool(default_value=False).tag(sync=True)
     disable_save_as = traitlets.Bool(default_value=False).tag(sync=True)
+    disable_rename = traitlets.Bool(default_value=False).tag(sync=True)
     disable_save_reason = traitlets.Unicode(allow_none=True).tag(sync=True)
+    disable_rename_reason = traitlets.Unicode(allow_none=True).tag(sync=True)
     default_new_item_name = traitlets.Unicode(default_value="New Item").tag(sync=True)
 
     # Action triggers (from Widget to Python)
     do_save = traitlets.Bool(default_value=False).tag(sync=True)
     do_reset = traitlets.Bool(default_value=False).tag(sync=True)
     do_load = traitlets.Bool(default_value=False).tag(sync=True)
+    do_rename = traitlets.Bool(default_value=False).tag(sync=True)
 
     # Response traits (from Python to Widget)
     action_note = traitlets.Unicode(allow_none=True).tag(sync=True)
@@ -216,14 +232,22 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
     create_new_item = traitlets.Bool(default_value=False).tag(sync=True)
     is_save_as = traitlets.Bool(default_value=False).tag(sync=True)
 
+    # For tracking save-as target
+    save_as_target_name = traitlets.Unicode(allow_none=True).tag(sync=True)
+
+    # For rename operations
+    rename_item_id = traitlets.Unicode(allow_none=True).tag(sync=True)
+    rename_new_name = traitlets.Unicode(allow_none=True).tag(sync=True)
+
     _esm = ESM
     _css = CSS
 
     # Type aliases for readability
     LoadCallback = Callable[[str], tuple[bool, str | None]]
-    SaveCallback = Callable[[bool], tuple[bool, str | None]]
+    SaveCallback = Callable[..., tuple[bool, str | None]]
     ResetCallback = Callable[[], tuple[bool, str | None]]
     NewItemCallback = Callable[[str, bool], tuple[dict[str, Any], bool, str | None]]
+    RenameCallback = Callable[[str, str], tuple[bool, str | None]]
 
     def __init__(
         self,
@@ -232,11 +256,14 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
         on_save: SaveCallback | None = None,
         on_reset: ResetCallback | None = None,
         on_new: NewItemCallback | None = None,
+        on_rename: RenameCallback | None = None,
         selected_item_id: str | None = None,
         disable_load: bool = False,
         disable_save: bool = False,
         disable_save_as: bool = False,
+        disable_rename: bool = False,
         disable_save_reason: str | None = None,
+        disable_rename_reason: str | None = None,
         default_new_item_name: str = "New Item",
         modified: bool = False,
         modification_note: str | None = None,
@@ -250,16 +277,24 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
             on_load: Callback when an item is selected to load.
                 Should return (success, note).
             on_save: Callback when save is requested.
-                Should return (success, note).
+                Should return (success, note). Can optionally accept a target_name
+                parameter for Save As operations.
             on_reset: Callback when reset is requested.
                 Should return (success, note).
-            on_new: Callback when new item creation is requested.
+            on_new: Callback when new item creation is requested. This is called for
+                both "New Item" creation and "Save As" operations. The is_save_as
+                parameter distinguishes between the two cases.
                 Should return (item, success, note).
+            on_rename: Callback when item rename is requested.
+                Should return (success, note).
             selected_item_id: ID of the item to select initially.
             disable_load: Whether to disable the load button.
             disable_save: Whether to disable the save button.
             disable_save_as: Whether to disable the "Save As" button.
+            disable_rename: Whether to disable the rename functionality.
             disable_save_reason: Optional reason why saving is disabled
+                (shown as tooltip).
+            disable_rename_reason: Optional reason why renaming is disabled
                 (shown as tooltip).
             default_new_item_name: Default name for new items.
             modified: Whether the current item is modified.
@@ -274,6 +309,12 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
         self._on_save_callback = on_save
         self._on_reset_callback = on_reset
         self._on_new_callback = on_new
+        self._on_rename_callback = on_rename
+
+        # Check if save callback supports target_name parameter
+        self._save_callback_supports_target = self._check_save_callback_signature(
+            on_save
+        )
 
         # Initialize the widget
         super().__init__()
@@ -287,11 +328,36 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
         self.disable_load = disable_load
         self.disable_save = disable_save
         self.disable_save_as = disable_save_as
+        self.disable_rename = disable_rename
         self.disable_save_reason = disable_save_reason
+        self.disable_rename_reason = disable_rename_reason
         self.default_new_item_name = default_new_item_name
 
         self.is_modified = modified
         self.modification_note = modification_note
+
+    def _check_save_callback_signature(self, callback: SaveCallback | None) -> bool:
+        """
+        Check if the save callback supports the target_name parameter.
+
+        Args:
+            callback: The save callback to check.
+
+        Returns:
+            True if the callback supports target_name parameter, False otherwise.
+
+        """
+        if callback is None:
+            return False
+
+        try:
+            sig = inspect.signature(callback)
+            params = list(sig.parameters.keys())
+        except (ValueError, TypeError):
+            return False
+        else:
+            # Check if callback has target_name parameter
+            return "target_name" in params
 
     def set_items(self, items: list[dict[str, Any]]) -> None:
         """
@@ -340,6 +406,18 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
         self.disable_save_as = disable
         self.disable_save_reason = reason
 
+    def set_disable_rename(self, disable: bool, reason: str | None = None) -> None:
+        """
+        Set whether rename is disabled and optionally provide a reason.
+
+        Args:
+            disable: Whether to disable the rename functionality.
+            reason: Optional reason why renaming is disabled (shown as tooltip).
+
+        """
+        self.disable_rename = disable
+        self.disable_rename_reason = reason
+
     def set_selected_item(self, item_id: str | None) -> None:
         """
         Set the selected item by ID.
@@ -350,6 +428,16 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
         """
         self.selected_item_id = item_id
 
+    def set_save_as_target(self, target_name: str | None) -> None:
+        """
+        Set the target name for Save As operations.
+
+        Args:
+            target_name: The name of the target item to save to.
+
+        """
+        self.save_as_target_name = target_name
+
     @traitlets.observe("do_save")  # type: ignore[misc]
     def _do_save_changed(self, change: traitlets.Bunch) -> None:
         """Handle save requests from the widget."""
@@ -357,7 +445,25 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
             return
 
         if self._on_save_callback is not None:
-            success, note = self._handle_save(save_forced=False)
+            # Get the target name if this is a Save As operation
+            target_name = self.save_as_target_name
+
+            # Find the target name by looking up the selected item
+            if (target_name is None or target_name == "") and self.selected_item_id:
+                target_item = next(
+                    (
+                        item
+                        for item in self.items
+                        if item["id"] == self.selected_item_id
+                    ),
+                    None,
+                )
+                if target_item:
+                    target_name = target_item["label"]
+
+            success, note = self._handle_save(
+                save_forced=False, target_name=target_name
+            )
         else:
             success, note = True, None
 
@@ -368,8 +474,9 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
         if success:
             self.set_modified(False)
 
-        # Reset the flag
+        # Reset the flags
         self.do_save = False
+        self.save_as_target_name = None
 
     @traitlets.observe("do_reset")  # type: ignore[misc]
     def _do_reset_changed(self, change: traitlets.Bunch) -> None:
@@ -413,6 +520,44 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
 
         # Reset the flag
         self.do_load = False
+
+    @traitlets.observe("do_rename")  # type: ignore[misc]
+    def _do_rename_changed(self, change: traitlets.Bunch) -> None:
+        """Handle rename requests from the widget."""
+        if not change.new:
+            return
+
+        if (
+            self._on_rename_callback is not None
+            and self.rename_item_id
+            and self.rename_new_name
+        ):
+            success, note = self._on_rename_callback(
+                self.rename_item_id, self.rename_new_name
+            )
+            self.success_status = success
+            self.action_note = note
+
+            # Update the item in the list if rename was successful
+            if success:
+                updated_items = []
+                for item in self.items:
+                    if item["id"] == self.rename_item_id:
+                        updated_item = item.copy()
+                        updated_item["label"] = self.rename_new_name
+                        updated_items.append(updated_item)
+                    else:
+                        updated_items.append(item)
+                self.items = updated_items
+                self.search_results = updated_items.copy()
+        else:
+            self.success_status = False
+            self.action_note = "Rename failed: missing callback or parameters"
+
+        # Reset the flags
+        self.do_rename = False
+        self.rename_item_id = None
+        self.rename_new_name = None
 
     @traitlets.observe("create_new_item")  # type: ignore[misc]
     def _create_new_item_changed(self, change: traitlets.Bunch) -> None:
@@ -465,15 +610,11 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
         try:
             return self._on_new_callback(name, is_save_as)
         except TypeError:
-            # If two parameters fail, try with just one parameter
-            try:
-                return self._on_new_callback(name)  # type: ignore[call-arg]
-            except (TypeError, ValueError, AttributeError, KeyError) as e:
-                # Handle specific exceptions that might occur during item creation
-                import uuid
+            # Callback might not support the second parameter, create default item
+            import uuid
 
-                new_item = {"id": str(uuid.uuid4()), "label": name}
-                return new_item, False, f"Failed to create new item: {e!s}"
+            new_item = {"id": str(uuid.uuid4()), "label": name}
+            return new_item, False, "Callback doesn't support is_save_as parameter"
 
     def _handle_successful_item_creation(
         self, new_item: dict[str, Any], is_save_as: bool
@@ -543,13 +684,16 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
         if not save_note:
             self.action_note = f"Created '{new_item['label']}'"
 
-    def _handle_save(self, save_forced: bool = False) -> tuple[bool, str | None]:
+    def _handle_save(
+        self, save_forced: bool = False, target_name: str | None = None
+    ) -> tuple[bool, str | None]:
         """
         Call the save callback.
 
         Args:
             save_forced: Whether to force a save even if the item doesn't
               appear modified. This is used for Save As operations.
+            target_name: The name of the target item to save to, for Save As operations.
 
         Returns:
             A tuple of (success, note).
@@ -558,5 +702,9 @@ class LoadSaveWidget(anywidget.AnyWidget):  # type: ignore[misc]
         if self._on_save_callback is None:
             return True, None
 
-        # Always pass the force parameter - assume the callback supports it
+        # Call the callback with appropriate parameters
+        if self._save_callback_supports_target:
+            # New-style callback that supports target_name
+            return self._on_save_callback(save_forced, target_name)
+        # Legacy callback that only supports force parameter
         return self._on_save_callback(save_forced)

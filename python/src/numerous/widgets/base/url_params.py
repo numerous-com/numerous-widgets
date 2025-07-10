@@ -87,7 +87,7 @@ class URLParams(anywidget.AnyWidget):  # type: ignore[misc]
     def _handle_browser_updates(self, change: traitlets.Bunch) -> None:
         """Handle updates coming from the browser."""
         with self._update_lock:
-            trait_name = cast(str, change.name)
+            trait_name = cast("str", change.name)
             new_value = change.new
 
             if (
@@ -95,16 +95,16 @@ class URLParams(anywidget.AnyWidget):  # type: ignore[misc]
                 and self._on_params_change is not None
             ):
                 with suppress(TypeError, ValueError):
-                    self._on_params_change(cast(dict[str, str], new_value))
+                    self._on_params_change(cast("dict[str, str]", new_value))
             elif (
                 trait_name == "browser_path_segments"
                 and self._on_path_change is not None
             ):
-                self._on_path_change(cast(list[str], new_value))
+                self._on_path_change(cast("list[str]", new_value))
             elif (
                 trait_name == "browser_current_url" and self._on_url_change is not None
             ):
-                self._on_url_change(cast(str, new_value))
+                self._on_url_change(cast("str", new_value))
 
     def get_query_param(self, key: str, default: str = "") -> str:
         """
@@ -118,7 +118,7 @@ class URLParams(anywidget.AnyWidget):  # type: ignore[misc]
             The parameter value or the default
 
         """
-        params = cast(dict[str, str], self.browser_query_params)
+        params = cast("dict[str, str]", self.browser_query_params)
         return params.get(key, default)
 
     def get_query_params(self) -> dict[str, str]:
@@ -129,7 +129,7 @@ class URLParams(anywidget.AnyWidget):  # type: ignore[misc]
             Dictionary of all query parameters
 
         """
-        return cast(dict[str, str], dict(self.browser_query_params))
+        return cast("dict[str, str]", dict(self.browser_query_params))
 
     def get_path_segments(self) -> list[str]:
         """
@@ -139,7 +139,7 @@ class URLParams(anywidget.AnyWidget):  # type: ignore[misc]
             List of URL path segments
 
         """
-        return cast(list[str], list(self.browser_path_segments))
+        return cast("list[str]", list(self.browser_path_segments))
 
     def get_path_segment(self, index: int, default: str = "") -> str:
         """
@@ -153,7 +153,7 @@ class URLParams(anywidget.AnyWidget):  # type: ignore[misc]
             The segment value or the default
 
         """
-        segments = cast(list[str], self.browser_path_segments)
+        segments = cast("list[str]", self.browser_path_segments)
         if 0 <= index < len(segments):
             return segments[index]
         return default
@@ -167,7 +167,7 @@ class URLParams(anywidget.AnyWidget):  # type: ignore[misc]
             parameters
 
         """
-        return cast(str, self.browser_current_url)
+        return cast("str", self.browser_current_url)
 
     def get_base_url(self) -> str:
         """
@@ -177,4 +177,4 @@ class URLParams(anywidget.AnyWidget):  # type: ignore[misc]
             The base URL (e.g., 'https://example.com')
 
         """
-        return cast(str, self.browser_base_url)
+        return cast("str", self.browser_base_url)

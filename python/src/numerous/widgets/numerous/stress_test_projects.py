@@ -79,7 +79,7 @@ def main() -> None:
             scenarios={},
         )
 
-        logging.info(f"\nCreating project {p+1}/{NUM_PROJECTS}")
+        logging.info(f"\nCreating project {p + 1}/{NUM_PROJECTS}")
         save_project(project)
 
         for s in range(SCENARIOS_PER_PROJECT):
@@ -91,7 +91,7 @@ def main() -> None:
                 files=None,
             )
 
-            logging.info(f"  Creating scenario {s+1}/{SCENARIOS_PER_PROJECT}")
+            logging.info(f"  Creating scenario {s + 1}/{SCENARIOS_PER_PROJECT}")
             save_scenario(project, scenario)
 
             for d in range(DOCUMENTS_PER_SCENARIO):
@@ -110,7 +110,9 @@ def main() -> None:
         f"Created {NUM_PROJECTS} projects with {total_documents} total documents"
     )
     logging.info(f"Total time: {duration:.2f} seconds")
-    logging.info(f"Average time per document: {(duration/total_documents):.3f} seconds")
+    logging.info(
+        f"Average time per document: {(duration / total_documents):.3f} seconds"
+    )
 
 
 if __name__ == "__main__":

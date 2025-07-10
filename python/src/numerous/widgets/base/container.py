@@ -41,7 +41,7 @@ def container(
     style_str = "; ".join(style_parts)
 
     return f"""
-        <div class="widget-container{" "+classes}" style="{style_str}">
+        <div class="widget-container{" " + classes}" style="{style_str}">
             {content_html}
         </div>
     """

@@ -34,7 +34,7 @@ def card(
     flex_direction = "row" if direction.lower() == "row" else "column"
 
     return f"""
-    <div class="card" style="display: {'none' if hidden else 'block'};">
+    <div class="card" style="display: {"none" if hidden else "block"};">
         <div class="card-body" style="display: flex; flex-direction: {flex_direction};">
             {title_html}
             {content_html}

@@ -18,7 +18,9 @@ interface LoadSaveContextType {
   disableLoad: boolean;
   disableSave: boolean;
   disableSaveAs: boolean;
+  disableRename: boolean;
   disableSaveReason: string | null;
+  disableRenameReason: string | null;
   defaultNewItemName: string;
   searchResults: Item[];
   actionNote: string | null;
@@ -56,13 +58,16 @@ export const LoadSaveProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [disableLoad] = useModelState<boolean>("disable_load");
   const [disableSave] = useModelState<boolean>("disable_save");
   const [disableSaveAs] = useModelState<boolean>("disable_save_as");
+  const [disableRename] = useModelState<boolean>("disable_rename");
   const [disableSaveReason] = useModelState<string | null>("disable_save_reason");
+  const [disableRenameReason] = useModelState<string | null>("disable_rename_reason");
   const [defaultNewItemName] = useModelState<string>("default_new_item_name");
   
   // Action triggers
   const [doSave, setDoSave] = useModelState<boolean>("do_save");
   const [doReset, setDoReset] = useModelState<boolean>("do_reset");
   const [doLoad, setDoLoad] = useModelState<boolean>("do_load");
+  const [doRename, setDoRename] = useModelState<boolean>("do_rename");
   
   // Response states
   const [actionNote, setActionNote] = useModelState<string | null>("action_note");
@@ -72,6 +77,9 @@ export const LoadSaveProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [newItemName, setNewItemName] = useModelState<string | null>("new_item_name");
   const [createNewItem, setCreateNewItem] = useModelState<boolean>("create_new_item");
   const [isSaveAs, setIsSaveAs] = useModelState<boolean>("is_save_as");
+  
+  // Save as target name
+  const [saveAsTargetName, setSaveAsTargetName] = useModelState<string | null>("save_as_target_name");
 
   // Local state for tracking operations
   const [saveInProgress, setSaveInProgress] = React.useState(false);
@@ -81,6 +89,10 @@ export const LoadSaveProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [currentSearchQuery, setCurrentSearchQuery] = useState('');
   // Local state for search results (no Python sync)
   const [clientSearchResults, setClientSearchResults] = useState<Item[]>([]);
+
+  // Rename operations
+  const [renameItemId, setRenameItemId] = useModelState<string | null>("rename_item_id");
+  const [renameNewName, setRenameNewName] = useModelState<string | null>("rename_new_name");
 
   // Handle effects for save operations
   useEffect(() => {
@@ -156,10 +168,16 @@ export const LoadSaveProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const handleSaveAsWithId = useCallback((itemId: string) => {
     saveTargetRef.current = itemId;
+    // Find the target item's label to pass to the backend
+    const targetItem = items?.find((item: Item) => item.id === itemId);
+    if (targetItem) {
+      // Set the target name for the backend to use
+      setSaveAsTargetName(targetItem.label);
+    }
     setSelectedItemId(itemId);
     setSaveInProgress(true);
     setDoSave(true);
-  }, [setSelectedItemId, setDoSave]);
+  }, [setSelectedItemId, setDoSave, items, setSaveAsTargetName]);
 
   // Search handler only updates local state, no Python communication
   const handleSearch = useCallback((query: string) => {
@@ -167,22 +185,10 @@ export const LoadSaveProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, []);
 
   const handleRename = useCallback((itemId: string, newName: string) => {
-    const updatedItems = items?.map(item => 
-      item.id === itemId ? { ...item, label: newName } : item
-    );
-    
-    if (updatedItems) {
-      setItems(updatedItems);
-      
-      // Also update local search results to reflect the name change
-      setClientSearchResults(prev => 
-        prev.map(item => item.id === itemId ? { ...item, label: newName } : item)
-      );
-    }
-    
-    setActionNote(`Item renamed to "${newName}"`);
-    setSuccessStatus(true);
-  }, [items, setItems, setActionNote, setSuccessStatus]);
+    setRenameItemId(itemId);
+    setRenameNewName(newName);
+    setDoRename(true);
+  }, [setRenameItemId, setRenameNewName, setDoRename]);
 
   const value = {
     // States
@@ -193,7 +199,9 @@ export const LoadSaveProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     disableLoad: disableLoad || false,
     disableSave: disableSave || false,
     disableSaveAs: disableSaveAs || false,
+    disableRename: disableRename || false,
     disableSaveReason,
+    disableRenameReason,
     defaultNewItemName: defaultNewItemName || "New Item",
     searchResults: clientSearchResults,
     actionNote,
