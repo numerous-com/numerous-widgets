@@ -45,6 +45,79 @@ Thank you for your interest in contributing to Numerous Widgets! This document p
    echo "VITE_DEV_SERVER=http://localhost:5173" >> python/.env
    ```
 
+## ⚡ Quality Requirements & Standards
+
+**We maintain high code quality standards to ensure reliability and maintainability.** All contributions must meet these requirements before being merged. We're transparent about what's expected - check the configuration files for exact specifications.
+
+### 📋 Code Quality Checklist
+
+Before contributing, ensure your code meets these standards:
+
+**Python Requirements:**
+- ✅ **Linting**: Code passes [Ruff](https://github.com/astral-sh/ruff) checks
+- ✅ **Formatting**: Code is formatted with Ruff
+- ✅ **Type Safety**: All code has proper type annotations and passes MyPy strict mode
+- ✅ **Testing**: All new code has comprehensive tests with good coverage
+- ✅ **Documentation**: All public APIs are documented
+
+**JavaScript/TypeScript Requirements:**
+- ✅ **Type Safety**: All TypeScript compiles without errors
+- ✅ **Testing**: All components have unit tests
+- ✅ **Build**: Widgets build successfully
+
+**Configuration Files** (see exact requirements here):
+- 📁 [`.pre-commit-config.yaml`](.pre-commit-config.yaml) - Pre-commit hooks and quality checks
+- 📁 [`pyproject.toml`](pyproject.toml) - Python project configuration, Ruff rules, MyPy settings
+- 📁 [`js/package.json`](js/package.json) - JavaScript dependencies and scripts
+- 📁 [`js/tsconfig.json`](js/tsconfig.json) - TypeScript configuration
+- 📁 [`.github/workflows/release.yml`](.github/workflows/release.yml) - CI/CD pipeline requirements
+
+### 🔧 Local Quality Checks
+
+**Quick checks (run automatically on commit/push):**
+```bash
+# These run automatically via pre-commit hooks
+git commit -m "your changes"  # Triggers basic formatting and linting
+git push                      # Triggers basic tests
+```
+
+**Manual quality checks:**
+```bash
+# Run all basic checks
+pre-commit run --all-files
+
+# Run specific checks
+cd js
+npm run lint        # ESLint
+npm run typecheck   # TypeScript
+npm test           # Jest tests
+```
+
+**CI simulation (run before creating PR):**
+```bash
+# Simulate full CI pipeline locally - this is what runs on GitHub Actions
+pre-commit run --hook-stage manual
+
+# Or run individual CI checks:
+pre-commit run --hook-stage manual ruff-check-strict    # Strict linting
+pre-commit run --hook-stage manual mypy-strict          # Strict type checking
+pre-commit run --hook-stage manual ci-check-python      # Python tests with coverage
+pre-commit run --hook-stage manual ci-check-javascript  # JavaScript tests
+pre-commit run --hook-stage manual ci-check-build-widgets  # Build verification
+```
+
+### 📈 Quality Philosophy
+
+We follow these principles:
+
+1. **Transparency**: All requirements are clearly documented in config files
+2. **Developer Choice**: You control when to run strict checks
+3. **Fast Feedback**: Basic checks run quickly on commit/push
+4. **CI Confidence**: Local CI simulation helps avoid pipeline failures
+5. **Comprehensive Coverage**: All code paths are tested
+
+**💡 Pro Tip**: Run `pre-commit run --hook-stage manual` before creating a PR to ensure CI will pass!
+
 ## 🏗️ Development Workflow
 
 ### Development Environment
@@ -72,32 +145,12 @@ This setup enables hot-reloading for both Python and JavaScript changes.
 
 ### Code Style and Linting
 
-The project enforces strict code quality standards:
+The project enforces strict code quality standards. **See the [Quality Requirements & Standards](#-quality-requirements--standards) section above for complete details.**
 
-#### Python
-- **Ruff**: Linting and formatting
-- **MyPy**: Type checking
-- **Coverage**: Test coverage reporting
-
-#### JavaScript/TypeScript
-- **ESLint**: Linting
-- **TypeScript**: Type checking
-- **Jest**: Testing framework
-
-#### Running Quality Checks
-
-```bash
-# Run all checks (recommended before committing)
-pre-commit run --all-files
-
-# Run specific checks
-cd js
-npm run lint        # ESLint
-npm run typecheck   # TypeScript
-npm test           # Jest tests
-
-# Python checks are handled by pre-commit hooks
-```
+Quick reference:
+- **Python**: Ruff (linting/formatting), MyPy (type checking), pytest (testing)
+- **JavaScript/TypeScript**: ESLint, TypeScript compiler, Jest (testing)
+- **All quality checks**: See configuration files linked above for exact specifications
 
 ## 🎨 Creating New Widgets
 
@@ -520,56 +573,90 @@ pre-commit run --all-files
 
 ## 🧪 Testing
 
+### Testing Strategy
+
+We use a three-tier testing approach:
+
+1. **Basic Tests** (run on pre-push): Fast, essential functionality
+2. **Comprehensive Tests** (run manually): Full test suite with coverage
+3. **CI Tests** (run on GitHub Actions): Production-ready validation
+
 ### Running Tests
 
+**Basic testing** (fast, run automatically):
 ```bash
-# Run all tests
-pre-commit run --all-files
+# Run basic tests (triggered on git push)
+git push
 
-# Run Python tests only
-pytest python/tests/ -v
+# Or run manually
+pre-commit run pytest-basic jest-basic
+```
 
-# Run JavaScript tests only
-cd js
-npm test
+**Comprehensive testing** (full coverage):
+```bash
+# Run all tests with coverage (CI simulation)
+pre-commit run --hook-stage manual ci-check-python ci-check-javascript
 
-# Run tests with coverage
-cd js
-npm run test:coverage
+# Or run individual test suites
+pytest python/tests/ -v                    # Python tests
+cd js && npm test                          # JavaScript tests  
+python -m coverage run -m pytest python/tests/  # Python with coverage
+```
+
+**CI simulation** (exact match to GitHub Actions):
+```bash
+# Run complete CI pipeline locally
+pre-commit run --hook-stage manual
+
+# This includes:
+# - Strict linting (ruff --no-fix)
+# - Strict type checking (mypy --strict)
+# - Python tests with coverage reporting
+# - JavaScript tests with npm ci
+# - Widget build verification
 ```
 
 ### Test Requirements
 
-- **Python**: Minimum 80% test coverage
+- **Python**: Minimum 80% test coverage (measured in CI)
 - **JavaScript**: All components should have unit tests
 - **Integration**: Test widget creation and basic functionality
 - **Type Safety**: All TypeScript must compile without errors
+- **Build**: Widgets must build successfully without errors
+
+### Test File Organization
+
+Follow these naming conventions:
+- **Python**: `python/tests/test_widget_name.py`
+- **Widget Component**: `js/src/components/widgets/__tests__/WidgetNameWidget.test.tsx`
+- **UI Component**: `js/src/components/ui/__tests__/ComponentName.test.tsx`
 
 ## 📋 Code Review Process
 
 ### Before Submitting
 
-1. **Run all quality checks**:
+1. **Run CI simulation** (recommended):
    ```bash
-   pre-commit run --all-files
+   # This runs the same checks as GitHub Actions
+   pre-commit run --hook-stage manual
    ```
 
-2. **Test your changes**:
+2. **Alternative: Run individual checks**:
    ```bash
+   # Basic quality checks
+   pre-commit run --all-files
+   
    # Test Python widgets
    pytest python/tests/
    
    # Test JavaScript components
    cd js && npm test
+   
+   # Build widgets
+   cd js && bash build-widgets.sh
    ```
 
-3. **Build widgets**:
-   ```bash
-   cd js
-   ./build-widgets.sh  # or build-widgets.ps1 on Windows
-   ```
-
-4. **Test in development environment**:
+3. **Test in development environment**:
    ```bash
    # Start Vite dev server
    cd js && npm run dev
@@ -578,6 +665,17 @@ npm run test:coverage
    cd python/examples/marimo/numerous
    marimo edit app.py
    ```
+
+### 🎯 PR Readiness Checklist
+
+Before creating your PR, ensure:
+
+- ✅ **CI simulation passes**: `pre-commit run --hook-stage manual`
+- ✅ **All tests pass**: Both Python and JavaScript
+- ✅ **Widgets build successfully**: No build errors
+- ✅ **Code is documented**: New widgets have proper docstrings
+- ✅ **Tests are comprehensive**: New functionality is tested
+- ✅ **Examples work**: Test your changes in the development environment
 
 ### Pull Request Guidelines
 

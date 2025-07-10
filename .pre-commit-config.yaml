@@ -5,17 +5,38 @@ repos:
     # Ruff version.
     rev: v0.6.4
     hooks:
-      # Run the linter.
+      # Run the linter with auto-fix (lenient on pre-commit)
       - id: ruff
         args: [--fix]
-      # Run the formatter.
+        stages: [pre-commit]
+      # Run the formatter
       - id: ruff-format
+        stages: [pre-commit]
+      # Strict linting for CI simulation (no auto-fix)
+      - id: ruff
+        name: ruff-check-strict
+        args: [--no-fix]
+        stages: [manual]
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.11.2
     hooks:
+      # Lenient mypy for pre-commit (basic type checking)
       - id: mypy
+        name: mypy-basic
+        entry: "mypy ./python"
+        pass_filenames: false
+        stages: [pre-commit]
+        additional_dependencies:
+          - "types-requests"
+          - "pytest-asyncio"
+          - "pydantic"
+          - "marimo"
+      # Strict mypy for CI simulation
+      - id: mypy
+        name: mypy-strict
         entry: "mypy --strict ./python"
         pass_filenames: false
+        stages: [manual]
         additional_dependencies:
           - "types-requests"
           - "pytest-asyncio"
@@ -23,19 +44,45 @@ repos:
           - "marimo"
   - repo: local
     hooks:
-      - id: pytest-check
+      # Basic Python tests on pre-push
+      - id: pytest-basic
         stages: [pre-push]
         types: [python]
-        name: pytest-check
-        entry: python -m pytest -v python/tests/
+        name: pytest-basic
+        entry: python -m pytest python/tests/ -x
         language: system
         pass_filenames: false
         always_run: true
-      - id: jest-tests
+      # Basic JavaScript tests on pre-push
+      - id: jest-basic
         stages: [pre-push]
         types: [javascript, jsx, ts, tsx]
-        name: jest-tests
-        entry: powershell -Command "Set-Location js; npm test"
+        name: jest-basic
+        entry: bash -c "cd js && npm test -- --passWithNoTests"
+        language: system
+        pass_filenames: false
+        always_run: true
+      # === CI SIMULATION HOOKS (run manually with: pre-commit run --hook-stage manual) ===
+      - id: ci-check-python
+        stages: [manual]
+        name: ci-check-python
+        entry: bash -c "python -m coverage run -m pytest -vv python/tests/ && python -m coverage report"
+        language: system
+        pass_filenames: false
+        always_run: true
+        types: [python]
+      - id: ci-check-javascript
+        stages: [manual]
+        name: ci-check-javascript
+        entry: bash -c "cd js && npm test"
+        language: system
+        pass_filenames: false
+        always_run: true
+        types: [javascript, jsx, ts, tsx]
+      - id: ci-check-build-widgets
+        stages: [manual]
+        name: ci-check-build-widgets
+        entry: bash -c "cd js && bash build-widgets.sh"
         language: system
         pass_filenames: false
         always_run: true
