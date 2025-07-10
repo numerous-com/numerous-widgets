@@ -2,6 +2,42 @@
 
 
 
+## v0.3.0 (2025-07-10)
+
+### Documentation
+
+* docs(CONTRIBUTING): Expand contributing guidelines with detailed setup and development instructions
+
+- Enhanced the contributing document to provide a comprehensive overview of prerequisites, initial setup, development workflow, and testing procedures.
+- Included step-by-step instructions for creating new widgets, along with testing requirements and code review processes.
+- Added sections on widget architecture, testing strategies, and community engagement resources. ([`433dcc1`](https://github.com/numerous-com/numerous-widgets/commit/433dcc134c69eba180e5d4d5363b45f7305a8a37))
+
+### Feature
+
+* feat(pre-commit): Enhance pre-commit configuration and add quality requirements to CONTRIBUTING.md
+
+- Introduced a new `.coverage` file for coverage reporting.
+- Updated `.pre-commit-config.yaml` to include additional hooks for strict linting and type checking, as well as basic testing for both Python and JavaScript.
+- Expanded the CONTRIBUTING.md file with a detailed quality requirements section, outlining code quality standards for Python and JavaScript contributions.
+- Added a testing strategy section to clarify the approach for testing and CI simulation. ([`c00c7f6`](https://github.com/numerous-com/numerous-widgets/commit/c00c7f644fd77b8142dec5701f5451cf42f3f225))
+
+* feat(CopyToClipboardWidget): Add CopyToClipboard widget with comprehensive tests and styles
+
+- Introduced the CopyToClipboard widget in the widgets module, including options for show_root_heading.
+- Updated widget configuration to include CopyToClipboardWidget.
+- Added CSS styles for the CopyToClipboard widget to enhance its display and usability.
+- Created comprehensive tests for both Python and JavaScript components, covering various scenarios and edge cases.
+- Expanded documentation to include testing guidelines and integration instructions for the new widget. ([`a4ad55e`](https://github.com/numerous-com/numerous-widgets/commit/a4ad55e2867379bbfecc04ec99e9879261e68605))
+
+### Fix
+
+* fix(TextWidget): Add TextWidget implementation and styles
+
+- Introduced the TextWidget in the widgets module with options for show_root_heading.
+- Updated widget configuration to include TextWidget.
+- Added CSS styles for TextWidget to enhance its display and usability, including support for single and multiline text displays. ([`ddebb52`](https://github.com/numerous-com/numerous-widgets/commit/ddebb5237d1665d1ada4e11d8ec82972d3e7e714))
+
+
 ## v0.2.18 (2025-07-10)
 
 ### Fix
