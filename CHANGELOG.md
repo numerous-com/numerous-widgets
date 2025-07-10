@@ -2,6 +2,19 @@
 
 
 
+## v0.2.18 (2025-07-10)
+
+### Fix
+
+* fix(LoadSaveWidget): Enhance LoadSaveWidget functionality with granular permission controls and improved save-as support (#6)
+
+- Updated the Save &amp; Load widget documentation to reflect new features including granular permission controls for loading, saving, and renaming items.
+- Implemented support for target names in save and save-as operations, allowing users to specify target names during save actions.
+- Enhanced the configuration manager to support user roles, enabling dynamic permission updates for UI elements.
+- Improved user feedback mechanisms with tooltips and confirmation dialogs for better accessibility.
+- Added comprehensive tests for new functionalities, including rename operations and save-as workflows. ([`9d0a5a4`](https://github.com/numerous-com/numerous-widgets/commit/9d0a5a46197df491aad88da2a23c99c351b8d12b))
+
+
 ## v0.2.17 (2025-06-25)
 
 ### Fix
