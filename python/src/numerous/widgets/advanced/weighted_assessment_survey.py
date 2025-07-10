@@ -189,7 +189,7 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
                 ]
 
         # Explicitly cast to SurveyData to satisfy MyPy
-        typed_survey_data = cast(SurveyData, survey_data_to_use)
+        typed_survey_data = cast("SurveyData", survey_data_to_use)
 
         # Store the complete survey data privately
         self._complete_survey_data = typed_survey_data
@@ -227,7 +227,7 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
         essential information needed for displaying the survey, removing sensitive
         or unnecessary data.
         """
-        survey_data_dict = cast(dict[str, Any], survey_data)
+        survey_data_dict = cast("dict[str, Any]", survey_data)
 
         filtered_data: SurveyType = {
             "title": survey_data_dict.get("title", ""),
@@ -344,7 +344,7 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
             # Merge submitted results with complete data
             return self._merge_results_with_complete_data()
         # Cast survey_data to SurveyData
-        return cast(SurveyData, self.survey_data)
+        return cast("SurveyData", self.survey_data)
 
     def _update_questions(
         self,
@@ -367,8 +367,8 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
                 if complete_question.get("id") == question_id:
                     found_question = True
                     # Cast to dict for key iteration
-                    complete_question_dict = cast(dict[str, Any], complete_question)
-                    question_dict = cast(dict[str, Any], question)
+                    complete_question_dict = cast("dict[str, Any]", complete_question)
+                    question_dict = cast("dict[str, Any]", question)
                     # Copy all properties from the submitted question
                     # Make sure to preserve key properties like categoryTypes
                     category_types = complete_question_dict.get("categoryTypes", {})
@@ -398,8 +398,8 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
         merged_data = self._complete_survey_data.copy()
 
         # Cast to dict[str, Any] to allow for dynamic key access
-        merged_data_dict = cast(dict[str, Any], merged_data)
-        survey_data_dict = cast(dict[str, Any], self.survey_data)
+        merged_data_dict = cast("dict[str, Any]", merged_data)
+        survey_data_dict = cast("dict[str, Any]", self.survey_data)
 
         # Create a map of existing group IDs for faster lookup
         existing_group_ids = {
@@ -443,8 +443,8 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
 
                 if complete_group.get("id") == group_id:
                     found_group = True
-                    complete_group_dict = cast(dict[str, Any], complete_group)
-                    group_dict = cast(dict[str, Any], group)
+                    complete_group_dict = cast("dict[str, Any]", complete_group)
+                    group_dict = cast("dict[str, Any]", group)
 
                     # Update group properties that might have been modified
                     for key in group_dict:
@@ -476,12 +476,12 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
                 ) and not group.get("questions", [])
 
                 if not is_default_empty:
-                    group_copy = cast(Group, group.copy())
+                    group_copy = cast("Group", group.copy())
                     updated_groups.append(group_copy)
                     # Ensure merged_data["groups"] exists
                     merged_data_dict["groups"] = merged_data_dict.get("groups", [])
                     merged_data_dict_groups = cast(
-                        list[Group], merged_data_dict["groups"]
+                        "list[Group]", merged_data_dict["groups"]
                     )
                     merged_data_dict_groups.append(group_copy)
 
@@ -489,10 +489,10 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
         merged_data_dict["groups"] = updated_groups
 
         # Process categories if present
-        self._merge_categories(cast(SurveyData, merged_data_dict))
+        self._merge_categories(cast("SurveyData", merged_data_dict))
 
         # Return as a properly typed SurveyData
-        return cast(SurveyData, merged_data_dict)
+        return cast("SurveyData", merged_data_dict)
 
     def _merge_categories(self, merged_data: SurveyData) -> None:  # noqa: C901, PLR0912
         """
@@ -503,8 +503,8 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
         if "categories" not in self.survey_data:
             return
 
-        survey_data_dict = cast(dict[str, Any], self.survey_data)
-        merged_data_dict = cast(dict[str, Any], merged_data)
+        survey_data_dict = cast("dict[str, Any]", self.survey_data)
+        merged_data_dict = cast("dict[str, Any]", merged_data)
 
         # Ensure survey_data_dict has categories and it's a list
         survey_categories = survey_data_dict.get("categories", [])
@@ -609,10 +609,10 @@ class WeightedAssessmentSurvey(anywidget.AnyWidget):  # type: ignore[misc]
         self.enable_do_not_know = enable
 
         # Update both survey data dictionaries
-        survey_data_dict = cast(dict[str, Any], self.survey_data)
+        survey_data_dict = cast("dict[str, Any]", self.survey_data)
         survey_data_dict["enable_do_not_know"] = enable
 
         # Also update the complete survey data if using survey mode
         if self._survey_mode:
-            complete_data_dict = cast(dict[str, Any], self._complete_survey_data)
+            complete_data_dict = cast("dict[str, Any]", self._complete_survey_data)
             complete_data_dict["enable_do_not_know"] = enable

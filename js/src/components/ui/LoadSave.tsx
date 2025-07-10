@@ -615,7 +615,9 @@ export const LoadSave: React.FC = () => {
     disableLoad,
     disableSave,
     disableSaveAs,
+    disableRename,
     disableSaveReason,
+    disableRenameReason,
     defaultNewItemName,
     searchResults,
     actionNote,
@@ -762,9 +764,10 @@ export const LoadSave: React.FC = () => {
             
             {selectedItemId && (
               <button
-                className="dropdown-item"
+                className={`dropdown-item ${disableRename ? 'disabled' : ''}`}
                 onClick={() => setIsRenameDialogOpen(true)}
-                title="Rename current item"
+                disabled={disableRename}
+                title={disableRename && disableRenameReason ? disableRenameReason : "Rename current item"}
               >
                 Rename
               </button>
